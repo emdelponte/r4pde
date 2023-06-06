@@ -13,10 +13,16 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/DSAF.html</loc>
+  </url>
+  <url>
     <loc>/reference/DSI.html</loc>
   </url>
   <url>
     <loc>/reference/FusariumBanana.html</loc>
+  </url>
+  <url>
+    <loc>/reference/RustSoybean.html</loc>
   </url>
   <url>
     <loc>/reference/doublets.test.html</loc>
@@ -26,5 +32,8 @@
   </url>
   <url>
     <loc>/reference/oruns.test.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_DSAF.html</loc>
   </url>
 </urlset>
