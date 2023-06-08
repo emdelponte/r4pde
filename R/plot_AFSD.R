@@ -31,12 +31,12 @@ plot_AFSD <- function(df) {
 
   # Calculate the centroid of each cluster
   centroids <- df %>%
-    group_by(foci_id) %>%
+    group_by(focus_id) %>%
     summarise(x = mean(x), y = mean(y), .groups = "drop")
 
   # Create scatter plot
   ggplot(df, aes(x = x, y = y)) +
     geom_tile(fill = "green", color =  "black") +  # color points by cluster
-    geom_text(data = centroids, aes(label = foci_id), size = 5, vjust = -0.5) +
+    geom_text(data = centroids, aes(label = focus_id), size = 5, vjust = -0.5) +
     theme_minimal()
 }
