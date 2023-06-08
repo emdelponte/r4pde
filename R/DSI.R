@@ -1,4 +1,4 @@
-#' DSI
+#' Disease severity index
 #' @description
 #' Calculates the Disease Severity Index
 #' @param unit A numeric vector representing the unit of measure

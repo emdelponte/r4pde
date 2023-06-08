@@ -1,6 +1,6 @@
-#' Plot Dynamics and Structure Analysif of Foci (plot_DSAF)
+#' Plot ASFD
 #'
-#' This function creates a tile plot of the foci (cluster) identified by the DSAF function.
+#' This function creates a tile plot of the foci (cluster) identified by the AFSD function.
 #' It colors each cell in a foci and labels the centroid of each cluster with the foci ID.
 #' The 'ggplot2' package is used for the plot, and will be automatically installed if not already present.
 #'
@@ -15,15 +15,15 @@
 #'                  y = sample(1:100, 500, replace = TRUE),
 #'                  i = sample(0:1, 500, replace = TRUE, prob = c(0.7, 0.3)))
 #'
-#' # Perform the DSAF
-#' result <- DSAF(df)
+#' # Perform the AFSD
+#' result <- AFSD(df)
 #' # Plot the foci
-#' plot_DSAF(result[[3]])
+#' plot_AFSD(result[[3]])
 #'
 #' @importFrom ggplot2 ggplot geom_tile theme_minimal geom_text
 #' @importFrom dplyr group_by summarise
 #' @export
-plot_DSAF <- function(df) {
+plot_AFSD <- function(df) {
   if (!require("ggplot2")) {
     install.packages("ggplot2")
     library("ggplot2")

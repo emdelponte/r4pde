@@ -2,7 +2,7 @@
 % Please edit documentation in R/DSI.R
 \name{DSI}
 \alias{DSI}
-\title{DSI}
+\title{Disease severity index}
 \usage{
 DSI(unit, class, max)
 }
