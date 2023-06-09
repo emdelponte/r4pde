@@ -40,5 +40,5 @@ oruns.test <- function(x) {
                    c("randomness"))
 
   # Return the results as a list
-  return(list(U = U, EU = EU, pvalue = pvalue, result = result))
+  return(list(U = U, EU = EU, Z = Z, pvalue = pvalue, result = result))
 }

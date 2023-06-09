@@ -46,7 +46,7 @@ doublets.test <- function(x) {
                    c("randomness"))
 
   # Return the results as a list
-  return(list(Db = Db, EDb = EDb, pvalue = pvalue, result = result))
+  return(list(Db = Db, EDb = EDb, ZDb = ZDb, pvalue = pvalue, result = result))
 
 
 
