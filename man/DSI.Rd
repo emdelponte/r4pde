@@ -2,26 +2,32 @@
 % Please edit documentation in R/DSI.R
 \name{DSI}
 \alias{DSI}
-\title{Disease severity index}
+\title{Calculate the Disease Severity Index (DSI) (class for each unit)}
 \usage{
 DSI(unit, class, max)
 }
 \arguments{
-\item{unit}{A numeric vector representing the unit of measure}
+\item{unit}{A vector representing the units.}
 
-\item{class}{A factor vector representing the class labels}
+\item{class}{A vector representing the classes corresponding to the units.}
 
-\item{max}{A numeric scalar representing the maximum possible value of the unit of measure}
+\item{max}{A numeric value representing the maximum possible class value.}
 }
 \value{
-A numeric scalar representing the DSI
+Returns a single numeric value representing the DSI.
 }
 \description{
-Calculates the Disease Severity Index
+This function calculates the Disease Severity Index (DSI) based on the provided unit,
+class, and maximum class value. The DSI is computed by aggregating the classes,
+calculating weights by multiplying the frequency of each class by the class itself,
+and then dividing the sum of these weights by the product of the total number of
+entries and the maximum class value, then multiplying by 100.
 }
 \examples{
-unit <- c(1:12)
-class <- c(2,3,1,1,3,4,5,0,2,5,2,1)
-ratings <- data.frame(unit, class)
-DSI(unit = ratings$unit, class = ratings$class, max = 6)
+# Example usage:
+unit <- c(1, 2, 3, 4, 5, 6)
+class <- c(1, 2, 1, 2, 3, 1)
+max <- 3
+DSI(unit, class, max)
+
 }
