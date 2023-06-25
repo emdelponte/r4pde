@@ -21,13 +21,10 @@ Soybean rust severity
   }
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
-}
-\source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+Text
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+Del Ponte et al. (2006)
 }
 \examples{
 data(RustSoybean)
