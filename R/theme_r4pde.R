@@ -1,7 +1,4 @@
 # Load necessary libraries
-library(cowplot)
-library(ggplot2)
-
 #' Custom ggplot2 theme based on cowplot::theme_half_open
 #'
 #' This function creates a new ggplot2 theme by modifying the cowplot::theme_half_open theme.

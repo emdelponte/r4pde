@@ -1,14 +1,17 @@
+
+
 #' Fit Gradient Models to Data
 #'
 #' This function fits three gradient models (exponential, power, and modified power) to given data.
 #' It then ranks the models based on their R-squared values and returns diagnostic plots for each model.
 #'
-#' @param data A dataframe containing the data, with columns "x" for the distance and "Y" for the disease count or measurement.
+#' @param data A dataframe containing the data, with columns "x" representing distances and
+#' "Y" representing the corresponding measurements or counts.
 #' @param C A constant to be used in the modified power model. Defaults to 1.
 #'
 #' @return A list containing:
 #' \itemize{
-#'   \item{\code{data}}{The input data.}
+#'   \item{\code{data}}{The input data, which will include an additional column 'mod_x'.}
 #'   \item{\code{results_table}}{A table of the model parameters and R-squared values.}
 #'   \item{\code{plot_exponential}}{Diagnostic plot for the exponential model.}
 #'   \item{\code{plot_power}}{Diagnostic plot for the power model.}
@@ -18,6 +21,15 @@
 #'   \item{\code{plot_modified_power_original}}{Plot of the original data with the modified power model fit.}
 #' }
 #'
+#' @examples
+#' x <- c(0.8, 1.6, 2.4, 3.2, 4, 7.2, 12, 15.2, 21.6, 28.8)
+#' Y <- c(184.9, 113.3, 113.3, 64.1, 25, 8, 4.3, 2.5, 1, 0.8)
+#' grad1 <- data.frame(x = x, Y = Y)
+#' mg <- fit_gradients(grad1, C = 0.4)
+#' mg$plot_power_original +
+#'   labs(title = "", x = "Distance from focus (m)", y = "Count of lesions")
+#'
+#' @export
 
 
 fit_gradients <- function(data, C = 1) {
