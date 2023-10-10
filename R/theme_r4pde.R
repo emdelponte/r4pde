@@ -11,11 +11,7 @@ library(ggplot2)
 #'
 #' @return A ggplot2 theme object.
 #' @export
-#' @examples
-#' gg <- ggplot(mtcars, aes(x = mpg, y = wt)) +
-#'   geom_point() +
-#'   theme_r4pde()
-#' print(gg)
+
 theme_r4pde <- function(font_size = 16) {
   base_theme <- cowplot::theme_half_open(font_size = font_size)
   modified_theme <- base_theme +

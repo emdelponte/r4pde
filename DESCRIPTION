@@ -15,5 +15,8 @@ Imports:
     dplyr,
     ggplot2,
     igraph,
-    tidyr
+    tidyr,
+    lubridate, 
+    purrr, 
+    tibble
 LazyData: true

@@ -16,9 +16,3 @@ A ggplot2 theme object.
 This function creates a new ggplot2 theme by modifying the cowplot::theme_half_open theme.
 It sets a custom font size and changes the panel background color to gray96.
 }
-\examples{
-gg <- ggplot(mtcars, aes(x = mpg, y = wt)) +
-  geom_point() +
-  theme_r4pde()
-print(gg)
-}
