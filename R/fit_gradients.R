@@ -45,14 +45,26 @@ fit_gradients <- function(data, C = 1) {
   # Extract parameters and R-squared
   get_params <- function(model) {
     s <- summary(model)
-    a <- coef(model)[1]
-    b <- coef(model)[2]
-    R2 <- s$r.squared
-    a_back_transformed <- exp(a)
-    se_a <- s$coefficients["(Intercept)", "Std. Error"]
-    se_b <- s$coefficients["x", "Std. Error"]
+    a <- round(coef(model)[1], 3)
+    b <- round(coef(model)[2], 3)
+    R2 <- round(s$r.squared, 3)
+    a_back_transformed <- round(exp(a), 3)
 
-    return(list(a = a, a_back = a_back_transformed, b = b, R2 = R2, se_a = se_a, se_b = se_b))
+    # Get standard errors for a and b
+    se_a <- round(s$coefficients["(Intercept)", "Std. Error"], 3)
+    predictor_name <- names(coef(model))[2]  # Get the name of the predictor
+    se_b <- round(s$coefficients[predictor_name, "Std. Error"], 3)
+
+    # Get significance symbols for a and b
+    sig_symbol <- function(p_val) {
+      if (p_val < 0.01) return("**")
+      else if (p_val < 0.05) return("*")
+      else return("")
+    }
+    sig_a <- sig_symbol(s$coefficients["(Intercept)", "Pr(>|t|)"])
+    sig_b <- sig_symbol(s$coefficients[predictor_name, "Pr(>|t|)"])
+
+    return(list(a = a, se_a = se_a, sig_a = sig_a,  b = b, se_b = se_b, sig_b = sig_b, a_back = a_back_transformed, R2 = R2))
   }
 
 
@@ -67,8 +79,7 @@ fit_gradients <- function(data, C = 1) {
     Modified_Power = unlist(mod_power_params)
   )
 
-  # Rank the models by R-squared
-  results <- results[order(-results[, "R2"]), ]
+
 
   # Create plots
   plot_exponential <- ggplot(data, aes(x = x, y = log(Y))) +
@@ -112,3 +123,4 @@ fit_gradients <- function(data, C = 1) {
               plot_power_original = plot_power_original,
               plot_modified_power_original = plot_modified_power_original))
 }
+
