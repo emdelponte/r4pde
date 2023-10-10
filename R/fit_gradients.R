@@ -1,5 +1,4 @@
 
-
 #' Fit Gradient Models to Data
 #'
 #' This function fits three gradient models (exponential, power, and modified power) to given data.
@@ -50,8 +49,12 @@ fit_gradients <- function(data, C = 1) {
     b <- coef(model)[2]
     R2 <- s$r.squared
     a_back_transformed <- exp(a)
-    return(list(a = a, a_back = a_back_transformed, b = b, R2 = R2))
+    se_a <- s$coefficients["(Intercept)", "Std. Error"]
+    se_b <- s$coefficients["x", "Std. Error"]
+
+    return(list(a = a, a_back = a_back_transformed, b = b, R2 = R2, se_a = se_a, se_b = se_b))
   }
+
 
   exp_params <- get_params(exponential)
   power_params <- get_params(power)
@@ -66,9 +69,6 @@ fit_gradients <- function(data, C = 1) {
 
   # Rank the models by R-squared
   results <- results[order(-results[, "R2"]), ]
-
-
-
 
   # Create plots
   plot_exponential <- ggplot(data, aes(x = x, y = log(Y))) +
@@ -86,7 +86,6 @@ fit_gradients <- function(data, C = 1) {
     geom_point() +
     geom_smooth(method = "lm", se = FALSE, color = "black") +
     ggtitle("Modified Power Model")
-
 
   # Create original plots with model fits
   plot_exponential_original <- ggplot(data, aes(x = x, y = Y)) +
