@@ -92,17 +92,17 @@ fit_gradients <- function(data, C = 1) {
   plot_exponential_original <- ggplot(data, aes(x = x, y = Y)) +
     geom_point() +
     stat_function(fun = function(x) exp_params$a_back * exp(exp_params$b * x), color = "black") +
-    ggtitle("Exponential Model (Original)")
+    ggtitle("Exponential Model Fit")
 
   plot_power_original <- ggplot(data, aes(x = x, y = Y)) +
     geom_point() +
     stat_function(fun = function(x) power_params$a_back * (x^power_params$b), color = "black") +
-    ggtitle("Power Model (Original)")
+    ggtitle("Power Model Fit")
 
   plot_modified_power_original <- ggplot(data, aes(x = x, y = Y)) +
     geom_point() +
     stat_function(fun = function(x) mod_power_params$a_back * ((x + C)^mod_power_params$b), color = "black") +
-    ggtitle("Modified Power Model (Original)")
+    ggtitle("Modified Power Model Fit")
 
   return(list(data = data,
               results_table = results,
