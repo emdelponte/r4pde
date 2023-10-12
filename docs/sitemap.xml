@@ -16,9 +16,6 @@
     <loc>/reference/AFSD.html</loc>
   </url>
   <url>
-    <loc>/reference/DSAF.html</loc>
-  </url>
-  <url>
     <loc>/reference/DSI.html</loc>
   </url>
   <url>
@@ -40,9 +37,6 @@
     <loc>/reference/SpatialRandom.html</loc>
   </url>
   <url>
-    <loc>/reference/VirusPotato.html</loc>
-  </url>
-  <url>
     <loc>/reference/WhiteMoldSoybean.html</loc>
   </url>
   <url>
@@ -59,9 +53,6 @@
   </url>
   <url>
     <loc>/reference/plot_AFSD.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_DSAF.html</loc>
   </url>
   <url>
     <loc>/reference/theme_r4pde.html</loc>
