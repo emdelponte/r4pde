@@ -36,7 +36,7 @@ plot_AFSD <- function(df) {
 
   # Create scatter plot
   ggplot(df, aes(x = x, y = y)) +
-    geom_tile(fill = "green", color =  "black") +  # color points by cluster
+    geom_tile(fill = "gray70", color =  "black") +  # color points by cluster
     geom_text(data = centroids, aes(label = focus_id), size = 5, vjust = -0.5) +
     theme_minimal()
 }
