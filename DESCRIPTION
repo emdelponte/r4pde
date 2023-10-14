@@ -18,5 +18,7 @@ Imports:
     tidyr,
     lubridate, 
     purrr, 
-    tibble
+    tibble, 
+    interval,
+    survival
 LazyData: true
