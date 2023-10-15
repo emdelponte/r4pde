@@ -32,10 +32,10 @@ oruns.test <- function(x) {
   Z = (U - EU) / sU
 
   # pvalue is the p-value of the Z-score
-  pvalue <- (pnorm(abs(Z), lower.tail = FALSE))
+  pvalue <- (1 - pnorm(abs(Z), lower.tail = TRUE))
 
   # result is "clustering" if the Z-score is less than 1.64, otherwise it is "randomness"
-  result <- ifelse(Z < 1.64,
+  result <- ifelse(Z < -1.64,
                    c("aggregation or clustering"),
                    c("randomness"))
 

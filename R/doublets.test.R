@@ -38,7 +38,7 @@ doublets.test <- function(x) {
   ZDb = (Db - EDb) / SDb
 
   # pvalue is the p-value of the Z-score
-  pvalue <- (pnorm(abs(ZDb), lower.tail = FALSE))
+  pvalue <- (1- pnorm(abs(ZDb), lower.tail = TRUE))
 
   # result is "aggregation or clustering" if the Z-score is greater than 1.64, otherwise it is "randomness"
   result <- ifelse(abs(ZDb) >= 1.64,
