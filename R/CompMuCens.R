@@ -45,7 +45,21 @@
 
 CompMuCens <- function(dat, scale, grade=T, ckData=F){
   #Check if the required packages are installed in the working environment
-
+  #Check if the required packages are installed in the working environment
+  if (class(try(library(interval))) =="try-error") {
+    if (class(try(library(Icens))) =="try-error") {
+      if (!require("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+      #Installing the Icens package, which is required by the Interval package
+      BiocManager::install("Icens")
+    }
+    #Installing the interval package
+    install.packages ("interval", repos="http://cloud.r-project.org")
+  }
+  if (class(try(library(dplyr))) =="try-error") {
+    #Installing the dplyr package.
+    install.packages("dplyr", repos="http://cloud.r-project.org")
+  }
 
   # Converting data into a censored data format
   if (grade==T) {

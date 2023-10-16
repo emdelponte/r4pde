@@ -2,7 +2,7 @@
 \alias{DidymellaWatermelon}
 \title{Spatial data on gummy stem blight of watermelon}
 \description{
- Data form the paper "Temporal and spatial dynamics of watermelon gummy stem blight epidemics".
+ Data from the paper 'Temporal and spatial dynamics of watermelon gummy stem blight epidemics'.
 }
 \usage{data("DidymellaWatermelon")}
 \format{
