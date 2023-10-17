@@ -135,13 +135,7 @@ join_count <- function(matrix_data) {
   # You can also return this message as a value, in addition to other statistical details, if needed.
   return(message)
 }
-matrix_data <- matrix(c(1,1,1,0,0,
-                        1,1,1,0,0,
-                        1,1,1,0,0,
-                        1,1,1,0,0,
-                        0,0,0,0,0), ncol = 5, byrow = TRUE)
 
-test_result <- join_count(matrix_data)
 
 
 
