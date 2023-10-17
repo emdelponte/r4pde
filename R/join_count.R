@@ -1,49 +1,46 @@
-
 #' Test for Spatial Join Count Statistics
 #'
 #' @description
-#' The function `join_count` calculates spatial statistics for a matrix.
-#' It identifies patterns of aggregation for values in a binary matrix based on
-#' join count statistics. The results determine whether the observed spatial
-#' arrangement is aggregated, random, or uniform regarding the presence of 1s
-#' ("D") and 0s ("H").
+#' The function `join_count` calculates spatial join count statistics for a binary matrix,
+#' identifying patterns of aggregation or randomness.
 #'
-#' @param matrix_data A binary matrix (with elements 0 and 1) representing the
-#'   spatial distribution of two types of points. Rows and columns of the matrix
-#'   indicate coordinates while the 0s and 1s represent different categories of
-#'   observations.
+#' @param matrix_data A binary matrix (with elements 0 and 1) representing the spatial distribution
+#'   of two types of points where 0 = healthy plant (H) and 1 = disease plant (D). This could reflect
 #'
-#' @return A list containing several statistical measures:
+#' @return A comprehensive, rich-text formatted string of results that includes:
 #'   \itemize{
-#'     \item Observed_01_10: The number of observed 01 or 10 sequences.
-#'     \item Observed_11: The number of observed 11 sequences.
-#'     \item Expected_ER_01: The expected number of 01 or 10 sequences under
-#'           random distribution.
-#'     \item Expected_ER_11: The expected number of 11 sequences under random
-#'           distribution.
-#'     \item sR_01: Standard deviation for 01 or 10 sequences.
-#'     \item sR_11: Standard deviation for 11 sequences.
-#'     \item ZHD: The Z-score for 01 or 10 sequences.
-#'     \item ZDD: The Z-score for 11 sequences.
-#'     \item PatternHD: Descriptive result for 01 or 10 sequences - "Aggregated"
-#'           or "Not Aggregated".
-#'     \item PatternDD: Descriptive result for 11 sequences - "Aggregated" or
-#'           "Not Aggregated".
+#'     \item Statistical counts of specific binary sequences (e.g., "01 or 10", "11")
+#'     \item Expected counts under the assumption of Complete Spatial Randomness (CSR)
+#'     \item Standard deviations and Z-scores (ZHD for "01 or 10" sequences, ZDD for "11" sequences)
+#'     \item Interpretation of whether the spatial distribution for each sequence type is
+#'           "Aggregated" or "Not Aggregated" based on Z-scores
+#'     \item A summary explaining the implications of these statistics and patterns
 #'   }
+#'   The return value aims to provide a clear understanding of the spatial arrangement's
+#'   characteristics, aiding in further spatial analysis or research.
 #'
 #' @details
-#' The function first calculates the count of specific binary sequences in the
-#' matrix both horizontally and vertically. It then computes expected values
-#' and standard deviations based on the spatial arrangement dimensions and uses
-#' these for Z-score calculations to identify the pattern of the matrix.
+#' The function conducts an analysis by first counting the occurrence of specific sequences
+#' ("01 or 10" and "11" - equivalent to HD and DD) in the binary matrix.
+#'  It then calculates expected values, standard
+#' deviations, and Z-scores to determine the spatial randomness or aggregation. The analysis
+#' considers both horizontal and vertical adjacency (rook case) in the matrix.
 #'
 #' @examples
+#' \dontrun{
 #' matrix_data <- matrix(c(1,1,1,0,0,
 #'                         1,1,1,0,0,
 #'                         1,1,1,0,0,
 #'                         1,1,1,0,0,
-#'                         0,0,0,0,0), ncol = 5, byrow = TRUE)
-#' join_count(matrix_data)
+#'                         0,0,0,0,0),
+#'                         ncol = 5, byrow = TRUE)
+#' result_text <- join_count(matrix_data)
+#' cat(result_text)  # Print the rich text output
+#' }
+#'
+#' @references
+#' Madden, L. V., Hughes, G., & van den Bosch, F. (2007). The Study of Plant Disease Epidemics.
+#'   The American Phytopathological Society.
 #'
 #' @export
 join_count <- function(matrix_data) {
@@ -106,12 +103,47 @@ join_count <- function(matrix_data) {
 
   pattern2 <- ifelse(ZDD > 1.64, "Aggregated", "Not Aggregated")
 
-  # Return results
-  return(list(Observed_01_10 = results$One_Zero_or_Zero_One, Observed_11 = results$One_One,
-              Expected_ER_01 = ER_01, Expected_ER_11 = ER_11,
-              sR_01 = sR_01, sR_11 = sR_11,
-              ZHD = ZHD, ZDD = ZDD, PatternHD = pattern1, PatternDD = pattern2))
+  # Construct the result sentence based on Z-scores.
+  spatial_pattern_HD <- ifelse(ZHD < -1.64, "aggregated", "not aggregated")
+  spatial_pattern_DD <- ifelse(ZDD > 1.64, "aggregated", "not aggregated")
+
+  # Prepare a rich, informative text output.
+  message <- paste(
+    "Join Count Analysis of Spatial Patterns of Plant Diseases:\n",
+    "-------------------------------------\n",
+    "This analysis is based on the assessment of spatial patterns within the provided matrix data, focusing on the occurrences of 'HD' (pair of healthy and diseased plant) and 'DD' (pair of diseased plants) sequences.\n\n",
+    "1) 'HD' Sequences:\n",
+    sprintf("   - Observed Count: %d\n", results$One_Zero_or_Zero_One),
+    sprintf("   - Expected Count : %.2f\n", ER_01),
+    sprintf("   - Standard Deviation: %.2f\n", sR_01),
+    sprintf("   - Z-score: %.2f\n", ZHD),
+    sprintf("Based on the ZHD score, the spatial pattern for '01 or 10' sequences is '%s'.\n\n", spatial_pattern_HD),
+    "2) 'DD' Sequences:\n",
+    sprintf("   - Observed Count: %d\n", results$One_One),
+    sprintf("   - Expected Count: %.2f\n", ER_11),
+    sprintf("   - Standard Deviation: %.2f\n", sR_11),
+    sprintf("   - Z-score: %.2f\n", ZDD),
+    sprintf("Based on the Z score, the spatial pattern for 'DD' sequences is '%s'.\n", spatial_pattern_DD),
+    "-----------------------------------------------------\n",
+    "Implications:\n",
+    "The Z-scores indicate the deviation from Complete Spatial Randomness (CSR). A pattern is considered 'aggregated' if the Z-score is significantly low/high (Z <-1.64 or Z > 1.64), suggesting a clustering of data points. Conversely, 'random' suggests a random or uniform distribution. The example data and calculations performed here were based on the specifications and formulations provided in The Study of Plant Diseaes book by Madden et al. (2007)."
+  )
+
+  # Print the message for immediate visibility in the console.
+  cat(message)
+
+  # You can also return this message as a value, in addition to other statistical details, if needed.
+  return(message)
 }
+matrix_data <- matrix(c(1,1,1,0,0,
+                        1,1,1,0,0,
+                        1,1,1,0,0,
+                        1,1,1,0,0,
+                        0,0,0,0,0), ncol = 5, byrow = TRUE)
+
+test_result <- join_count(matrix_data)
+
+
 
 
 

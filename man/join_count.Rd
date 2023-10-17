@@ -7,49 +7,47 @@
 join_count(matrix_data)
 }
 \arguments{
-\item{matrix_data}{A binary matrix (with elements 0 and 1) representing the
-spatial distribution of two types of points. Rows and columns of the matrix
-indicate coordinates while the 0s and 1s represent different categories of
-observations.}
+\item{matrix_data}{A binary matrix (with elements 0 and 1) representing the spatial distribution
+of two types of points where 0 = healthy plant (H) and 1 = disease plant (D). This could reflect}
 }
 \value{
-A list containing several statistical measures:
+A comprehensive, rich-text formatted string of results that includes:
 \itemize{
-\item Observed_01_10: The number of observed 01 or 10 sequences.
-\item Observed_11: The number of observed 11 sequences.
-\item Expected_ER_01: The expected number of 01 or 10 sequences under
-random distribution.
-\item Expected_ER_11: The expected number of 11 sequences under random
-distribution.
-\item sR_01: Standard deviation for 01 or 10 sequences.
-\item sR_11: Standard deviation for 11 sequences.
-\item ZHD: The Z-score for 01 or 10 sequences.
-\item ZDD: The Z-score for 11 sequences.
-\item PatternHD: Descriptive result for 01 or 10 sequences - "Aggregated"
-or "Not Aggregated".
-\item PatternDD: Descriptive result for 11 sequences - "Aggregated" or
-"Not Aggregated".
+\item Statistical counts of specific binary sequences (e.g., "01 or 10", "11")
+\item Expected counts under the assumption of Complete Spatial Randomness (CSR)
+\item Standard deviations and Z-scores (ZHD for "01 or 10" sequences, ZDD for "11" sequences)
+\item Interpretation of whether the spatial distribution for each sequence type is
+"Aggregated" or "Not Aggregated" based on Z-scores
+\item A summary explaining the implications of these statistics and patterns
 }
+The return value aims to provide a clear understanding of the spatial arrangement's
+characteristics, aiding in further spatial analysis or research.
 }
 \description{
-The function \code{join_count} calculates spatial statistics for a matrix.
-It identifies patterns of aggregation for values in a binary matrix based on
-join count statistics. The results determine whether the observed spatial
-arrangement is aggregated, random, or uniform regarding the presence of 1s
-("D") and 0s ("H").
+The function \code{join_count} calculates spatial join count statistics for a binary matrix,
+identifying patterns of aggregation or randomness.
 }
 \details{
-The function first calculates the count of specific binary sequences in the
-matrix both horizontally and vertically. It then computes expected values
-and standard deviations based on the spatial arrangement dimensions and uses
-these for Z-score calculations to identify the pattern of the matrix.
+The function conducts an analysis by first counting the occurrence of specific sequences
+("01 or 10" and "11" - equivalent to HD and DD) in the binary matrix.
+It then calculates expected values, standard
+deviations, and Z-scores to determine the spatial randomness or aggregation. The analysis
+considers both horizontal and vertical adjacency (rook case) in the matrix.
 }
 \examples{
+\dontrun{
 matrix_data <- matrix(c(1,1,1,0,0,
                         1,1,1,0,0,
                         1,1,1,0,0,
                         1,1,1,0,0,
-                        0,0,0,0,0), ncol = 5, byrow = TRUE)
-join_count(matrix_data)
+                        0,0,0,0,0),
+                        ncol = 5, byrow = TRUE)
+result_text <- join_count(matrix_data)
+cat(result_text)  # Print the rich text output
+}
 
+}
+\references{
+Madden, L. V., Hughes, G., & van den Bosch, F. (2007). The Study of Plant Disease Epidemics.
+The American Phytopathological Society.
 }
