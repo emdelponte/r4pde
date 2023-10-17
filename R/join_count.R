@@ -111,20 +111,19 @@ join_count <- function(matrix_data) {
   message <- paste(
     "Join Count Analysis of Spatial Patterns of Plant Diseases:\n",
     "----------------------------------------------------------\n",
-    "This analysis is based on the assessment of spatial patterns within the provided matrix data, focusing on the occurrences of 'HD' (pair of healthy and diseased plant) and 'DD' (pair of diseased plants) sequences. Specifications and formulations as shown in Madden et al. (2007).\n\n",
-    "1) 'HD' Sequences:\n",
+   "1) 'HD' Sequences:\n",
     sprintf("   - Observed Count: %d\n", results$One_Zero_or_Zero_One),
     sprintf("   - Expected Count : %.2f\n", ER_01),
     sprintf("   - Standard Deviation: %.2f\n", sR_01),
     sprintf("   - Z-score: %.2f\n", ZHD),
-    sprintf("Based on the Z score, the pattern for 'HD' sequences is '%s'.\n\n", spatial_pattern_HD),
+    sprintf("The pattern for 'HD' sequences is '%s'.\n\n", spatial_pattern_HD),
     "2) 'DD' Sequences:\n",
     sprintf("   - Observed Count: %d\n", results$One_One),
     sprintf("   - Expected Count: %.2f\n", ER_11),
     sprintf("   - Standard Deviation: %.2f\n", sR_11),
     sprintf("   - Z-score: %.2f\n", ZDD),
-    sprintf("Based on the Z score, the pattern for 'DD' sequences is '%s'.\n", spatial_pattern_DD),
-    "-----------------------------------------------------\n"
+    sprintf("The pattern for 'DD' sequences is '%s'.\n", spatial_pattern_DD),
+    "----------------------------------------------------------\n"
 
   )
 
