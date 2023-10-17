@@ -5,11 +5,11 @@
 #' @param x A numeric vector representing the input data
 #' @return A list with elements U (number of runs), EU (expected number of runs), pvalue, and result (either "clustering" or "randomness").
 #' @examples
-#' oruns.test(c(1, 0, 1, 1, 0, 1, 0, 0, 1, 1))
+#' oruns_test(c(1, 0, 1, 1, 0, 1, 0, 0, 1, 1))
 #'
 #' @importFrom stats pnorm
 #' @export
-oruns.test <- function(x) {
+oruns_test <- function(x) {
   # S is the input data
   S <- x
 

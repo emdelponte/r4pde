@@ -52,7 +52,13 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/join_count.html</loc>
+  </url>
+  <url>
     <loc>/reference/oruns.test.html</loc>
+  </url>
+  <url>
+    <loc>/reference/oruns_test.html</loc>
   </url>
   <url>
     <loc>/reference/plot_AFSD.html</loc>
