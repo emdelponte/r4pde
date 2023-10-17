@@ -34,11 +34,21 @@ oruns_test <- function(x) {
   # pvalue is the p-value of the Z-score
   pvalue <- (1 - pnorm(abs(Z), lower.tail = TRUE))
 
-  # result is "clustering" if the Z-score is less than 1.64, otherwise it is "randomness"
   result <- ifelse(Z < -1.64,
                    c("aggregation or clustering"),
                    c("randomness"))
+  message <- paste(
+    "Ordinary Runs Test of Data Sequence:\n",
+    "-------------------------------------\n",
+    sprintf("Total Number of Runs (U): %d\n", U),
+    sprintf("Expected Number of Runs (EU): %.2f\n", EU),
+    sprintf("Standard Deviation of Runs (sU): %.2f\n", sU),
+    sprintf("Z-score: %.2f\n", Z),
+    sprintf("P-value: %.4f\n\n", pvalue),
+    "Interpretation:\n",
+    sprintf("Based on the Z-score, the sequence exhibits '%s'.\n", result)
 
-  # Return the results as a list
-  return(list(U = U, EU = EU, Z = Z, pvalue = pvalue, result = result))
+  )
+
+  cat(message)
 }
