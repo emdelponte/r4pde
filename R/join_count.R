@@ -5,8 +5,8 @@
 #' identifying patterns of aggregation or randomness.
 #'
 #' @param matrix_data A binary matrix (with elements 0 and 1) representing the spatial distribution
-#'   of two types of points where 0 = healthy plant (H) and 1 = disease plant (D). This could reflect
-#'
+#'   of two types of points: 0 for healthy plants (H) and 1 for diseased plants (D). This matrix reflects
+#'   the geographical distribution or layout of plants in the studied area.
 #' @return A comprehensive, rich-text formatted string of results that includes:
 #'   \itemize{
 #'     \item Statistical counts of specific binary sequences (e.g., "01 or 10", "11")
@@ -110,30 +110,29 @@ join_count <- function(matrix_data) {
   # Prepare a rich, informative text output.
   message <- paste(
     "Join Count Analysis of Spatial Patterns of Plant Diseases:\n",
-    "-------------------------------------\n",
-    "This analysis is based on the assessment of spatial patterns within the provided matrix data, focusing on the occurrences of 'HD' (pair of healthy and diseased plant) and 'DD' (pair of diseased plants) sequences.\n\n",
+    "----------------------------------------------------------\n",
+    "This analysis is based on the assessment of spatial patterns within the provided matrix data, focusing on the occurrences of 'HD' (pair of healthy and diseased plant) and 'DD' (pair of diseased plants) sequences. Specifications and formulations as shown in Madden et al. (2007).\n\n",
     "1) 'HD' Sequences:\n",
     sprintf("   - Observed Count: %d\n", results$One_Zero_or_Zero_One),
     sprintf("   - Expected Count : %.2f\n", ER_01),
     sprintf("   - Standard Deviation: %.2f\n", sR_01),
     sprintf("   - Z-score: %.2f\n", ZHD),
-    sprintf("Based on the ZHD score, the spatial pattern for '01 or 10' sequences is '%s'.\n\n", spatial_pattern_HD),
+    sprintf("Based on the Z score, the pattern for 'HD' sequences is '%s'.\n\n", spatial_pattern_HD),
     "2) 'DD' Sequences:\n",
     sprintf("   - Observed Count: %d\n", results$One_One),
     sprintf("   - Expected Count: %.2f\n", ER_11),
     sprintf("   - Standard Deviation: %.2f\n", sR_11),
     sprintf("   - Z-score: %.2f\n", ZDD),
-    sprintf("Based on the Z score, the spatial pattern for 'DD' sequences is '%s'.\n", spatial_pattern_DD),
-    "-----------------------------------------------------\n",
-    "Implications:\n",
-    "The Z-scores indicate the deviation from Complete Spatial Randomness (CSR). A pattern is considered 'aggregated' if the Z-score is significantly low/high (Z <-1.64 or Z > 1.64), suggesting a clustering of data points. Conversely, 'random' suggests a random or uniform distribution. The example data and calculations performed here were based on the specifications and formulations provided in The Study of Plant Diseaes book by Madden et al. (2007)."
+    sprintf("Based on the Z score, the pattern for 'DD' sequences is '%s'.\n", spatial_pattern_DD),
+    "-----------------------------------------------------\n"
+
   )
 
   # Print the message for immediate visibility in the console.
   cat(message)
 
   # You can also return this message as a value, in addition to other statistical details, if needed.
-  return(message)
+  #return(message)
 }
 
 

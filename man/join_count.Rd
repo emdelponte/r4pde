@@ -8,7 +8,8 @@ join_count(matrix_data)
 }
 \arguments{
 \item{matrix_data}{A binary matrix (with elements 0 and 1) representing the spatial distribution
-of two types of points where 0 = healthy plant (H) and 1 = disease plant (D). This could reflect}
+of two types of points: 0 for healthy plants (H) and 1 for diseased plants (D). This matrix reflects
+the geographical distribution or layout of plants in the studied area.}
 }
 \value{
 A comprehensive, rich-text formatted string of results that includes:
