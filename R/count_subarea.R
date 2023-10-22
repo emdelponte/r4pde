@@ -1,0 +1,86 @@
+#' Count the number of ones (diseased plants) in subareas of a matrix
+#'
+#' This function takes a matrix of 0s and 1s and counts the number of 1s in each
+#' subarea of the matrix. The subareas are defined by the number of rows and columns
+#' each subarea contains. The function returns a data frame that includes the position
+#' (starting row and column) of each subarea and the count of 1s.
+#'
+#' The function
+#' as written divides the original matrix into subareas based on
+#' the specified number of rows and columns for each subarea and counts the
+#' number of ones in each of these subareas. The way it's structured, it
+#' handles matrices with even dimensions quite efficiently. However, if
+#' the number of rows and columns in the original matrix is not a multiple
+#' of the subarea dimensions, some parts of the matrix will not be included
+#' in any subarea.
+#'
+#' @param data A matrix of 0s and 1s that you want to analyze.
+#' @param rows The number of rows in each subarea.
+#' @param cols The number of columns in each subarea.
+#'
+#' @return A dataframe with one row for each subarea and the following columns:
+#' \itemize{
+#'   \item \code{Row_Start}: The first row of the subarea in the original matrix.
+#'   \item \code{Col_Start}: The first column of the subarea in the original matrix.
+#'   \item \code{Ones_Count}: The number of ones in the subarea.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Create a sample matrix with random 0s and 1s
+#' set.seed(123) # for reproducibility
+#' my_data <- matrix(sample(c(0, 1), 12*16, replace = TRUE), nrow = 16, ncol = 12)
+#'
+#' # Apply the function to count 1's in each 3x3 subarea
+#' result <- count_subarea(data = my_data, rows = 3, cols = 3)
+#' print(result)
+#'
+#' # The resulting dataframe can be further used for visualization, for example, with ggplot2.
+#' }
+#'
+#' @export
+
+count_subarea <- function(data, rows, cols) {
+  # Ensure the data is in matrix form
+  if(!is.matrix(data)) {
+    stop("Input data must be a matrix")
+  }
+
+  # Get the dimensions of the matrix
+  main_rows <- nrow(data)
+  main_cols <- ncol(data)
+
+  # Calculate the number of subareas
+  num_row_subareas <- main_rows %/% rows
+  num_col_subareas <- main_cols %/% cols
+
+  # Prepare a container for results
+  results_list <- list()
+
+  # Loop through each subarea in the matrix
+  for (i in seq(num_row_subareas)) {
+    for (j in seq(num_col_subareas)) {
+      # Determine the rows and columns for the current subarea
+      row_indices <- (1:rows) + (i - 1) * rows
+      col_indices <- (1:cols) + (j - 1) * cols
+
+      # Extract the subarea from the main data matrix
+      subarea <- data[row_indices, col_indices, drop = FALSE]
+
+      # Count the number of ones in the subarea
+      count_ones <- sum(subarea == 1, na.rm = TRUE)
+
+      # Store the result with position information
+      results_list[[length(results_list) + 1]] <- data.frame(
+        Row_Start = row_indices[1],
+        Col_Start = col_indices[1],
+        Ones_Count = count_ones
+      )
+    }
+  }
+
+  # Combine all results into one data frame
+  results_df <- do.call(rbind, results_list)
+
+  return(results_df)
+}
