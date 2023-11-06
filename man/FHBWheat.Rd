@@ -2,10 +2,10 @@
 \alias{FHBWheat}
 \docType{data}
 \title{
-FHB incidence per quadrat in 20 fields
+FHB collected at 161 fiels in Brazil
 }
 \description{
-FHB incidence per quadrat with 10 spikes
+FHB collected at 20 quadrats per field in 161 fields in Brazil
 }
 \usage{data("FHBWheat")}
 \format{
