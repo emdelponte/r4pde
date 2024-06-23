@@ -10,7 +10,17 @@ oruns_test(x)
 \item{x}{A numeric vector representing the input data}
 }
 \value{
-A list with elements U (number of runs), EU (expected number of runs), pvalue, and result (either "clustering" or "randomness").
+an \code{r4pde.oruns} object.
+
+An \code{r4pde.oruns} object is a \code{list} containing:
+\itemize{
+\item U, number of runs,
+\item EU, expected number of runs,
+\item sU, standard deviation of the expected number of runs
+\item Z, Z-score of the observed number of runs,
+\item pvalue, the p-value of the Z-score, and
+\item result, the test result of either "aggregation or clustering" or "randomness"
+}
 }
 \description{
 Perform a runs test on the input data to test for clustering or randomness.
