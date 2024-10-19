@@ -1,146 +1,160 @@
-#' Sliding Window Analysis for Time-Series Data
+#' Windowpane Analysis of Epidemiological Data
 #'
-#' This function performs a sliding window analysis over a given data frame for the specified variable.
-#' It calculates the mean, sum, or count above a given threshold for the variable values in each window.
-#' The window size and direction are defined by the user-specified window lengths and direction.
+#' This function calculates rolling statistics (e.g., mean, sum) within defined time windows
+#' for a specified variable in epidemiological data.
 #'
-#' @param data A data frame that contains the data for analysis. It must include a `YYYYMMDD` date column.
-#' @param end_date A character string that specifies the end date for the analysis in the format 'YYYY-MM-DD'.
-#' @param variable The name of the variable in the data frame on which to perform the analysis.
-#' @param summary_type The type of summary statistic to compute for each window. Can be 'mean', 'sum', or 'above_threshold'.
-#' @param threshold An optional numerical value. If `summary_type` is 'above_threshold', the function counts how many variable values in each window are above this threshold.
-#' @param window_lengths A numerical vector that specifies the lengths of the windows for the analysis.
-#' @param direction A character string that specifies the direction of the sliding window. Can be 'backward' or 'forward'.
-#' The 'backward' option calculates windows moving from the `end_date` backward, while the 'forward' option calculates windows moving from the earliest date forward.
+#' @param data A dataframe containing the data.
+#' @param end_date_col A character string specifying the column name for the end date.
+#' @param date_col A character string specifying the column name for the date.
+#' @param variable A character string specifying the name of the variable to analyze.
+#' @param study_col A character string specifying the column name for study IDs.
+#' @param summary_type A character string specifying the type of summary ("mean", "sum", "above_threshold").
+#' @param threshold A numeric value for the threshold (used only if summary_type is "above_threshold").
+#' @param window_lengths A numeric vector specifying the window lengths to use (default is c(2, 4, 8, 16)).
+#' @param direction A character string specifying the direction of the rolling window ("backward" or "forward").
 #'
-#' @return A data frame in wide format where each column corresponds to a window of a certain length and start day, containing the calculated summary statistic for that window.
-#' The column names are in the format 'variable_startday_endday'.
-#'
-#' @importFrom dplyr filter summarize
-#' @importFrom lubridate days
-#' @importFrom tidyr pivot_wider unite
-#' @importFrom purrr map_dfr
-#' @importFrom tibble tibble
-#'
+#' @return A dataframe with the results of the windowpane analysis in wide format.
+#' @import dplyr tidyr lubridate progress
 #' @examples
-#' \dontrun{
-#' data <- tibble(YYYYMMDD = seq(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "day"),
-#'                variable = rnorm(365))
-#' windowpane(data, "2023-12-31", variable, "mean", NULL, c(7, 14, 21), direction = "backward")
-#' windowpane(data, "2023-01-01", variable, "sum", NULL, c(7, 14), direction = "forward")
-#' }
-
-
+#' # Simulated data example
+#' set.seed(123)
+#' n <- 100
+#' sim_data <- data.frame(
+#'   study = sample(1:5, n, replace = TRUE),
+#'   heading = as.Date('2024-01-01') + sample(0:30, n, replace = TRUE),
+#'   YYYYMMDD = as.Date('2024-01-01') + sample(0:30, n, replace = TRUE),
+#'   T2M = runif(n, 15, 30)
+#' )
+#' result <- windowpane(
+#'   data = sim_data,
+#'   end_date_col = "heading",
+#'   date_col = "YYYYMMDD",
+#'   variable = "T2M",
+#'   study_col = "study",
+#'   summary_type = "mean",
+#'   window_lengths = c(2, 4, 8, 16),
+#'   direction = "backward"
+#' )
+#' print(result)
+#'
+#' @export
 windowpane <- function(data,
-                       end_date,
+                       end_date_col,
+                       date_col,
                        variable,
+                       study_col,
                        summary_type,
                        threshold = NULL,
-                       window_lengths) {
-  variable_name <- deparse(substitute(variable))
-  data$date <- as.Date(data$YYYYMMDD)
-  end_date <- as.Date(end_date)
-  start_date <- end_date - days(max(window_lengths))
-
-  results <- tibble(
-    start_day = numeric(),
-    end_day = numeric(),
-    value = numeric()
-  )
-  for (window_size in window_lengths) {
-    for (i in 0:(max(window_lengths) - window_size)) {
-      window_end_date <- end_date - days(i)
-      window_start_date <- window_end_date - days(window_size - 1)
-      window_data <- data %>%
-        filter(date >= window_start_date & date <= window_end_date)
-      window_summary <- case_when(
-        summary_type == "mean" ~ window_data %>%
-          summarize(value = mean({{variable}}, na.rm = TRUE)),
-        summary_type == "sum" ~ window_data %>%
-          summarize(value = sum({{variable}}, na.rm = TRUE)),
-        summary_type == "above_threshold" ~ window_data %>%
-          summarize(value = sum({{variable}} > threshold, na.rm = TRUE))
-      )
-
-      # Save results
-      results <- rbind(results, tibble(
-        start_day = -i, # Start day is always 0 in this case
-        end_day = -(i + window_size - 1), # End day is the window size minus 1
-        value = window_summary$value
-      ))
-    }
-  }
-
-  # Pivot to wide format
-  results_wide <- results %>%
-    unite("column_name", start_day, end_day, sep = "_") %>%
-    pivot_wider(names_from = column_name, values_from = value)
-
-  # Adding the variable name to the column names
-  colnames(results_wide) <- paste0(variable_name, "_", colnames(results_wide))
-
-  return(results_wide)
-}
-
-windowpane <- function(data,
-                       end_date,
-                       variable,
-                       summary_type,
-                       threshold = NULL,
-                       window_lengths,
+                       window_lengths = c(2, 4, 8, 16),
                        direction = "backward") {
   variable_name <- deparse(substitute(variable))
-  data$date <- as.Date(data$YYYYMMDD)
-  end_date <- as.Date(end_date)
-  start_date <- end_date - days(max(window_lengths))
 
-  results <- tibble(
-    start_day = numeric(),
-    end_day = numeric(),
-    value = numeric()
+  results_list <- list()  # Initialize list to store results
+
+  # Unique combinations of study and end_date
+  unique_combinations <- data %>%
+    distinct(!!sym(study_col), !!sym(end_date_col))
+
+  # Calculate total steps accurately based on window_lengths
+  total_steps <- 0
+  for (window_size in window_lengths) {
+    total_steps <- total_steps + (max(window_lengths) - window_size + 1)
+  }
+  total_steps <- total_steps * nrow(unique_combinations)
+
+  # Initialize the progress bar
+  pb <- progress_bar$new(
+    format = "  Processing [:bar] :percent in :elapsed seconds",
+    total = total_steps,
+    clear = FALSE, width = 60
   )
 
-  for (window_size in window_lengths) {
-    for (i in 0:(max(window_lengths) - window_size)) {
+  # Iterate through each combination of study and end_date
+  for (i in 1:nrow(unique_combinations)) {
+    study_id <- unique_combinations[[study_col]][i]
+    end_date <- unique_combinations[[end_date_col]][i]
 
-      if (direction == "backward") {
-        window_end_date <- end_date - days(i)
-        window_start_date <- window_end_date - days(window_size - 1)
-      } else if (direction == "forward") {
-        window_start_date <- start_date + days(i)
-        window_end_date <- window_start_date + days(window_size - 1)
-      } else {
-        stop("Invalid direction. Use 'backward' or 'forward'.")
+    subset_data <- data %>%
+      filter(!!sym(study_col) == study_id, !!sym(end_date_col) == end_date)
+
+    start_date <- end_date - days(max(window_lengths))
+
+    results <- tibble(
+      start_day = numeric(),
+      end_day = numeric(),
+      value = numeric()
+    )
+
+    # Window calculations
+    for (window_size in window_lengths) {
+      for (j in 0:(max(window_lengths) - window_size)) {
+
+        if (direction == "backward") {
+          window_end_date <- end_date - days(j)
+          window_start_date <- window_end_date - days(window_size - 1)
+        } else {
+          window_start_date <- start_date + days(j)
+          window_end_date <- window_start_date + days(window_size - 1)
+        }
+
+        # Filter data for the current window
+        window_data <- subset_data %>%
+          filter(!!sym(date_col) >= window_start_date & !!sym(date_col) <= window_end_date)
+
+        # Calculate summary value based on the summary_type
+        if (summary_type == "mean") {
+          value <- mean(window_data[[variable]], na.rm = TRUE)
+        } else if (summary_type == "sum") {
+          value <- sum(window_data[[variable]], na.rm = TRUE)
+        } else if (summary_type == "above_threshold" & !is.null(threshold)) {
+          value <- sum(window_data[[variable]] > threshold, na.rm = TRUE)
+        } else {
+          value <- NA
+        }
+
+        # Save results
+        results <- bind_rows(results, tibble(
+          start_day = ifelse(direction == "backward", -j, j),
+          end_day = ifelse(direction == "backward", -(j + window_size - 1), j + window_size - 1),
+          value = value
+        ))
+
+        # Update progress bar after each iteration
+        pb$tick()
       }
-
-      window_data <- data %>%
-        filter(date >= window_start_date & date <= window_end_date)
-      window_summary <- case_when(
-        summary_type == "mean" ~ window_data %>%
-          summarize(value = mean({{variable}}, na.rm = TRUE)),
-        summary_type == "sum" ~ window_data %>%
-          summarize(value = sum({{variable}}, na.rm = TRUE)),
-        summary_type == "above_threshold" ~ window_data %>%
-          summarize(value = sum({{variable}} > threshold, na.rm = TRUE))
-      )
-
-      # Save results
-      results <- rbind(results, tibble(
-        start_day = ifelse(direction == "backward", -i, i),
-        end_day = ifelse(direction == "backward", -(i + window_size - 1), i + window_size - 1),
-        value = window_summary$value
-      ))
     }
+
+    # Pivot to wide format
+    results_wide <- results %>%
+      unite("column_name", start_day, end_day, sep = "_") %>%
+      pivot_wider(names_from = column_name, values_from = value)
+
+    # Append variable name to column names
+    colnames(results_wide) <- paste0(variable_name, "_", colnames(results_wide))
+
+    # Convert 'end_date' to Date format if it is numeric
+    if (is.numeric(end_date)) {
+      end_date <- as.Date(end_date, origin = "1970-01-01")
+    }
+
+    # Add end_date and study information
+    results_wide <- results_wide %>%
+      mutate(!!end_date_col := end_date,
+             !!study_col := study_id) %>%
+      relocate(!!sym(end_date_col), .before = everything()) %>%
+      relocate(!!sym(study_col), .before = everything())
+
+    results_list[[paste0(study_id, "_", end_date)]] <- results_wide
   }
 
-  # Pivot to wide format
-  results_wide <- results %>%
-    unite("column_name", start_day, end_day, sep = "_") %>%
-    pivot_wider(names_from = column_name, values_from = value)
+  # Combine all results into a single dataframe
+  final_results <- bind_rows(results_list)
 
-  # Adding the variable name to the column names
-  colnames(results_wide) <- paste0(variable_name, "_", colnames(results_wide))
-
-  return(results_wide)
+  return(final_results)
 }
+
+
+
+
+
 

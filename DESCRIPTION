@@ -12,6 +12,7 @@ RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 Imports: 
+    car,
     dplyr,
     ggplot2,
     igraph,
@@ -21,7 +22,8 @@ Imports:
     tibble, 
     interval,
     survival,
-    car
+    nasapower,
+    progress
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
