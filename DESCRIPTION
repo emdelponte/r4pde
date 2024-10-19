@@ -20,7 +20,8 @@ Imports:
     purrr, 
     tibble, 
     interval,
-    survival
+    survival,
+    car
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)

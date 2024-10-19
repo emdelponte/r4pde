@@ -38,7 +38,7 @@ and performs multiple pairwise comparisons to determine significance
 using the score statistic method.
 }
 \examples{
-Entering your data (ordinal rating scores)
+# Entering your data as ordinal rating scores
 trAs=c(5,4,2,5,5,4,4,2,5,2,2,3,4,3,2,2,6,2,2,4,2,4,2,4,5,3,4,2,2,3)
 trBs=c(5,3,2,4,4,5,4,5,4,4,6,4,5,5,5,2,6,2,3,5,2,6,4,3,2,5,3,5,4,5)
 trCs=c(2,3,1,4,1,1,4,1,1,3,2,1,4,1,1,2,5,2,1,3,1,4,2,2,2,4,2,3,2,2)
@@ -47,7 +47,7 @@ trDs=c(5,5,4,5,5,6,6,4,6,4,3,5,5,6,4,6,5,6,5,4,5,5,5,3,5,6,5,5,5,6)
 inputData = data.frame(treatment=c(rep("A",30),rep("B",30),rep("C",30),
 rep("D",30)), x=c(trAs, trBs, trCs, trDs))
 # Perform analysis using CompMuCens() function
-CompMuCens(dat=inputData, scale=c(0,3,6,12,25,50,75,88,94,97,100,100),ckData=T)
+CompMuCens(dat=inputData, scale=c(0,3,6,12,25,50,75,88,94,97,100,100),ckData=TRUE)
 
 }
 \references{

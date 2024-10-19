@@ -10,7 +10,8 @@ windowpane(
   variable,
   summary_type,
   threshold = NULL,
-  window_lengths
+  window_lengths,
+  direction = "backward"
 )
 }
 \arguments{
@@ -25,20 +26,24 @@ windowpane(
 \item{threshold}{An optional numerical value. If \code{summary_type} is 'above_threshold', the function counts how many variable values in each window are above this threshold.}
 
 \item{window_lengths}{A numerical vector that specifies the lengths of the windows for the analysis.}
+
+\item{direction}{A character string that specifies the direction of the sliding window. Can be 'backward' or 'forward'.
+The 'backward' option calculates windows moving from the \code{end_date} backward, while the 'forward' option calculates windows moving from the earliest date forward.}
 }
 \value{
-A data frame in wide format where each column corresponds to a window of a certain length and start day, and contains the calculated summary statistic for that window.
+A data frame in wide format where each column corresponds to a window of a certain length and start day, containing the calculated summary statistic for that window.
 The column names are in the format 'variable_startday_endday'.
 }
 \description{
 This function performs a sliding window analysis over a given data frame for the specified variable.
 It calculates the mean, sum, or count above a given threshold for the variable values in each window.
-The window size is defined by the user-specified window lengths.
+The window size and direction are defined by the user-specified window lengths and direction.
 }
 \examples{
 \dontrun{
 data <- tibble(YYYYMMDD = seq(as.Date("2023-01-01"), as.Date("2023-12-31"), by = "day"),
                variable = rnorm(365))
-windowpane(data, "2023-12-31", variable, "mean", NULL, c(7, 14, 21))
+windowpane(data, "2023-12-31", variable, "mean", NULL, c(7, 14, 21), direction = "backward")
+windowpane(data, "2023-01-01", variable, "sum", NULL, c(7, 14), direction = "forward")
 }
 }

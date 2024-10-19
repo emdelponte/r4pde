@@ -24,6 +24,7 @@
 #' x <- c(0.8, 1.6, 2.4, 3.2, 4, 7.2, 12, 15.2, 21.6, 28.8)
 #' Y <- c(184.9, 113.3, 113.3, 64.1, 25, 8, 4.3, 2.5, 1, 0.8)
 #' grad1 <- data.frame(x = x, Y = Y)
+#' library(ggplot2)
 #' mg <- fit_gradients(grad1, C = 0.4)
 #' mg$plot_power_original +
 #'   labs(title = "", x = "Distance from focus (m)", y = "Count of lesions")
