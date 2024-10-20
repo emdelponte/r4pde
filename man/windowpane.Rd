@@ -2,66 +2,61 @@
 % Please edit documentation in R/windowpane.R
 \name{windowpane}
 \alias{windowpane}
-\title{Windowpane Analysis of Epidemiological Data}
+\title{Window Pane for Epidemiological Analysis}
 \usage{
 windowpane(
   data,
   end_date_col,
   date_col,
   variable,
-  study_col,
   summary_type,
   threshold = NULL,
-  window_lengths = c(2, 4, 8, 16),
-  direction = "backward"
+  window_lengths,
+  direction = "backward",
+  group_by_cols = NULL,
+  date_format = "\%Y-\%m-\%d"
 )
 }
 \arguments{
-\item{data}{A dataframe containing the data.}
+\item{data}{A dataframe containing the input data.}
 
-\item{end_date_col}{A character string specifying the column name for the end date.}
+\item{end_date_col}{The name of the column representing the end date.}
 
-\item{date_col}{A character string specifying the column name for the date.}
+\item{date_col}{The name of the column representing the date variable.}
 
-\item{variable}{A character string specifying the name of the variable to analyze.}
+\item{variable}{The name of the column for which summary statistics are calculated.}
 
-\item{study_col}{A character string specifying the column name for study IDs.}
+\item{summary_type}{The type of summary to calculate. Options are "mean", "sum",
+or "above_threshold".}
 
-\item{summary_type}{A character string specifying the type of summary ("mean", "sum", "above_threshold").}
+\item{threshold}{Optional numeric value used when summary_type is "above_threshold".}
 
-\item{threshold}{A numeric value for the threshold (used only if summary_type is "above_threshold").}
+\item{window_lengths}{A vector of window lengths (in days) for the calculations.}
 
-\item{window_lengths}{A numeric vector specifying the window lengths to use (default is c(2, 4, 8, 16)).}
+\item{direction}{The direction of the window. Options are "backward" (default) or "forward".}
 
-\item{direction}{A character string specifying the direction of the rolling window ("backward" or "forward").}
+\item{group_by_cols}{Optional vector of column names for grouping the data.}
+
+\item{date_format}{The format of the date columns. Default is "\%Y-\%m-\%d".}
 }
 \value{
-A dataframe with the results of the windowpane analysis in wide format.
+A dataframe with the calculated summary values for each window.
 }
 \description{
-This function calculates rolling statistics (e.g., mean, sum) within defined time windows
-for a specified variable in epidemiological data.
+This function calculates summary statistics within specified windows around a given end date
+in a dataset, facilitating epidemiological analysis. It allows backward or forward window
+calculations based on a user-defined variable and window lengths.
 }
 \examples{
-# Simulated data example
-set.seed(123)
-n <- 100
-sim_data <- data.frame(
-  study = sample(1:5, n, replace = TRUE),
-  heading = as.Date('2024-01-01') + sample(0:30, n, replace = TRUE),
-  YYYYMMDD = as.Date('2024-01-01') + sample(0:30, n, replace = TRUE),
-  T2M = runif(n, 15, 30)
+# Example usage
+data <- data.frame(
+  study = rep(1, 10),
+  date = as.Date("2023-01-01") + 0:9,
+  value = rnorm(10),
+  end_date = rep(as.Date("2023-01-10"), 10)
 )
-result <- windowpane(
-  data = sim_data,
-  end_date_col = "heading",
-  date_col = "YYYYMMDD",
-  variable = "T2M",
-  study_col = "study",
-  summary_type = "mean",
-  window_lengths = c(2, 4, 8, 16),
-  direction = "backward"
-)
-print(result)
+windowpane(data, end_date_col = end_date, date_col = date,
+           variable = value, summary_type = "mean",
+           window_lengths = c(3, 5), direction = "backward")
 
 }
