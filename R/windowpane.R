@@ -1,22 +1,23 @@
 #' Window Pane for Epidemiological Analysis
 #'
 #' This function calculates summary statistics within specified windows around a given end date
-#' in a dataset, facilitating epidemiological analysis. It allows backward or forward window
-#' calculations based on a user-defined variable and window lengths.
+#' in a dataset, facilitating epidemiological analysis. It allows backward, forward, or both
+#' directions of window calculations based on a user-defined variable and window lengths.
 #'
-#' @param data A dataframe containing the input data.
-#' @param end_date_col The name of the column representing the end date.
-#' @param date_col The name of the column representing the date variable.
-#' @param variable The name of the column for which summary statistics are calculated.
-#' @param summary_type The type of summary to calculate. Options are "mean", "sum",
+#' @param data A data frame containing the input data.
+#' @param end_date_col A string specifying the name of the column representing the end date.
+#' @param date_col A string specifying the name of the column representing the date variable.
+#' @param variable A string specifying the name of the column for which summary statistics are calculated.
+#' @param summary_type A string specifying the type of summary to calculate. Options are "mean", "sum",
 #'   "above_threshold", or "below_threshold".
-#' @param threshold Optional numeric value used when summary_type is "above_threshold" or "below_threshold".
-#' @param window_lengths A vector of window lengths (in days) for the calculations.
-#' @param direction The direction of the window. Options are "backward" (default) or "forward".
-#' @param group_by_cols Optional vector of column names for grouping the data.
-#' @param date_format The format of the date columns. Default is "%Y-%m-%d".
+#' @param threshold Optional numeric value used when \code{summary_type} is "above_threshold" or "below_threshold".
+#' @param window_lengths A numeric vector specifying the window lengths (in days) for the calculations.
+#' @param direction A string specifying the direction of the window. Options are "backward" (default),
+#'   "forward", or "both".
+#' @param group_by_cols Optional vector of strings specifying column names for grouping the data.
+#' @param date_format A string specifying the format of the date columns. Default is "%Y-%m-%d".
 #'
-#' @return A dataframe with the calculated summary values for each window.
+#' @return A data frame with the calculated summary values for each window.
 #'
 #' @import dplyr tidyr
 #' @export
