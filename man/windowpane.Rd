@@ -27,9 +27,9 @@ windowpane(
 \item{variable}{The name of the column for which summary statistics are calculated.}
 
 \item{summary_type}{The type of summary to calculate. Options are "mean", "sum",
-or "above_threshold".}
+"above_threshold", or "below_threshold".}
 
-\item{threshold}{Optional numeric value used when summary_type is "above_threshold".}
+\item{threshold}{Optional numeric value used when summary_type is "above_threshold" or "below_threshold".}
 
 \item{window_lengths}{A vector of window lengths (in days) for the calculations.}
 
@@ -46,17 +46,4 @@ A dataframe with the calculated summary values for each window.
 This function calculates summary statistics within specified windows around a given end date
 in a dataset, facilitating epidemiological analysis. It allows backward or forward window
 calculations based on a user-defined variable and window lengths.
-}
-\examples{
-# Example usage
-data <- data.frame(
-  study = rep(1, 10),
-  date = as.Date("2023-01-01") + 0:9,
-  value = rnorm(10),
-  end_date = rep(as.Date("2023-01-10"), 10)
-)
-windowpane(data, end_date_col = end_date, date_col = date,
-           variable = value, summary_type = "mean",
-           window_lengths = c(3, 5), direction = "backward")
-
 }

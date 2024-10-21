@@ -9,26 +9,14 @@
 #' @param date_col The name of the column representing the date variable.
 #' @param variable The name of the column for which summary statistics are calculated.
 #' @param summary_type The type of summary to calculate. Options are "mean", "sum",
-#'   or "above_threshold".
-#' @param threshold Optional numeric value used when summary_type is "above_threshold".
+#'   "above_threshold", or "below_threshold".
+#' @param threshold Optional numeric value used when summary_type is "above_threshold" or "below_threshold".
 #' @param window_lengths A vector of window lengths (in days) for the calculations.
 #' @param direction The direction of the window. Options are "backward" (default) or "forward".
 #' @param group_by_cols Optional vector of column names for grouping the data.
 #' @param date_format The format of the date columns. Default is "%Y-%m-%d".
 #'
 #' @return A dataframe with the calculated summary values for each window.
-#'
-#' @examples
-#' # Example usage
-#' data <- data.frame(
-#'   study = rep(1, 10),
-#'   date = as.Date("2023-01-01") + 0:9,
-#'   value = rnorm(10),
-#'   end_date = rep(as.Date("2023-01-10"), 10)
-#' )
-#' windowpane(data, end_date_col = end_date, date_col = date,
-#'            variable = value, summary_type = "mean",
-#'            window_lengths = c(3, 5), direction = "backward")
 #'
 #' @import dplyr tidyr
 #' @export
@@ -85,14 +73,17 @@ windowpane <- function(data,
 
     start_date <- end_date - max(window_lengths)
 
-    results <- tibble(
-      start_day = numeric(),
-      end_day = numeric(),
-      value = numeric()
-    )
+    # Temporary list to store results for each window size
+    temp_results <- list()
 
     # Window calculations
     for (window_size in window_lengths) {
+      window_results <- tibble(
+        start_day = numeric(),
+        end_day = numeric(),
+        value = numeric()
+      )
+
       for (j in 0:(max(window_lengths) - window_size)) {
 
         if (direction == "backward") {
@@ -109,7 +100,7 @@ windowpane <- function(data,
 
         # Calculate summary value
         if (nrow(window_data) == 0) {
-          value <- 0
+          value <- NA
         } else {
           if (summary_type == "mean") {
             value <- mean(pull(window_data, !!variable), na.rm = TRUE)
@@ -117,46 +108,57 @@ windowpane <- function(data,
             value <- sum(pull(window_data, !!variable), na.rm = TRUE)
           } else if (summary_type == "above_threshold" & !is.null(threshold)) {
             value <- sum(pull(window_data, !!variable) > threshold, na.rm = TRUE)
+          } else if (summary_type == "below_threshold" & !is.null(threshold)) {
+            value <- sum(pull(window_data, !!variable) < threshold, na.rm = TRUE)
           } else {
             value <- NA
           }
         }
 
         # Save results
-        results <- bind_rows(results, tibble(
+        window_results <- bind_rows(window_results, tibble(
           start_day = ifelse(direction == "backward", -j, j),
           end_day = ifelse(direction == "backward", -(j + window_size - 1), j + window_size - 1),
           value = value
         ))
       }
+
+      # Pivot to wide format for current window size
+      window_results_wide <- window_results %>%
+        unite("column_name", start_day, end_day, sep = "_") %>%
+        pivot_wider(names_from = column_name, values_from = value)
+
+      # Add variable name, summary type, and window length to column names
+      window_results_wide <- window_results_wide %>%
+        rename_with(~ paste0("length", window_size, "_", as_label(variable), "_", summary_type, "_", .))
+
+      # Store results in temporary list
+      temp_results[[as.character(window_size)]] <- window_results_wide
     }
 
-    # Pivot to wide format
-    results_wide <- results %>%
-      unite("column_name", start_day, end_day, sep = "_") %>%
-      pivot_wider(names_from = column_name, values_from = value)
-
-    # Identify grouping columns present in results_wide
-    existing_group_cols <- intersect(names(results_wide), c(group_by_cols, as_label(end_date_col)))
-
-    # Add the variable name as a prefix to all non-grouping columns
-    results_wide <- results_wide %>%
-      rename_with(~ paste0(as_label(variable), "_", .), .cols = -all_of(existing_group_cols))
+    # Combine results for all window sizes for the current group
+    combined_results <- bind_cols(temp_results)
 
     # Add grouping columns and end_date column
     if (!is.null(group_by_cols)) {
       for (col in group_by_cols) {
-        results_wide[[col]] <- current_group[[col]]
+        combined_results[[col]] <- current_group[[col]]
       }
     }
-    results_wide[[as_label(end_date_col)]] <- as.character(end_date)
+    combined_results[[as_label(end_date_col)]] <- as.character(end_date)
 
     # Store the results for the current group
-    results_list[[i]] <- results_wide
+    results_list[[i]] <- combined_results
   }
 
   # Combine all results into a single dataframe
   final_results <- bind_rows(results_list)
 
+  # Remove any "window_size" column if it exists
+  final_results <- final_results %>% select(-contains("window_size"))
+
+
   return(final_results)
 }
+
+
