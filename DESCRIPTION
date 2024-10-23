@@ -12,18 +12,11 @@ RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 Imports: 
-    car,
-    dplyr,
+   dplyr,
     ggplot2,
-    igraph,
-    tidyr,
-    lubridate, 
-    purrr, 
-    tibble, 
-    interval,
-    survival,
-    nasapower,
-    progress
+    purrr,
+    tibble,
+    survival
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
