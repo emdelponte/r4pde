@@ -18,32 +18,33 @@ windowpane(
 )
 }
 \arguments{
-\item{data}{A dataframe containing the input data.}
+\item{data}{A data frame containing the input data.}
 
-\item{end_date_col}{The name of the column representing the end date.}
+\item{end_date_col}{A string specifying the name of the column representing the end date.}
 
-\item{date_col}{The name of the column representing the date variable.}
+\item{date_col}{A string specifying the name of the column representing the date variable.}
 
-\item{variable}{The name of the column for which summary statistics are calculated.}
+\item{variable}{A string specifying the name of the column for which summary statistics are calculated.}
 
-\item{summary_type}{The type of summary to calculate. Options are "mean", "sum",
+\item{summary_type}{A string specifying the type of summary to calculate. Options are "mean", "sum",
 "above_threshold", or "below_threshold".}
 
-\item{threshold}{Optional numeric value used when summary_type is "above_threshold" or "below_threshold".}
+\item{threshold}{Optional numeric value used when \code{summary_type} is "above_threshold" or "below_threshold".}
 
-\item{window_lengths}{A vector of window lengths (in days) for the calculations.}
+\item{window_lengths}{A numeric vector specifying the window lengths (in days) for the calculations.}
 
-\item{direction}{The direction of the window. Options are "backward" (default) or "forward".}
+\item{direction}{A string specifying the direction of the window. Options are "backward" (default),
+"forward", or "both".}
 
-\item{group_by_cols}{Optional vector of column names for grouping the data.}
+\item{group_by_cols}{Optional vector of strings specifying column names for grouping the data.}
 
-\item{date_format}{The format of the date columns. Default is "\%Y-\%m-\%d".}
+\item{date_format}{A string specifying the format of the date columns. Default is "\%Y-\%m-\%d".}
 }
 \value{
-A dataframe with the calculated summary values for each window.
+A data frame with the calculated summary values for each window.
 }
 \description{
 This function calculates summary statistics within specified windows around a given end date
-in a dataset, facilitating epidemiological analysis. It allows backward or forward window
-calculations based on a user-defined variable and window lengths.
+in a dataset, facilitating epidemiological analysis. It allows backward, forward, or both
+directions of window calculations based on a user-defined variable and window lengths.
 }
