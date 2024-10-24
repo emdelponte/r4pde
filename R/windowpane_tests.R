@@ -120,7 +120,7 @@ windowpane_tests <- function(data, response_var, corr_type = "spearman", R = 100
   global_significant <- Pg < global_alpha
 
   # Find the maximum correlation
-  max_correlation <- max(results$correlation, na.rm = TRUE)
+  max_correlation <- max(abs(results$correlation), na.rm = TRUE)
 
   # Add global Pg and max correlation as a separate row
   summary_table <- data.frame(
