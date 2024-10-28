@@ -77,64 +77,102 @@ windowpane <- function(data,
     # Temporary list to store results for each window size
     temp_results <- list()
 
-    # Window calculations
-    for (window_size in window_lengths) {
-      window_results <- tibble(
-        start_day = numeric(),
-        end_day = numeric(),
-        value = numeric()
-      )
+    # Backward window calculations
+    if (direction == "backward" || direction == "both") {
+      for (window_size in window_lengths) {
+        window_results <- tibble(
+          start_day = numeric(),
+          end_day = numeric(),
+          value = numeric()
+        )
 
-      for (j in 0:(max(window_lengths) - window_size)) {
-
-        if (direction == "backward") {
+        for (j in 0:(max(window_lengths) - window_size)) {
           window_end_date <- end_date - j
           window_start_date <- window_end_date - (window_size - 1)
-        } else {
+
+          # Filter data for the current window
+          window_data <- subset_data %>%
+            filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
+
+          # Calculate summary value
+          value <- switch(
+            summary_type,
+            "mean" = mean(pull(window_data, !!variable), na.rm = TRUE),
+            "sum" = sum(pull(window_data, !!variable), na.rm = TRUE),
+            "above_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) > threshold, na.rm = TRUE),
+            "below_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) < threshold, na.rm = TRUE),
+            NA
+          )
+
+          # Save results
+          window_results <- bind_rows(window_results, tibble(
+            start_day = -j,
+            end_day = -(j + window_size - 1),
+            value = value
+          ))
+        }
+
+        # Pivot to wide format for current window size
+        window_results_wide <- window_results %>%
+          unite("column_name", start_day, end_day, sep = "_") %>%
+          pivot_wider(names_from = column_name, values_from = value)
+
+        # Add prefix to column names for backward direction
+        window_results_wide <- window_results_wide %>%
+          rename_with(~ paste0("bw_length", window_size, "_", as_label(variable), "_", summary_type, "_", .))
+
+        # Store results in temporary list
+        temp_results[[paste0("bw_", window_size)]] <- window_results_wide
+      }
+    }
+
+    # Forward window calculations
+    if (direction == "forward" || direction == "both") {
+      for (window_size in window_lengths) {
+        window_results <- tibble(
+          start_day = numeric(),
+          end_day = numeric(),
+          value = numeric()
+        )
+
+        for (j in 0:(max(window_lengths) - window_size)) {
           window_start_date <- start_date + j
           window_end_date <- window_start_date + (window_size - 1)
+
+          # Filter data for the current window
+          window_data <- subset_data %>%
+            filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
+
+          # Calculate summary value
+          value <- switch(
+            summary_type,
+            "mean" = mean(pull(window_data, !!variable), na.rm = TRUE),
+            "sum" = sum(pull(window_data, !!variable), na.rm = TRUE),
+            "above_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) > threshold, na.rm = TRUE),
+            "below_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) < threshold, na.rm = TRUE),
+            NA
+          )
+
+          # Save results
+          window_results <- bind_rows(window_results, tibble(
+            start_day = j,
+            end_day = j + window_size - 1,
+            value = value
+          ))
         }
 
-        # Filter data for the current window
-        window_data <- subset_data %>%
-          filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
+        # Pivot to wide format for current window size
+        window_results_wide <- window_results %>%
+          unite("column_name", start_day, end_day, sep = "_") %>%
+          pivot_wider(names_from = column_name, values_from = value)
 
-        # Calculate summary value
-        if (nrow(window_data) == 0) {
-          value <- NA
-        } else {
-          if (summary_type == "mean") {
-            value <- mean(pull(window_data, !!variable), na.rm = TRUE)
-          } else if (summary_type == "sum") {
-            value <- sum(pull(window_data, !!variable), na.rm = TRUE)
-          } else if (summary_type == "above_threshold" & !is.null(threshold)) {
-            value <- sum(pull(window_data, !!variable) > threshold, na.rm = TRUE)
-          } else if (summary_type == "below_threshold" & !is.null(threshold)) {
-            value <- sum(pull(window_data, !!variable) < threshold, na.rm = TRUE)
-          } else {
-            value <- NA
-          }
-        }
+        # Add prefix to column names for forward direction
+        window_results_wide <- window_results_wide %>%
+          rename_with(~ paste0("fw_length", window_size, "_", as_label(variable), "_", summary_type, "_", .))
 
-        # Save results
-        window_results <- bind_rows(window_results, tibble(
-          start_day = ifelse(direction == "backward", -j, j),
-          end_day = ifelse(direction == "backward", -(j + window_size - 1), j + window_size - 1),
-          value = value
-        ))
+        # Store results in temporary list
+        temp_results[[paste0("fw_", window_size)]] <- window_results_wide
       }
-
-      # Pivot to wide format for current window size
-      window_results_wide <- window_results %>%
-        unite("column_name", start_day, end_day, sep = "_") %>%
-        pivot_wider(names_from = column_name, values_from = value)
-
-      # Add variable name, summary type, and window length to column names
-      window_results_wide <- window_results_wide %>%
-        rename_with(~ paste0("length", window_size, "_", as_label(variable), "_", summary_type, "_", .))
-
-      # Store results in temporary list
-      temp_results[[as.character(window_size)]] <- window_results_wide
     }
 
     # Combine results for all window sizes for the current group
@@ -155,11 +193,5 @@ windowpane <- function(data,
   # Combine all results into a single dataframe
   final_results <- bind_rows(results_list)
 
-  # Remove any "window_size" column if it exists
-  final_results <- final_results %>% select(-contains("window_size"))
-
-
   return(final_results)
 }
-
-
