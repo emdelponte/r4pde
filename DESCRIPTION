@@ -1,23 +1,33 @@
 Package: r4pde
-Title: Companion to R4PDE book 
-Version: 0.0.0.9000
+Title: Companion to R4PDE book
+Version: 0.1.0
 Authors@R: 
     person("Emerson", "Del Ponte", , "delponte@ufv.br", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0003-4398-409X"))
 Description: Provides data and functions used throughout the book.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 Imports: 
-   dplyr,
+    boot,
+    car,
+    cowplot,
+    dplyr,
     ggplot2,
+    igraph,
+    interval,
+    lubridate,
+    nasapower,
+    progress,
     purrr,
-    tibble,
-    survival
-LazyData: true
-Suggests: 
-    testthat (>= 3.0.0)
+    rlang,
+    stats,
+    survival,
+    tidyr
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+URL: https://github.com/emdelponte/r4pde
+BugReports: https://github.com/emdelponte/r4pde/issues

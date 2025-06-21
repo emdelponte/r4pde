@@ -24,19 +24,21 @@
 #' @importFrom dplyr group_by summarise
 #' @export
 plot_AFSD <- function(df) {
-  if (!require("ggplot2")) {
-    install.packages("ggplot2")
-    library("ggplot2")
+  # Check required packages
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("The 'ggplot2' package is required. Please install it with install.packages('ggplot2').")
+  }
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("The 'dplyr' package is required. Please install it with install.packages('dplyr').")
   }
 
   # Calculate the centroid of each cluster
-  centroids <- df %>%
-    group_by(focus_id) %>%
-    summarise(x = mean(x), y = mean(y), .groups = "drop")
+  centroids <- dplyr::group_by(df, focus_id) |>
+    dplyr::summarise(x = mean(x), y = mean(y), .groups = "drop")
 
   # Create scatter plot
-  ggplot(df, aes(x = x, y = y)) +
-    geom_tile(fill = "gray70", color =  "black") +  # color points by cluster
-    geom_text(data = centroids, aes(label = focus_id), size = 5, vjust = -0.5) +
-    theme_minimal()
+  ggplot2::ggplot(df, ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_tile(fill = "gray70", color = "black") +
+    ggplot2::geom_text(data = centroids, ggplot2::aes(label = focus_id), size = 5, vjust = -0.5) +
+    ggplot2::theme_minimal()
 }

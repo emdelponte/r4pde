@@ -40,185 +40,171 @@
 #' @importFrom dplyr %>% mutate group_by summarise arrange select rowwise filter
 #' @importFrom survival Surv
 #' @importFrom interval ictest
-#'
 #' @export
 
-CompMuCens <- function(dat, scale, grade=T, ckData=F){
-  #Check if the required packages are installed in the working environment
-  #Check if the required packages are installed in the working environment
-  if (class(try(library(interval))) =="try-error") {
-    if (class(try(library(Icens))) =="try-error") {
-      if (!require("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-      #Installing the Icens package, which is required by the Interval package
-      BiocManager::install("Icens")
-    }
-    #Installing the interval package
-    install.packages ("interval", repos="http://cloud.r-project.org")
-  }
-  if (class(try(library(dplyr))) =="try-error") {
-    #Installing the dplyr package.
-    install.packages("dplyr", repos="http://cloud.r-project.org")
-  }
+CompMuCens <- function(dat, scale, grade = TRUE, ckData = FALSE) {
+
 
   # Converting data into a censored data format
-  if (grade==T) {
-    ######class value
-    if (scale[1]==0) {
-      if (scale[length(scale)-1]==100) {
-        Scale=unique(scale)
-        dat$Slow=ifelse(dat$x==1, 0,
-                        ifelse(dat$x==length(scale), 100,
-                               suppressWarnings(   #Suppress Warnings
-                                 as.numeric(lapply(dat$x, function(x)Scale[x-1])) ) ))
-        dat$Sup=ifelse(dat$x==1, 0,
-                       ifelse(dat$x==length(scale), 100,
-                              suppressWarnings(   #Suppress Warnings
-                                as.numeric(lapply(dat$x, function(x)Scale[x])) ) ))
+  if (grade) {
+    if (scale[1] == 0) {
+      if (scale[length(scale) - 1] == 100) {
+        Scale <- unique(scale)
+        dat$Slow <- ifelse(dat$x == 1, 0,
+                           ifelse(dat$x == length(scale), 100,
+                                  suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x - 1])))))
+        dat$Sup <- ifelse(dat$x == 1, 0,
+                          ifelse(dat$x == length(scale), 100,
+                                 suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x])))))
       } else {
-        Scale=scale
-        dat$Slow=ifelse(dat$x==1, 0,
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply(dat$x, function(x)Scale[x-1])) ) )
-        dat$Sup=ifelse(dat$x==1, 0,
-                       suppressWarnings(   #Suppress Warnings
-                         as.numeric(lapply(dat$x, function(x)Scale[x])) ) )
+        Scale <- scale
+        dat$Slow <- ifelse(dat$x == 1, 0,
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x - 1]))))
+        dat$Sup <- ifelse(dat$x == 1, 0,
+                          suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x]))))
       }
     } else {
-      if (scale[length(scale)-1]==100) {
-        Scale=c(0,unique(scale))
-        dat$Slow=ifelse(dat$x==length(scale), 100,
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply(dat$x, function(x)Scale[x])) ) )
-        dat$Sup=ifelse(dat$x==length(scale), 100,
-                       suppressWarnings(   #Suppress Warnings
-                         as.numeric(lapply(dat$x, function(x)Scale[x+1])) ) )
+      if (scale[length(scale) - 1] == 100) {
+        Scale <- c(0, unique(scale))
+        dat$Slow <- ifelse(dat$x == length(scale), 100,
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x]))))
+        dat$Sup <- ifelse(dat$x == length(scale), 100,
+                          suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[x + 1]))))
       } else {
-        if (scale[length(scale)]==100){
-          Scale=c(0,scale)
+        if (scale[length(scale)] == 100) {
+          Scale <- c(0, scale)
         } else {
-          Scale=c(0,scale,100)
+          Scale <- c(0, scale, 100)
         }
-        dat$Slow=as.numeric(lapply(dat$x, function(x)Scale[x]))
-        dat$Sup=as.numeric(lapply(dat$x, function(x)Scale[x+1]))
+        dat$Slow <- as.numeric(lapply(dat$x, function(x) Scale[x]))
+        dat$Sup <- as.numeric(lapply(dat$x, function(x) Scale[x + 1]))
       }
     }
-    outPrintD <- dat %>% rename(ClassValue=x)
-    dat <- dat %>% select (treatment, Slow, Sup)
+    outPrintD <- dplyr::rename(dat, ClassValue = x)
+    dat <- dplyr::select(dat, treatment, Slow, Sup)
   } else {
-    ######NPE
-    if (scale[1]==0) {
-      if (scale[length(scale)-1]==100) {
-        Scale=unique(scale)
-        dat$Slow=ifelse(!dat$x %in% c(0,100),
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply (dat$x, function(x) Scale[max(which(x>Scale))]))),
-                        dat$x)
-        dat$Sup=as.numeric(lapply(dat$x, function(x) Scale[min(which(x<=Scale))]) )
+    if (scale[1] == 0) {
+      if (scale[length(scale) - 1] == 100) {
+        Scale <- unique(scale)
+        dat$Slow <- ifelse(!dat$x %in% c(0, 100),
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[max(which(x > Scale))]))),
+                           dat$x)
+        dat$Sup <- as.numeric(lapply(dat$x, function(x) Scale[min(which(x <= Scale))]))
       } else {
-        Scale=scale
-        dat$Slow=ifelse(!dat$x==0,
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply (dat$x, function(x) Scale[max(which(x>Scale))]))),
-                        dat$x)
-        dat$Sup=as.numeric(lapply(dat$x, function(x) Scale[min(which(x<=Scale))]) )
+        Scale <- scale
+        dat$Slow <- ifelse(dat$x != 0,
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[max(which(x > Scale))]))),
+                           dat$x)
+        dat$Sup <- as.numeric(lapply(dat$x, function(x) Scale[min(which(x <= Scale))]))
       }
     } else {
-      if (scale[length(scale)-1]==100) {
-        Scale=c(0,unique(scale))
-        dat$Slow=ifelse(!dat$x %in% c(0,100),
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply (dat$x, function(x) Scale[max(which(x>Scale))]))),
-                        dat$x)
-        dat$Sup=ifelse(!dat$x==0,
-                       as.numeric(lapply(dat$x, function(x) Scale[min(which(x<=Scale))])),
-                       Scale[2])
+      if (scale[length(scale) - 1] == 100) {
+        Scale <- c(0, unique(scale))
+        dat$Slow <- ifelse(!dat$x %in% c(0, 100),
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[max(which(x > Scale))]))),
+                           dat$x)
+        dat$Sup <- ifelse(dat$x != 0,
+                          as.numeric(lapply(dat$x, function(x) Scale[min(which(x <= Scale))])),
+                          Scale[2])
       } else {
-        if (scale[length(scale)]==100){
-          Scale=c(0,scale)
+        if (scale[length(scale)] == 100) {
+          Scale <- c(0, scale)
         } else {
-          Scale=c(0,scale,100)
+          Scale <- c(0, scale, 100)
         }
-        dat$Slow=ifelse(!dat$x==0,
-                        suppressWarnings(   #Suppress Warnings
-                          as.numeric(lapply (dat$x, function(x) Scale[max(which(x>Scale))]))),
-                        dat$x)
-        dat$Sup=ifelse(!dat$x==0,
-                       as.numeric(lapply(dat$x, function(x) Scale[min(which(x<=Scale))])),
-                       Scale[2])
+        dat$Slow <- ifelse(dat$x != 0,
+                           suppressWarnings(as.numeric(lapply(dat$x, function(x) Scale[max(which(x > Scale))]))),
+                           dat$x)
+        dat$Sup <- ifelse(dat$x != 0,
+                          as.numeric(lapply(dat$x, function(x) Scale[min(which(x <= Scale))])),
+                          Scale[2])
       }
     }
-    outPrintD <- dat %>% rename(MidPoint=x)
-    dat <- dat %>% select (treatment, Slow, Sup)
+    outPrintD <- dplyr::rename(dat, MidPoint = x)
+    dat <- dplyr::select(dat, treatment, Slow, Sup)
   }
 
-  #Convert to Interval Data (To confirmation the scale input format)
-  outPrintD$intervals=as.character(survival::Surv(outPrintD$Slow, outPrintD$Sup, type = "interval2"))
-  outPrintD <- outPrintD %>% select(-Slow,-Sup)
+  outPrintD$intervals <- as.character(survival::Surv(outPrintD$Slow, outPrintD$Sup, type = "interval2"))
+  outPrintD <- dplyr::select(outPrintD, -Slow, -Sup)
 
-  # Extracting score statistics from each treatment group
-  mAll=ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treatment, scores="wmw",data=dat)
-  #Create a tag data frame for score statistics
-  anaD=dat %>% mutate(score=mAll$scores) %>%
-    group_by(treatment) %>% summarise(score=sum(score)) %>%
-    arrange(desc(score)) %>%
-    mutate (mk=row_number ()) %>% # "mk" being the descending order of the score statistic for each treatment.
-    as.data.frame()
+  mAll <- interval::ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treatment, scores = "wmw", data = dat)
 
-  # Creating a data frame to store the results of the analysis
-  out=anaD %>% arrange(desc(mk)) %>% mutate (V1=treatment,
-                                             V2=lead(treatment),
-                                             V1n=mk,
-                                             V2n=lead(mk),
-                                             pvalue=NA,
-                                             pvalue2=NA,
-                                             conclusion="",
-                                             conc1="") %>%  as.data.frame()
+  anaD <- dat |>
+    dplyr::mutate(score = mAll$scores) |>
+    dplyr::group_by(treatment) |>
+    dplyr::summarise(score = sum(score), .groups = "drop") |>
+    dplyr::arrange(dplyr::desc(score)) |>
+    dplyr::mutate(mk = dplyr::row_number())
 
-  # Creating a copy of the original data
-  dat1=dat %>% rowwise() %>% #Run code row by row
-    mutate (treat=which (anaD$treatment %in% treatment)) # "treat" being the descending order of the score statistic for each treatment
+  out <- anaD |>
+    dplyr::arrange(dplyr::desc(mk)) |>
+    dplyr::mutate(
+      V1 = treatment,
+      V2 = dplyr::lead(treatment),
+      V1n = mk,
+      V2n = dplyr::lead(mk),
+      pvalue = NA,
+      pvalue2 = NA,
+      conclusion = "",
+      conc1 = ""
+    )
 
-  # Pairwise comparison is performed in a loop.
-  # The significance level is adjusted based on the Bonferroni adjustment. For example, if there are three treatments A, B, and C, and the order in which they are administered is fixed, then we only need to compare A to B and B to C. We don't need to compare A to C, so the total number of comparisons is 2. Therefore, the significance level should be alpha/2.
-  for (i in c(1:(nrow(out)-1))) {
-    # Because ictest() performs the comparison according to the order of treatments, it needs to sort the treatments first.
-    testD=dat1 %>% filter(treatment %in% c(out[i,4],out[i,5])) %>%
-      select(-treatment) %>% arrange(treat)
-    m22=ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treat, scores="wmw",
-               data=testD, alternative="greater")
-    out[i,8]=m22$p.value
-    if (out[i,8]>(0.05/(nrow(out)-1))) {
-      m221=ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treat, scores="wmw",
-                  data=testD, alternative="two.sided")
-      out[i,9]=m221$p.value
-      out[i,10]=ifelse(m221$p.value>(0.05/(nrow(out)-1)), paste0(out[i,4],"=",out[i,5]), paste0(out[i,4],"<",out[i,5]))
-      rm(m221)
-    } else {  out[i,10]=paste0(out[i,4],">",out[i,5])   }
+  dat1 <- dat |>
+    dplyr::rowwise() |>
+    dplyr::mutate(treat = which(anaD$treatment %in% treatment))
 
-    if (i==1){  out[i,11]=out[i,10]  } else {
-      out[i,11]=substr(out[i,10],start=which( unlist(strsplit(out[i,10],split="")) %in% c(">", "<", "=") ),stop=nchar(out[i,10]))
+  for (i in seq_len(nrow(out) - 1)) {
+    testD <- dat1 |>
+      dplyr::filter(treatment %in% c(out[i, 4], out[i, 5])) |>
+      dplyr::select(-treatment) |>
+      dplyr::arrange(treat)
+
+    m22 <- interval::ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treat,
+                            scores = "wmw", data = testD, alternative = "greater")
+    out[i, 8] <- m22$p.value
+
+    if (out[i, 8] > (0.05 / (nrow(out) - 1))) {
+      m221 <- interval::ictest(survival::Surv(Slow, Sup, type = "interval2") ~ treat,
+                               scores = "wmw", data = testD, alternative = "two.sided")
+      out[i, 9] <- m221$p.value
+      out[i, 10] <- ifelse(m221$p.value > (0.05 / (nrow(out) - 1)),
+                           paste0(out[i, 4], "=", out[i, 5]),
+                           paste0(out[i, 4], "<", out[i, 5]))
+    } else {
+      out[i, 10] <- paste0(out[i, 4], ">", out[i, 5])
     }
-    rm(testD, m22)
+
+    if (i == 1) {
+      out[i, 11] <- as.character(out[i, 10])
+    } else {
+      out[i, 11] <- substr(
+        as.character(out[i, 10]),
+        start = which(unlist(strsplit(as.character(out[i, 10]), split = "")) %in% c(">", "<", "=")),
+        stop = nchar(as.character(out[i, 10]))
+      )
+    }
   }
 
-  #Renaming the columns in the analysis results
-  colnames(out)[c(4,5,8,9)]=c("treat1","treat2", "p-value for H0: treat1 ≤ treat2",
-                              "p-value for H0: treat1 = treat2" )
+  colnames(out)[c(4, 5, 8, 9)] <- c("treat1", "treat2", "p-value for H0: treat1 <= treat2",
+                                    "p-value for H0: treat1 = treat2")
 
-  #Creating the final output file
-  if (ckData==F){
-    out1=list( U.Score=out[,c(1,2)],
-               Hypothesis.test=out[-nrow(out), c(4,5,8,9)],
-               adj.Signif=0.05/(nrow(out)-1),
-               Conclusion=paste(out[-nrow(out),11], collapse = ""))
+  if (!ckData) {
+    out1 <- list(
+      U.Score = out[, c(1, 2)],
+      Hypothesis.test = out[-nrow(out), c(4, 5, 8, 9)],
+      adj.Signif = 0.05 / (nrow(out) - 1),
+      Conclusion = paste(out[-nrow(out), 11], collapse = "")
+    )
   } else {
-    out1=list( inputData=outPrintD,
-               U.Score=out[,c(1,2)],
-               Hypothesis.test=out[-nrow(out), c(4,5,8,9)],
-               adj.Signif=0.05/(nrow(out)-1),
-               Conclusion=paste(out[-nrow(out),11], collapse = ""))
+    out1 <- list(
+      inputData = outPrintD,
+      U.Score = out[, c(1, 2)],
+      Hypothesis.test = out[-nrow(out), c(4, 5, 8, 9)],
+      adj.Signif = 0.05 / (nrow(out) - 1),
+      Conclusion = paste(out[-nrow(out), 11], collapse = "")
+    )
   }
 
   return(out1)
 }
+

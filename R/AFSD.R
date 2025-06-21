@@ -36,10 +36,12 @@ AFSD <- function(df) {
     stop("Dataframe must contain 'x', 'y', and 'i' columns.")
   }
 
-  # Import the necessary libraries
-  if (!require("igraph")) {
-    install.packages("igraph")
-    library("igraph")
+  # Check for required packages
+  if (!requireNamespace("igraph", quietly = TRUE)) {
+    stop("The 'igraph' package is required. Please install it with install.packages('igraph').")
+  }
+  if (!requireNamespace("tidyr", quietly = TRUE)) {
+    stop("The 'tidyr' package is required. Please install it with install.packages('tidyr').")
   }
 
   # Filter for rows where i == 1
@@ -57,8 +59,8 @@ AFSD <- function(df) {
   adj_thresholded <- adj <= sqrt(2)  # Consider cells touching diagonally as well
 
   # Create graph and find clusters
-  g <- graph_from_adjacency_matrix(adj_thresholded, mode = "undirected")
-  clusters <- components(g)
+  g <- igraph::graph_from_adjacency_matrix(adj_thresholded, mode = "undirected")
+  clusters <- igraph::components(g)
 
   # Calculate proportion of diseased plants
   prop_diseased <- sum(df$i) / nrow(df)
@@ -67,43 +69,42 @@ AFSD <- function(df) {
   cluster_sizes <- table(clusters$membership)
 
   # Create a dataframe with cluster information and sizes
-  cluster_df <- data.frame(focus_id = names(cluster_sizes),
-                           size = as.integer(cluster_sizes))
+  cluster_df <- data.frame(
+    focus_id = names(cluster_sizes),
+    size = as.integer(cluster_sizes)
+  )
 
-
-  cluster_summary <- data.frame(NF = length(cluster_sizes),
-                                NF1000 = length(cluster_sizes) * 1000 / nrow(df),
-                                NSF = sum(cluster_sizes == 1),
-                                NSF1000 = sum(cluster_sizes == 1) * 1000 / nrow(df),
-                                DIS_INC = prop_diseased)
+  cluster_summary <- data.frame(
+    NF = length(cluster_sizes),
+    NF1000 = length(cluster_sizes) * 1000 / nrow(df),
+    NSF = sum(cluster_sizes == 1),
+    NSF1000 = sum(cluster_sizes == 1) * 1000 / nrow(df),
+    DIS_INC = prop_diseased
+  )
 
   # Add columns for the number of rows and columns in each cluster
   cluster_df$rows <- sapply(cluster_df$focus_id, function(id) {
-    nodes_in_cluster <- which(clusters$membership == id)
+    nodes_in_cluster <- which(clusters$membership == as.integer(id))
     max(df_filtered[nodes_in_cluster, 'y']) - min(df_filtered[nodes_in_cluster, 'y']) + 1
   })
   cluster_df$cols <- sapply(cluster_df$focus_id, function(id) {
-    nodes_in_cluster <- which(clusters$membership == id)
+    nodes_in_cluster <- which(clusters$membership == as.integer(id))
     max(df_filtered[nodes_in_cluster, 'x']) - min(df_filtered[nodes_in_cluster, 'x']) + 1
   })
 
-  cluster_df$SIF <- cluster_df$rows/cluster_df$cols
+  cluster_df$SIF <- cluster_df$rows / cluster_df$cols
   cluster_df$CIF <- cluster_df$size / (cluster_df$rows * cluster_df$cols)
 
-
-  # Add a mean index for the shape of cluster
+  # Add mean indices for shape and compactness
   cluster_summary$mean_SIF <- mean(cluster_df$cols / cluster_df$rows)
-
-  # Add a mean index for the compactness of the cluster
   cluster_summary$mean_CIF <- mean(cluster_df$size / (cluster_df$rows * cluster_df$cols))
 
-  cluster_summary2 <- cluster_summary |>
-    pivot_longer(1:7, names_to = "stats", values_to = "value")
+  # Pivot the summary table
+  cluster_summary2 <- tidyr::pivot_longer(cluster_summary, cols = 1:7, names_to = "stats", values_to = "value")
 
-  df_clustered <- df[df$i == 1, ]  # only keep rows where i == 1
-  df_clustered$focus_id <- clusters$membership  # add cluster ID to the dataframe
-
-
+  # Add cluster IDs to filtered df
+  df_clustered <- df[df$i == 1, ]
+  df_clustered$focus_id <- clusters$membership
 
   return(list(cluster_summary2, cluster_df, df_clustered))
 }

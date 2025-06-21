@@ -48,11 +48,3 @@ data frame, using bootstrapping to generate mean, standard deviation, and median
 correlation. The Simes correction is applied to control for multiple testing, providing a global
 p-value (\emph{Pg}). The function also returns the maximum observed correlation.
 }
-\examples{
-# Example usage
-data <- data.frame(x1 = rnorm(100), x2 = rnorm(100), y = rnorm(100))
-result <- windowpane_tests(data, "y", corr_type = "spearman", R = 500)
-result$results
-result$summary_table
-
-}

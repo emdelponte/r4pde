@@ -4,7 +4,7 @@
 \alias{CompMuCens}
 \title{Survival analysis for quantitative ordinal scale data.}
 \usage{
-CompMuCens(dat, scale, grade = T, ckData = F)
+CompMuCens(dat, scale, grade = TRUE, ckData = FALSE)
 }
 \arguments{
 \item{dat}{Data frame containing the data to be processed.}

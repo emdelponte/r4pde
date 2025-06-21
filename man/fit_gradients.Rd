@@ -14,16 +14,14 @@ fit_gradients(data, C = 1)
 }
 \value{
 A list containing:
-\itemize{
-\item{\code{data}}{The input data, which will include an additional column 'mod_x'.}
-\item{\code{results_table}}{A table of the model parameters and R-squared values.}
-\item{\code{plot_exponential}}{Diagnostic plot for the exponential model.}
-\item{\code{plot_power}}{Diagnostic plot for the power model.}
-\item{\code{plot_modified_power}}{Diagnostic plot for the modified power model.}
-\item{\code{plot_exponential_original}}{Plot of the original data with the exponential model fit.}
-\item{\code{plot_power_original}}{Plot of the original data with the power model fit.}
-\item{\code{plot_modified_power_original}}{Plot of the original data with the modified power model fit.}
-}
+\item{data}{The input data, which will include an additional column 'mod_x'.}
+\item{results_table}{A table of the model parameters and R-squared values.}
+\item{plot_exponential}{Diagnostic plot for the exponential model.}
+\item{plot_power}{Diagnostic plot for the power model.}
+\item{plot_modified_power}{Diagnostic plot for the modified power model.}
+\item{plot_exponential_original}{Plot of the original data with the exponential model fit.}
+\item{plot_power_original}{Plot of the original data with the power model fit.}
+\item{plot_modified_power_original}{Plot of the original data with the modified power model fit.}
 }
 \description{
 This function fits three gradient models (exponential, power, and modified power) to given data.

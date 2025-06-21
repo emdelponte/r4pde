@@ -1,93 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/AFSD.html</loc>
-  </url>
-  <url>
-    <loc>/reference/BPL.html</loc>
-  </url>
-  <url>
-    <loc>/reference/BlastWheat.html</loc>
-  </url>
-  <url>
-    <loc>/reference/BudBlightSoybean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/CompMuCens.html</loc>
-  </url>
-  <url>
-    <loc>/reference/DSI.html</loc>
-  </url>
-  <url>
-    <loc>/reference/DSI2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/DidymellaWatermelon.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FHBWheat.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FusariumBanana.html</loc>
-  </url>
-  <url>
-    <loc>/reference/RustSoybean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/SpatialAggregated.html</loc>
-  </url>
-  <url>
-    <loc>/reference/SpatialRandom.html</loc>
-  </url>
-  <url>
-    <loc>/reference/WhiteMoldSoybean.html</loc>
-  </url>
-  <url>
-    <loc>/reference/count_subarea.html</loc>
-  </url>
-  <url>
-    <loc>/reference/doublets.test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fit_gradients.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_nasapower.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/join_count.html</loc>
-  </url>
-  <url>
-    <loc>/reference/oruns.test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/oruns_test.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_AFSD.html</loc>
-  </url>
-  <url>
-    <loc>/reference/theme_r4pde.html</loc>
-  </url>
-  <url>
-    <loc>/reference/windowpane.html</loc>
-  </url>
-  <url>
-    <loc>/reference/windowpane_tests.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/AFSD.html</loc></url>
+<url><loc>/reference/BPL.html</loc></url>
+<url><loc>/reference/BlastWheat.html</loc></url>
+<url><loc>/reference/BudBlightSoybean.html</loc></url>
+<url><loc>/reference/CompMuCens.html</loc></url>
+<url><loc>/reference/DSI.html</loc></url>
+<url><loc>/reference/DSI2.html</loc></url>
+<url><loc>/reference/DidymellaWatermelon.html</loc></url>
+<url><loc>/reference/FHBWheat.html</loc></url>
+<url><loc>/reference/FusariumBanana.html</loc></url>
+<url><loc>/reference/RustSoybean.html</loc></url>
+<url><loc>/reference/SpatialAggregated.html</loc></url>
+<url><loc>/reference/SpatialRandom.html</loc></url>
+<url><loc>/reference/WhiteMoldSoybean.html</loc></url>
+<url><loc>/reference/count_subareas.html</loc></url>
+<url><loc>/reference/count_subareas_random.html</loc></url>
+<url><loc>/reference/doublets.test.html</loc></url>
+<url><loc>/reference/fit_gradients.html</loc></url>
+<url><loc>/reference/get_nasapower.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/join_count.html</loc></url>
+<url><loc>/reference/oruns_test.html</loc></url>
+<url><loc>/reference/oruns_test_boustrophedon.html</loc></url>
+<url><loc>/reference/oruns_test_byrowcol.html</loc></url>
+<url><loc>/reference/plot_AFSD.html</loc></url>
+<url><loc>/reference/theme_r4pde.html</loc></url>
+<url><loc>/reference/windowpane.html</loc></url>
+<url><loc>/reference/windowpane_tests.html</loc></url>
 </urlset>
+

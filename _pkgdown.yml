@@ -1,4 +1,12 @@
 url: ~
 template:
-  bootstrap: 5
-
+  bslib:
+    version: 5
+    bootswatch: flatly   # light theme with good contrast
+    primary: "#2E8B57"   # seagreen primary color
+    bg: "#ffffff"        # white background
+    fg: "#1c1c1c"        # near-black text
+    base_font: {google: "Open Sans"}
+    code_font: {google: "Fira Code"}
+    heading_font: {google: "Lato"}
+    theme_toggle: false   # enables light/dark toggle

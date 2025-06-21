@@ -19,7 +19,7 @@
 #'
 #' @return A data frame with the calculated summary values for each window.
 #'
-#' @import dplyr tidyr
+#' @import tidyr
 #' @export
 windowpane <- function(data,
                        end_date_col,

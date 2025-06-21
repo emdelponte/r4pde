@@ -26,16 +26,9 @@
 #' \item{summary_table}{A data frame summarizing the global p-value (\emph{Pg}) and maximum correlation.}
 #' \item{global_significant}{A logical value indicating whether the global test is significant.}
 #'
-#' @examples
-#' # Example usage
-#' data <- data.frame(x1 = rnorm(100), x2 = rnorm(100), y = rnorm(100))
-#' result <- windowpane_tests(data, "y", corr_type = "spearman", R = 500)
-#' result$results
-#' result$summary_table
 #'
-#' @import boot
-#' @import dplyr
 #' @export
+
 windowpane_tests <- function(data, response_var, corr_type = "spearman", R = 1000, global_alpha = 0.05, individual_alpha = 0.005) {
   # Define predictors and response
   predictors <- setdiff(names(data), response_var)
@@ -80,7 +73,7 @@ windowpane_tests <- function(data, response_var, corr_type = "spearman", R = 100
         data_boot <- data.frame(var_data = var_data[complete_cases], response = response[complete_cases])
 
         # Run the bootstrap (using boot package)
-        boot_result <- boot(data = data_boot, statistic = function(data, indices) {
+        boot_result <- boot::boot(data = data_boot, statistic = function(data, indices) {
           calc_correlation(data, indices, "var_data", "response")
         }, R = R)
 
