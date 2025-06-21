@@ -10,13 +10,7 @@ if (getRversion() >= "2.15.1") {
     "mk", "treat", "treatment", "Slow", "Sup", ":="
   ))
 }
-.onLoad <- function(libname, pkgname) {
-  if (!requireNamespace("Icens", quietly = TRUE)) {
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-    BiocManager::install("Icens", ask = FALSE, update = FALSE)
-  }
-}
+
 # Import from base and recommended packages to suppress NOTES on undefined functions
 #' @importFrom stats aggregate coef complete.cases cor.test lm median sd var
 #' @importFrom utils install.packages
