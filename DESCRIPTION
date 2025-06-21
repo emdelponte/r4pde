@@ -1,13 +1,15 @@
 Package: r4pde
-Title: Companion to R4PDE book
+Type: Package
+Title: Companion to R4PDE Book
 Version: 0.1.0
 Authors@R: 
-    person("Emerson", "Del Ponte", , "delponte@ufv.br", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-4398-409X"))
-Description: Provides data and functions used throughout the book.
+    person(given = "Emerson", family = "Del Ponte", email = "delponte@ufv.br", 
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4398-409X"))
+Description: Provides datasets and utility functions to support the book
+    "R for Plant Disease Epidemiology".
 License: MIT + file LICENSE
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 Imports: 
     boot,
     car,
@@ -25,6 +27,11 @@ Imports:
     survival,
     tidyr,
     Icens
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
