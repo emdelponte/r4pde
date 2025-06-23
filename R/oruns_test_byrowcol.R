@@ -21,18 +21,19 @@ oruns_test_byrowcol <- function(mat) {
     oruns_test(x)
   }
 
+  build_df <- function(res) {
+    if (is.null(res)) {
+      return(data.frame(U = NA, EU = NA, sU = NA, Z = NA, pvalue = NA, result = NA))
+    } else {
+      return(data.frame(U = res$U, EU = res$EU, sU = res$sU, Z = res$Z, pvalue = res$pvalue, result = res$result))
+    }
+  }
+
   row_tests <- lapply(seq_len(nrow(mat)), function(i) apply_oruns(mat[i, ]))
   col_tests <- lapply(seq_len(ncol(mat)), function(j) apply_oruns(mat[, j]))
 
-  row_df <- do.call(rbind, lapply(row_tests, function(res) {
-    if (is.null(res)) return(data.frame(result = NA))
-    data.frame(U = res$U, EU = res$EU, sU = res$sU, Z = res$Z, pvalue = res$pvalue, result = res$result)
-  }))
-
-  col_df <- do.call(rbind, lapply(col_tests, function(res) {
-    if (is.null(res)) return(data.frame(result = NA))
-    data.frame(U = res$U, EU = res$EU, sU = res$sU, Z = res$Z, pvalue = res$pvalue, result = res$result)
-  }))
+  row_df <- do.call(rbind, lapply(row_tests, build_df))
+  col_df <- do.call(rbind, lapply(col_tests, build_df))
 
   row_summary <- round(prop.table(table(na.omit(row_df$result))) * 100, 2)
   col_summary <- round(prop.table(table(na.omit(col_df$result))) * 100, 2)

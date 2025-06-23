@@ -1,12 +1,14 @@
-url: ~
+url: https://emdelponte.github.io/r4pde/
+
 template:
-  bslib:
-    version: 5
-    bootswatch: flatly   # light theme with good contrast
-    primary: "#2E8B57"   # seagreen primary color
-    bg: "#ffffff"        # white background
-    fg: "#1c1c1c"        # near-black text
-    base_font: {google: "Open Sans"}
-    code_font: {google: "Fira Code"}
-    heading_font: {google: "Lato"}
-    theme_toggle: false   # enables light/dark toggle
+  bootstrap: 5
+
+home:
+  title: r4pde
+  description: Companion package to the book "R for Plant Disease Epidemiology"
+  license: FALSE
+development:
+  mode: auto
+
+
+
