@@ -55,3 +55,9 @@ Chiang, K.S., Chang, Y.M., Liu, H.I., Lee, J.Y., El Jarroudi, M. and Bock, C., 2
 as a Basis to Test Hypotheses When Using Quantitative Ordinal Scale Disease Severity Data. Phytopathology,
 in press. Available at: https://apsjournals.apsnet.org/doi/abs/10.1094/PHYTO-02-23-0055-R
 }
+\seealso{
+Other Disease quantification: 
+\code{\link{DSI}()},
+\code{\link{DSI2}()}
+}
+\concept{Disease quantification}

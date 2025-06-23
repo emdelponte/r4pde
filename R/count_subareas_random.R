@@ -12,7 +12,7 @@
 #' \item{submatrix}{The sampled subgrid matrix.}
 #' \item{count}{Number of 1s in the sampled submatrix.}
 #' @export
-#'
+#' @family Spatial analysis
 
 count_subareas_random <- function(matrix_data, sub_rows = 3, sub_cols = 3, n_samples = 100) {
   total_rows <- nrow(matrix_data)

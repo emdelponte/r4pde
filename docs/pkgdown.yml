@@ -2,7 +2,7 @@ pandoc: '3.4'
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-06-23T10:43Z
+last_built: 2025-06-23T14:39Z
 urls:
   reference: https://emdelponte.github.io/r4pde/reference
   article: https://emdelponte.github.io/r4pde/articles

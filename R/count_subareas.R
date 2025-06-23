@@ -18,6 +18,7 @@
 #' print(count_matrix)
 #'
 #' @export
+#' @family Spatial analysis
 
 
 # Function to count 1s in subareas

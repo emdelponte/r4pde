@@ -30,6 +30,7 @@
 #' @importFrom stats dist
 #'
 #' @export
+#' @family Spatial analysis
 AFSD <- function(df) {
   # Check that the necessary columns are present in the dataframe
   if (!all(c("x", "y", "i") %in% colnames(df))) {

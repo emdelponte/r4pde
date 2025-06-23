@@ -18,6 +18,7 @@
 #'   * result, the test result of either "aggregation or clustering" or "randomness"
 #'
 #' @export
+#' @family Spatial analysis
 oruns_test <- function(x) {
   # S is the input data
   S <- x

@@ -43,6 +43,7 @@
 #'   The American Phytopathological Society.
 #'
 #' @export
+#' @family Spatial analysis
 join_count <- function(matrix_data) {
 
   count_sequences <- function(matrix_data) {

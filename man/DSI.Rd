@@ -31,3 +31,9 @@ max <- 3
 DSI(unit, class, max)
 
 }
+\seealso{
+Other Disease quantification: 
+\code{\link{CompMuCens}()},
+\code{\link{DSI2}()}
+}
+\concept{Disease quantification}

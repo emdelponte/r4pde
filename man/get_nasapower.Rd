@@ -52,3 +52,8 @@ results <- get_nasapower(data, days_around = 28, date_col = "heading")
 }
 
 }
+\seealso{
+Other Disease modeling: 
+\code{\link{windowpane}()}
+}
+\concept{Disease modeling}

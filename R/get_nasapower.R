@@ -41,6 +41,7 @@
 #' }
 #'
 #' @export
+#' @family Disease modeling
 get_nasapower <- function(data, days_around, date_col, pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")) {
   # Helper function to fetch data for a single location
   get_nasa_data <- function(data, index, days_around, date_col, pars) {

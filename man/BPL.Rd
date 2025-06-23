@@ -50,3 +50,16 @@ print(paste("ln(Ap):", result$ln_Ap))
 print(paste("Slope (b):", result$slope))
 }
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{count_subareas}()},
+\code{\link{count_subareas_random}()},
+\code{\link{fit_gradients}()},
+\code{\link{join_count}()},
+\code{\link{oruns_test}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

@@ -21,6 +21,7 @@
 #'
 #' @import tidyr
 #' @export
+#' @family Disease modeling
 windowpane <- function(data,
                        end_date_col,
                        date_col,

@@ -8,6 +8,7 @@
 #'
 #' @return A ggplot2 theme object.
 #' @export
+#' @family Miscellaneous
 
 theme_r4pde <- function(font_size = 16) {
   base_theme <- cowplot::theme_half_open(font_size = font_size)

@@ -41,6 +41,7 @@
 #' @importFrom survival Surv
 #' @importFrom interval ictest
 #' @export
+#' @family Disease quantification
 
 CompMuCens <- function(dat, scale, grade = TRUE, ckData = FALSE) {
 

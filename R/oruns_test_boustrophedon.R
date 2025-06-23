@@ -10,6 +10,7 @@
 #' @export
 #' @seealso \code{\link{oruns_test}}
 #' @importFrom stats na.omit
+#' @family Spatial analysis
 
 oruns_test_boustrophedon <- function(mat) {
   if (!is.matrix(mat) || !all(mat %in% c(0, 1, NA))) {

@@ -1,5 +1,4 @@
-# r4pde <img src="man/figures/logo.png" width="170px" align="right"/>
-
+# r4pde <img src="man/figures/logo.png" width="200px" align="right"/>
 An R package developed as a companion to the book [R for Plant Disease Epidemiology](https://r4pde.netlify.app/). It provides access to a suite of specialized R functions and datasets tailored for teaching and analyzing plant disease epidemiology. This package supports researchers, students, and practitioners by offering tools for disease quantification, spatial analysis and predictive modeling.
 
 ## Installation

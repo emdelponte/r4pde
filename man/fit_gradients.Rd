@@ -37,3 +37,16 @@ mg$plot_power_original +
   labs(title = "", x = "Distance from focus (m)", y = "Count of lesions")
 
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{BPL}()},
+\code{\link{count_subareas}()},
+\code{\link{count_subareas_random}()},
+\code{\link{join_count}()},
+\code{\link{oruns_test}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

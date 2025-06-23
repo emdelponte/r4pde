@@ -29,3 +29,16 @@ count_matrix <- count_subareas(mat, sub_rows = 3, sub_cols = 3)
 print(count_matrix)
 
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{BPL}()},
+\code{\link{count_subareas_random}()},
+\code{\link{fit_gradients}()},
+\code{\link{join_count}()},
+\code{\link{oruns_test}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

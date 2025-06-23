@@ -25,3 +25,16 @@ A list of sampled subgrids. Each element is a list with:
 Randomly samples submatrices (quadrats) of specified size from a binary matrix,
 and returns the positions, submatrices, and count of 1s in each sampled quadrat.
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{BPL}()},
+\code{\link{count_subareas}()},
+\code{\link{fit_gradients}()},
+\code{\link{join_count}()},
+\code{\link{oruns_test}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

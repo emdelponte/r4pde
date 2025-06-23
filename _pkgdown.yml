@@ -10,5 +10,49 @@ home:
 development:
   mode: auto
 
+reference:
+  - title: "Disease Quantification"
+    desc: "Functions for calculating disease indices and survival-based metrics."
+    contents:
+      - DSI
+      - DSI2
+      - CompMuCens
 
+  - title: "Spatial analysis"
+    desc: "Functions to detect and quantify spatial structure in disease data."
+    contents:
+      - AFSD
+      - BPL
+      - count_subareas
+      - count_subareas_random
+      - join_count
+      - oruns_test
+      - oruns_test_byrowcol
+      - oruns_test_boustrophedon
+      - windowpane
+      - windowpane_tests
+      - plot_AFSD
 
+  - title: "Disease modeling"
+    desc: "Functions for fitting gradient models and retrieving climate data."
+    contents:
+      - fit_gradients
+      - get_nasapower
+
+  - title: "Datasets"
+    desc: "Datasets used in the examples and analyses."
+    contents:
+      - BlastWheat
+      - BudBlightSoybean
+      - DidymellaWatermelon
+      - FHBWheat
+      - FusariumBanana
+      - RustSoybean
+      - WhiteMoldSoybean
+      - SpatialAggregated
+      - SpatialRandom
+
+  - title: "Miscellaneous"
+    desc: "Utility functions for plotting and customization."
+    contents:
+      - theme_r4pde

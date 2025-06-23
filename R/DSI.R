@@ -20,6 +20,7 @@
 #' DSI(unit, class, max)
 #'
 #' @export
+#' @family Disease quantification
 DSI <- function(unit, class, max) {
   df <- data.frame(unit, class)
   tab <- aggregate(df$class, list(num=class), length)

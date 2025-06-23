@@ -28,3 +28,9 @@ and finally multiplied by 100 to get a percentage.
 DSI2(c(0, 1, 2, 3, 4), c(2, 0, 5, 0, 5), 4)
 
 }
+\seealso{
+Other Disease quantification: 
+\code{\link{CompMuCens}()},
+\code{\link{DSI}()}
+}
+\concept{Disease quantification}

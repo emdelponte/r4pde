@@ -33,6 +33,7 @@
 #' print(paste("Slope (b):", result$slope))
 #' }
 #' @export
+#' @family Spatial analysis
 
 BPL <- function(data) {
   # Summarize the data by field

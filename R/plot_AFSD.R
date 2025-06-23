@@ -23,6 +23,7 @@
 #' @importFrom ggplot2 ggplot geom_tile theme_minimal geom_text
 #' @importFrom dplyr group_by summarise
 #' @export
+#' @family Spatial analysis
 plot_AFSD <- function(df) {
   # Check required packages
   if (!requireNamespace("ggplot2", quietly = TRUE)) {

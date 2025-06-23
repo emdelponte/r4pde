@@ -29,3 +29,16 @@ Perform a runs test on the input data to test for clustering or randomness.
 oruns_test(c(1, 0, 1, 1, 0, 1, 0, 0, 1, 1))
 
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{BPL}()},
+\code{\link{count_subareas}()},
+\code{\link{count_subareas_random}()},
+\code{\link{fit_gradients}()},
+\code{\link{join_count}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

@@ -28,6 +28,7 @@
 #'   labs(title = "", x = "Distance from focus (m)", y = "Count of lesions")
 #'
 #' @export
+#' @family Spatial analysis
 
 fit_gradients <- function(data, C = 1) {
   # Ensure column names are as expected

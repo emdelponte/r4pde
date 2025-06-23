@@ -52,3 +52,16 @@ cat(result_text)  # Print the rich text output
 Madden, L. V., Hughes, G., & van den Bosch, F. (2007). The Study of Plant Disease Epidemics.
 The American Phytopathological Society.
 }
+\seealso{
+Other Spatial analysis: 
+\code{\link{AFSD}()},
+\code{\link{BPL}()},
+\code{\link{count_subareas}()},
+\code{\link{count_subareas_random}()},
+\code{\link{fit_gradients}()},
+\code{\link{oruns_test}()},
+\code{\link{oruns_test_boustrophedon}()},
+\code{\link{oruns_test_byrowcol}()},
+\code{\link{plot_AFSD}()}
+}
+\concept{Spatial analysis}

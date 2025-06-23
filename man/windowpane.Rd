@@ -48,3 +48,8 @@ This function calculates summary statistics within specified windows around a gi
 in a dataset, facilitating epidemiological analysis. It allows backward, forward, or both
 directions of window calculations based on a user-defined variable and window lengths.
 }
+\seealso{
+Other Disease modeling: 
+\code{\link{get_nasapower}()}
+}
+\concept{Disease modeling}

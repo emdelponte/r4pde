@@ -17,6 +17,7 @@
 #' DSI2(c(0, 1, 2, 3, 4), c(2, 0, 5, 0, 5), 4)
 #'
 #' @export
+#' @family Disease quantification
 DSI2 <- function(class, freq, max) {
   df <- data.frame(class, freq)
 
