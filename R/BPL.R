@@ -23,7 +23,7 @@
 #'   3. Fits a linear model to the log-transformed variances.
 #'   4. Tests the hypothesis that the slope of the linear model is equal to 1.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Example usage with a sample data frame
 #' result <- BPL(FHBWheat)
 #' print(result$summary)

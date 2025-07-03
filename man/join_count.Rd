@@ -4,12 +4,14 @@
 \alias{join_count}
 \title{Test for Spatial Join Count Statistics}
 \usage{
-join_count(matrix_data)
+join_count(matrix_data, verbose = TRUE)
 }
 \arguments{
 \item{matrix_data}{A binary matrix (with elements 0 and 1) representing the spatial distribution
 of two types of points: 0 for healthy plants (H) and 1 for diseased plants (D). This matrix reflects
 the geographical distribution or layout of plants in the studied area.}
+
+\item{verbose}{Logical. If TRUE (default), prints a formatted message to the console.}
 }
 \value{
 A comprehensive, rich-text formatted string of results that includes:
@@ -34,19 +36,6 @@ The function conducts an analysis by first counting the occurrence of specific s
 It then calculates expected values, standard
 deviations, and Z-scores to determine the spatial randomness or aggregation. The analysis
 considers both horizontal and vertical adjacency (rook case) in the matrix.
-}
-\examples{
-\dontrun{
-matrix_data <- matrix(c(1,1,1,0,0,
-                        1,1,1,0,0,
-                        1,1,1,0,0,
-                        1,1,1,0,0,
-                        0,0,0,0,0),
-                        ncol = 5, byrow = TRUE)
-result_text <- join_count(matrix_data)
-cat(result_text)  # Print the rich text output
-}
-
 }
 \references{
 Madden, L. V., Hughes, G., & van den Bosch, F. (2007). The Study of Plant Disease Epidemics.

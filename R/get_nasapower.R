@@ -25,21 +25,6 @@
 #' @importFrom nasapower get_power
 #' @importFrom purrr map_dfr
 #' @importFrom progress progress_bar
-#'
-#' @examples
-#' \dontrun{
-#' # Sample data
-#' data <- data.frame(
-#'   study = c("Study1", "Study2"),
-#'   latitude = c(-15.78, -20.45),
-#'   longitude = c(-47.93, -54.82),
-#'   heading = c("2022-05-10", "2022-05-15")
-#' )
-#'
-#' # Fetch weather data with a progress bar
-#' results <- get_nasapower(data, days_around = 28, date_col = "heading")
-#' }
-#'
 #' @export
 #' @family Disease modeling
 get_nasapower <- function(data, days_around, date_col, pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")) {

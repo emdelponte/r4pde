@@ -37,21 +37,6 @@ The function uses the \code{get_power} function from the \code{nasapower} packag
 dates around the specified date column for each location. A progress bar is shown during the data download
 process, and the results are combined into a single data frame.
 }
-\examples{
-\dontrun{
-# Sample data
-data <- data.frame(
-  study = c("Study1", "Study2"),
-  latitude = c(-15.78, -20.45),
-  longitude = c(-47.93, -54.82),
-  heading = c("2022-05-10", "2022-05-15")
-)
-
-# Fetch weather data with a progress bar
-results <- get_nasapower(data, days_around = 28, date_col = "heading")
-}
-
-}
 \seealso{
 Other Disease modeling: 
 \code{\link{windowpane}()}

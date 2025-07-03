@@ -40,7 +40,7 @@ mean incidence (\code{incidence_mean}), observed variance (\code{V}), and binomi
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # Example usage with a sample data frame
 result <- BPL(FHBWheat)
 print(result$summary)

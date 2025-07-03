@@ -63,15 +63,17 @@ oruns_test <- function(x) {
 #' @noRd
 
 print.r4pde.oruns_test <- function(x, ...) {
-  cat("Ordinary Runs Test of Data Sequence:\n")
-  cat("-------------------------------------\n")
-  cat(sprintf("Total Number of Runs (U): %d\n", x[[1]]))
-  cat(sprintf("Expected Number of Runs (EU): %.2f\n", x[[2]]))
-  cat(sprintf("Standard Deviation of Runs (sU): %.2f\n", x[[3]]))
-  cat(sprintf("Z-score: %.2f\n", x[[4]]))
-  cat(sprintf("P-value: %.4f\n\n", x[[4]]))
-  cat("Interpretation:\n")
-  cat(sprintf("Based on the Z-score, the sequence exhibits '%s'.\n", x[[6]]))
-
+  message(
+    "Ordinary Runs Test of Data Sequence:\n",
+    "-------------------------------------\n",
+    sprintf("Total Number of Runs (U): %d\n", x$U),
+    sprintf("Expected Number of Runs (EU): %.2f\n", x$EU),
+    sprintf("Standard Deviation of Runs (sU): %.2f\n", x$sU),
+    sprintf("Z-score: %.2f\n", x$Z),
+    sprintf("P-value: %.4f\n\n", x$pvalue),
+    "Interpretation:\n",
+    sprintf("Based on the Z-score, the sequence exhibits '%s'.\n", x$result)
+  )
   invisible(x)
 }
+
