@@ -59,16 +59,20 @@
 <img src="logo.png" class="logo" alt=""><h1 id="r4pde-">r4pde <a class="anchor" aria-label="anchor" href="#r4pde-"></a>
 </h1>
 </div>
-<p>An R package developed as a companion to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a>. It provides access to a suite of specialized R functions and datasets tailored for teaching and analyzing plant disease epidemiology. This package supports researchers, students, and practitioners by offering tools for disease quantification, spatial analysis and predictive modeling.</p>
+<p><a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://www.r-pkg.org/badges/version/r4pde" alt="CRAN"></a> <a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/r4pde" alt="Downloads"></a><br>
+An R package developed as a companion to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a>. It provides access to a suite of specialized R functions and datasets tailored for teaching and analyzing plant disease epidemiology. This package supports researchers, students, and practitioners by offering tools for disease quantification, spatial analysis and predictive modeling.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The development version of {r4pde} is available from GitHub. To install it along with its dependencies (including Bioconductor packages), use the <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a> package:</p>
+<p>Install the stable release from CRAN.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"r4pde"</span><span class="op">)</span></span></code></pre></div>
+<p>The development version of {r4pde} is available from GitHub. To install it along with its dependencies (including Bioconductor packages), use the <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a> package:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"pak"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"emdelponte/r4pde"</span><span class="op">)</span></span></code></pre></div>
 <p>Alternatively, using remotes:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"emdelponte/r4pde"</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
@@ -87,13 +91,14 @@
 <li>This package is released under the MIT license.</li>
 <li>To cite the package, please use:</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"r4pde"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=r4pde" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/issues" class="external-link">Report a bug</a></li>
 </ul>

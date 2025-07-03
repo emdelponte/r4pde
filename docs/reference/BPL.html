@@ -88,15 +88,60 @@ mean incidence (<code>incidence_mean</code>), observed variance (<code>V</code>)
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Example usage with a sample data frame</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">BPL</span><span class="op">(</span><span class="va">FHBWheat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 153 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    field n_total incidence_mean      V   Vbin log_V log_Vbin</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1     200          0.52  0.033<span style="text-decoration: underline;">3</span> 0.025<span style="text-decoration: underline;">0</span> -<span style="color: #BB0000;">3.40</span>    -<span style="color: #BB0000;">3.69</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     2     200          0.535 0.052<span style="text-decoration: underline;">9</span> 0.024<span style="text-decoration: underline;">9</span> -<span style="color: #BB0000;">2.94</span>    -<span style="color: #BB0000;">3.69</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     3     200          0.3   0.027<span style="text-decoration: underline;">4</span> 0.021  -<span style="color: #BB0000;">3.60</span>    -<span style="color: #BB0000;">3.86</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     4     200          0.42  0.020<span style="text-decoration: underline;">6</span> 0.024<span style="text-decoration: underline;">4</span> -<span style="color: #BB0000;">3.88</span>    -<span style="color: #BB0000;">3.71</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     5     200          0.35  0.01   0.022<span style="text-decoration: underline;">8</span> -<span style="color: #BB0000;">4.61</span>    -<span style="color: #BB0000;">3.78</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     6     200          0.365 0.046<span style="text-decoration: underline;">6</span> 0.023<span style="text-decoration: underline;">2</span> -<span style="color: #BB0000;">3.07</span>    -<span style="color: #BB0000;">3.76</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     7     200          0.315 0.024<span style="text-decoration: underline;">5</span> 0.021<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">3.71</span>    -<span style="color: #BB0000;">3.84</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     8     200          0.505 0.035<span style="text-decoration: underline;">2</span> 0.025<span style="text-decoration: underline;">0</span> -<span style="color: #BB0000;">3.35</span>    -<span style="color: #BB0000;">3.69</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     9     200          0.56  0.020<span style="text-decoration: underline;">4</span> 0.024<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">3.89</span>    -<span style="color: #BB0000;">3.70</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     200          0.43  0.024<span style="text-decoration: underline;">3</span> 0.024<span style="text-decoration: underline;">5</span> -<span style="color: #BB0000;">3.72</span>    -<span style="color: #BB0000;">3.71</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 143 more rows</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">model_summary</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lm(formula = log_V ~ log_Vbin, data = df_summary)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residuals:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Min       1Q   Median       3Q      Max </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -1.06015 -0.23599 -0.00801  0.25043  1.80832 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate Std. Error t value Pr(&gt;|t|)    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)   0.3158     0.1860   1.698   0.0916 .  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> log_Vbin      1.0205     0.0420  24.295   &lt;2e-16 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual standard error: 0.3935 on 151 degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiple R-squared:  0.7963,	Adjusted R-squared:  0.7949 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> F-statistic: 590.3 on 1 and 151 DF,  p-value: &lt; 2.2e-16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">hypothesis_test</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear hypothesis test:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> log_Vbin = 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model 1: restricted model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model 2: log_V ~ log_Vbin</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    152 23.422                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    151 23.385  1  0.036968 0.2387 0.6259</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"ln(Ap):"</span>, <span class="va">result</span><span class="op">$</span><span class="va">ln_Ap</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ln(Ap): 0.315806312326611"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Slope (b):"</span>, <span class="va">result</span><span class="op">$</span><span class="va">slope</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Slope (b): 1.02052263172857"</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
