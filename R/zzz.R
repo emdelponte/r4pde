@@ -10,7 +10,11 @@ if (getRversion() >= "2.15.1") {
     "mk", "treat", "treatment", "Slow", "Sup", ":="
   ))
 }
-
+utils::globalVariables(c(
+  ".mu_hat", ".res_dev", ".res_pear", ".y",
+  "time", "mu", "cluster", "trt_lab",
+  "label", "label_short", "xend", "yend"
+))
 # Import from base and recommended packages to suppress NOTES on undefined functions
 #' @importFrom stats aggregate coef complete.cases cor.test lm median sd var
 #' @importFrom utils install.packages

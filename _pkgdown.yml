@@ -56,3 +56,15 @@ reference:
     desc: "Utility functions for plotting and customization."
     contents:
       - theme_r4pde
+
+  - title: "Curve comparison"
+    contents:
+      - compare_curves
+      - plot_curves
+      - plot_dendrogram
+      - plot.r4pde_compare_curves
+  - title: "Diagnostics"
+    contents:
+      - diagnose_curves
+      - plot_diagnostics
+      - print.r4pde_curve_diagnostics

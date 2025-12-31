@@ -1,7 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://emdelponte.github.io/r4pde/404.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/LICENSE-text.html</loc></url>
-<url><loc>https://emdelponte.github.io/r4pde/LICENSE.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/authors.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/index.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/news/index.html</loc></url>
@@ -19,9 +18,10 @@
 <url><loc>https://emdelponte.github.io/r4pde/reference/SpatialAggregated.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/SpatialRandom.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/WhiteMoldSoybean.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/compare_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/count_subareas.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/count_subareas_random.html</loc></url>
-<url><loc>https://emdelponte.github.io/r4pde/reference/doublets.test.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/diagnose_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/fit_gradients.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/get_nasapower.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/index.html</loc></url>
@@ -29,7 +29,12 @@
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test_boustrophedon.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test_byrowcol.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_AFSD.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/plot_curves.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/plot_dendrogram.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/plot_diagnostics.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/print.r4pde_curve_diagnostics.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/theme_r4pde.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/windowpane.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/windowpane_tests.html</loc></url>
