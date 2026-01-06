@@ -9,7 +9,7 @@ Functions for calculating disease indices and survival-based metrics.
 - [`DSI2()`](https://emdelponte.github.io/r4pde/reference/DSI2.md) :
   Calculate the Disease severity Index (DSI) (frequency of each class)
 - [`CompMuCens()`](https://emdelponte.github.io/r4pde/reference/CompMuCens.md)
-  : Survival analysis for quantitative ordinal scale data.
+  : Survival analysis for quantitative ordinal scale data
 
 ## Spatial analysis
 
@@ -80,8 +80,8 @@ Utility functions for plotting and customization.
 ## Curve comparison
 
 - [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
-  : Compare epidemic curves using functional GAM smoothing and
-  clustering
+  : Compare epidemic curves using GAM smoothing, functional distances,
+  clustering, and optional permutation/bootstrapping
 - [`plot_curves()`](https://emdelponte.github.io/r4pde/reference/plot_curves.md)
   : Plot environment-adjusted epidemic curves by cluster
 - [`plot_dendrogram()`](https://emdelponte.github.io/r4pde/reference/plot_dendrogram.md)
