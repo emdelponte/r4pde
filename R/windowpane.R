@@ -68,10 +68,10 @@ windowpane <- function(data,
     subset_data <- data
     if (!is.null(group_by_cols)) {
       for (col in group_by_cols) {
-        subset_data <- subset_data %>% filter(.data[[col]] == current_group[[col]])
+        subset_data <- subset_data %>% dplyr::filter(.data[[col]] == current_group[[col]])
       }
     }
-    subset_data <- subset_data %>% filter((!!end_date_col) == end_date)
+    subset_data <- subset_data %>% dplyr::filter((!!end_date_col) == end_date)
 
     start_date <- end_date - max(window_lengths)
 
@@ -93,7 +93,7 @@ windowpane <- function(data,
 
           # Filter data for the current window
           window_data <- subset_data %>%
-            filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
+            dplyr::filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
 
           # Calculate summary value
           value <- switch(
@@ -142,7 +142,7 @@ windowpane <- function(data,
 
           # Filter data for the current window
           window_data <- subset_data %>%
-            filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
+            dplyr::filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
 
           # Calculate summary value
           value <- switch(

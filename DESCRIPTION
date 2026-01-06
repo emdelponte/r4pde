@@ -20,7 +20,6 @@ Imports:
     dplyr,
     ggplot2,
     igraph,
-    interval,
     lubridate,
     mgcv,
     nasapower,
@@ -32,6 +31,7 @@ Imports:
     tidyr,
     tibble
 Suggests:
+    interval,
     testthat,
     knitr,
     rmarkdown,

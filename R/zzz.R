@@ -15,6 +15,11 @@ utils::globalVariables(c(
   "time", "mu", "cluster", "trt_lab",
   "label", "label_short", "xend", "yend"
 ))
+.onLoad <- function(libname, pkgname) {
+  utils::globalVariables(c(
+    "curve_id_chr", "trt_chr", "y_hat", "u_chr", "id", ".iter"
+  ))
+}
 # Import from base and recommended packages to suppress NOTES on undefined functions
 #' @importFrom stats aggregate coef complete.cases cor.test lm median sd var
 #' @importFrom utils install.packages

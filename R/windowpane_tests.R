@@ -99,7 +99,7 @@ windowpane_tests <- function(data, response_var, corr_type = "spearman", R = 100
 
   # Apply Simes method to adjust for multiple testing
   results <- results %>%
-    arrange(p_value) %>%
+    dplyr::arrange(p_value) %>%
     mutate(rank = row_number(),
            m = n(),
            simes_threshold = global_alpha * rank / m,

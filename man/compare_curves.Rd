@@ -2,7 +2,7 @@
 % Please edit documentation in R/compare_curves.R
 \name{compare_curves}
 \alias{compare_curves}
-\title{Compare epidemic curves using functional GAM smoothing and clustering}
+\title{Compare epidemic curves using GAM smoothing, functional distances, clustering, and optional permutation/bootstrapping}
 \usage{
 compare_curves(
   data,
@@ -19,84 +19,141 @@ compare_curves(
   env_ref = NULL,
   k_smooth = 10,
   k_env = 4,
-  k_trt = 4,
+  k_trt = 6,
   gamma = 1.4,
   discrete = TRUE,
   cluster_k = 4,
   hc_method = "ward.D2",
+  test_factor = NULL,
+  n_perm = 999,
+  test_mode = c("auto", "none", "global", "global_pairwise"),
+  min_strata_for_pairwise = 6,
+  perm_unit = NULL,
+  perm_strata = NULL,
+  bootstrap = FALSE,
+  boot_B = 399,
+  boot_seed = 1,
+  boot_ci = c(0.025, 0.975),
+  bootstrap_mode = c("predicted", "refit"),
   ...
 )
 }
 \arguments{
-\item{data}{A data.frame containing epidemic curve data.}
+\item{data}{A data.frame containing disease progress observations in long format.}
 
-\item{time}{Character string giving the name of the time variable.}
+\item{time}{Character string naming the time variable (numeric or coercible to numeric).}
 
-\item{response}{Character string giving the name of the response variable
-(disease severity or incidence).}
+\item{response}{Character string naming the response variable (disease incidence/severity).}
 
-\item{treatment}{Character string giving the name of the treatment or cultivar factor.}
+\item{treatment}{Character string naming the treatment/cultivar factor.}
 
-\item{environment}{Optional character string giving the environment factor.}
+\item{environment}{Optional character string naming an environment factor (e.g., site-year).}
 
-\item{block}{Optional character string giving the block or plot factor.}
+\item{block}{Optional character string naming a blocking factor.}
 
-\item{unit}{Optional character string giving a unique experimental unit identifier.
-If NULL, a unit is constructed from the interaction of environment, treatment,
-and block (when available).}
+\item{unit}{Optional character string naming a unique experimental unit (curve) identifier.
+If \code{NULL}, a unit is constructed from the interaction of available factors
+(environment, treatment, and block).}
 
 \item{response_scale}{Character string specifying the response scale:
-either \code{"proportion"} (0–1) or \code{"percent"} (0–100).}
+\code{"proportion"} (0--1) or \code{"percent"} (0--100).}
 
-\item{eps}{Numeric small constant retained for API compatibility.}
+\item{eps}{Numeric small constant retained for API compatibility (not used for beta handling).}
 
-\item{min_points}{Minimum number of observations required per epidemic curve.}
+\item{min_points}{Minimum number of observations required per curve (unit) to be retained.}
 
-\item{grid_n}{Number of time points used to evaluate predicted mean curves.}
+\item{grid_n}{Number of time points for evaluating predicted curves on a common grid.}
 
-\item{env_ref}{Reference environment level for adjusted predictions.
-If NULL, the first level is used.}
+\item{env_ref}{Reference environment level used for adjusted treatment mean predictions.
+If \code{NULL}, the first level of \code{environment} is used.}
 
-\item{k_smooth}{Basis dimension for the global smooth over time.}
+\item{k_smooth}{Basis dimension for the global smooth of time.}
 
-\item{k_env}{Basis dimension for the environment-specific smooth.}
+\item{k_env}{Basis dimension for the environment-specific smooth (if \code{environment} is provided).}
 
 \item{k_trt}{Basis dimension for the treatment-specific smooth.}
 
 \item{gamma}{Penalization parameter passed to \code{mgcv::bam()}.}
 
-\item{discrete}{Logical; whether to use discrete fitting in \code{bam()}.}
+\item{discrete}{Logical; whether to use discrete (approximate) fitting in \code{mgcv::bam()}.}
 
-\item{cluster_k}{Number of clusters used to cut the hierarchical tree.}
+\item{cluster_k}{Number of clusters used to cut the hierarchical tree for treatments.}
 
-\item{hc_method}{Clustering method passed to \code{hclust()}.}
+\item{hc_method}{Clustering linkage method passed to \code{stats::hclust()}.}
+
+\item{test_factor}{Optional a priori grouping used for a distance-based permutation test.
+Either (i) a single character naming a column in \code{data} that maps uniquely to the
+permutation unit (see \code{perm_unit}), or (ii) a named vector whose names are
+permutation-unit identifiers and whose values are group labels.}
+
+\item{n_perm}{Number of permutations for the distance-based test.}
+
+\item{test_mode}{Character; permutation test mode. One of \code{"auto"}, \code{"none"},
+\code{"global"}, or \code{"global_pairwise"}. In \code{"auto"}, pairwise tests may be
+disabled when restricted strata support is limited.}
+
+\item{min_strata_for_pairwise}{Minimum number of strata levels (e.g., blocks) required to
+enable pairwise tests under \code{test_mode = "auto"}.}
+
+\item{perm_unit}{Optional character naming the unit at which group labels are permuted
+(e.g., genotype/cultivar). If \code{NULL}, permutation is performed at the curve (unit) level.}
+
+\item{perm_strata}{Optional character naming a factor defining restricted permutation strata
+(e.g., block or environment). If \code{NULL}, defaults to \code{block} when provided.}
+
+\item{bootstrap}{Logical; if \code{TRUE}, compute bootstrap envelopes and distance summaries
+from resampled predicted curves.}
+
+\item{boot_B}{Integer number of bootstrap replicates.}
+
+\item{boot_seed}{Integer seed for bootstrap resampling.}
+
+\item{boot_ci}{Length-2 numeric vector of quantiles for bootstrap intervals (e.g., \code{c(0.025, 0.975)}).}
+
+\item{bootstrap_mode}{Character; bootstrap strategy. Currently supports \code{"predicted"}
+(resampling predicted curves). \code{"refit"} is not implemented in this version.}
 
 \item{...}{Reserved for future extensions.}
 }
 \value{
 An object of class \code{"r4pde_compare_curves"} containing:
 \itemize{
-\item fitted GAM object,
-\item environment-adjusted predicted curves,
-\item functional distance matrix,
-\item hierarchical clustering,
-\item treatment cluster assignments.
+\item \code{gam}: fitted GAM object and \code{family_used};
+\item \code{pred}: environment-adjusted treatment mean curves on the common grid;
+\item \code{distance}: treatment-by-treatment functional distance matrix and \code{hc};
+\item \code{clusters}: treatment cluster assignments and summary scores;
+\item \code{curve_distance}: curve-by-curve distance matrix;
+\item \code{test}: optional distance-based permutation test results;
+\item \code{bootstrap}: optional bootstrap envelopes and distance summaries;
+\item diagnostic fields including \code{settings} and captured beta-fit warnings.
 }
 }
 \description{
-Fits a generalized additive model (GAM) to disease progress curves using
-a beta regression (with automatic fallback to quasibinomial),
-derives environment-adjusted mean curves for each treatment,
-computes functional distances among treatments,
-and performs hierarchical clustering of epidemic trajectories.
+Fits a generalized additive model (GAM) to replicated disease progress curves.
+By default, the response is modeled with beta regression (logit link) after a
+Smithson–Verkuilen adjustment to handle 0 and 1 values; if beta precision
+(theta) estimation fails, the model falls back to a quasibinomial GAM fit on
+the unclipped proportion response.
 
-The function is designed for replicated plant disease epidemics
-measured repeatedly over time, optionally across environments and blocks.
+From the fitted model, the function derives (i) environment-adjusted treatment
+mean curves on a common time grid, (ii) L2 functional distances among
+treatment mean trajectories followed by hierarchical clustering, and (iii)
+curve-level fitted trajectories (excluding unit random effects) to build a
+curve-by-curve distance matrix. Optionally, it performs a restricted
+permutation test on the curve-level distance matrix for a priori group labels,
+and computes bootstrap envelopes and distance uncertainty summaries from
+resampled predicted curves.
 }
 \details{
-The response is internally transformed using the Smithson–Verkuilen adjustment
-to avoid exact 0 and 1 values. Functional distances are computed using an
-L2 norm over predicted mean curves evaluated on a common time grid.
+Functional distances among treatments are computed as an L2 norm over the
+predicted mean curves evaluated on a common time grid. Curve-level distances
+are computed analogously using fitted trajectories (excluding unit random effects),
+and are scaled by the median non-zero distance for numerical stability; interpret
+these distances as relative rather than absolute units.
+
+The permutation test uses a PERMANOVA-like pseudo-\eqn{F} statistic computed from
+the curve-level distance matrix, with optional restricted permutations within
+strata. When enabled, pairwise comparisons are adjusted using Holm's method.
 }
 \seealso{
 \code{\link{plot_curves}},
