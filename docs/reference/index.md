@@ -46,6 +46,8 @@ Functions for fitting gradient models and retrieving climate data.
   : Fit Gradient Models to Data
 - [`get_nasapower()`](https://emdelponte.github.io/r4pde/reference/get_nasapower.md)
   : Fetch NASA POWER Data for Multiple Locations with a Progress Bar
+- [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md)
+  : Fetch ERA5 Data from Open-Meteo for Multiple Locations
 
 ## Datasets
 

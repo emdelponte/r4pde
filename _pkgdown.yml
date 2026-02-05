@@ -38,6 +38,7 @@ reference:
     contents:
       - fit_gradients
       - get_nasapower
+      - get_era5
 
   - title: "Datasets"
     desc: "Datasets used in the examples and analyses."

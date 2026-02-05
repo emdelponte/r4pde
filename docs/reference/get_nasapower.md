@@ -12,6 +12,7 @@ get_nasapower(
   data,
   days_around,
   date_col,
+  study_col = "study",
   pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")
 )
 ```
@@ -21,7 +22,7 @@ get_nasapower(
 - data:
 
   A data frame containing the input data, including columns for
-  latitude, longitude, study identifier, and the date column.
+  latitude, longitude, and the date column.
 
 - days_around:
 
@@ -33,6 +34,11 @@ get_nasapower(
   A character string specifying the name of the date column in the data
   frame.
 
+- study_col:
+
+  A character string specifying the name of the column containing the
+  study identifier in the input data frame (default: "study").
+
 - pars:
 
   A character vector specifying the weather variables to fetch from NASA
@@ -42,9 +48,9 @@ get_nasapower(
 ## Value
 
 A data frame with the downloaded weather data from NASA POWER, combined
-for all specified locations. Includes a new variable `study` indicating
-the study identifier from the input data. Returns an empty data frame if
-no data is retrieved.
+for all specified locations. Includes a variable `study` indicating the
+study identifier from the input data. Returns an empty data frame if no
+data is retrieved.
 
 ## Details
 
@@ -56,4 +62,5 @@ download process, and the results are combined into a single data frame.
 ## See also
 
 Other Disease modeling:
+[`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md),
 [`windowpane()`](https://emdelponte.github.io/r4pde/reference/windowpane.md)
