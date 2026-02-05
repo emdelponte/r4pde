@@ -8,24 +8,28 @@ get_nasapower(
   data,
   days_around,
   date_col,
+  study_col = "study",
   pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")
 )
 }
 \arguments{
-\item{data}{A data frame containing the input data, including columns for latitude, longitude, study identifier,
-and the date column.}
+\item{data}{A data frame containing the input data, including columns for latitude, longitude, and
+the date column.}
 
 \item{days_around}{An integer specifying the number of days before and after the date in the date column
 to download data.}
 
 \item{date_col}{A character string specifying the name of the date column in the data frame.}
 
+\item{study_col}{A character string specifying the name of the column containing the study identifier
+in the input data frame (default: "study").}
+
 \item{pars}{A character vector specifying the weather variables to fetch from NASA POWER
 (default: c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")).}
 }
 \value{
 A data frame with the downloaded weather data from NASA POWER, combined for all specified locations.
-Includes a new variable \code{study} indicating the study identifier from the input data.
+Includes a variable \code{study} indicating the study identifier from the input data.
 Returns an empty data frame if no data is retrieved.
 }
 \description{
@@ -39,6 +43,7 @@ process, and the results are combined into a single data frame.
 }
 \seealso{
 Other Disease modeling: 
+\code{\link{get_era5}()},
 \code{\link{windowpane}()}
 }
 \concept{Disease modeling}
