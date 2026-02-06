@@ -8,6 +8,10 @@
   [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md)
   for retrieving ERA5 reanalysis weather data via Open-Meteo API.
 - Added
+  [`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md)
+  for extracting daily weather data from the Brazilian Daily Weather
+  Gridded Data (BR-DWGD) NetCDF files.
+- Added
   [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
   for functional comparison and clustering of epidemic curves.
 - Added plotting and diagnostic helpers for curve models.

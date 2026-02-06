@@ -43,6 +43,7 @@ process, and the results are combined into a single data frame.
 }
 \seealso{
 Other Disease modeling: 
+\code{\link{get_brdwgd}()},
 \code{\link{get_era5}()},
 \code{\link{windowpane}()}
 }

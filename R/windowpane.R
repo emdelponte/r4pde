@@ -19,7 +19,10 @@
 #'
 #' @return A data frame with the calculated summary values for each window.
 #'
-#' @import tidyr
+#' @importFrom tidyr unite pivot_wider
+#' @importFrom dplyr mutate group_by summarize ungroup as_tibble select everything filter distinct pull bind_rows bind_cols rename_with across all_of
+#' @importFrom rlang enquo !! as_label
+#' @importFrom magrittr %>%
 #' @export
 #' @family Disease modeling
 windowpane <- function(data,

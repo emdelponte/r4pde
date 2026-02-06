@@ -79,5 +79,6 @@ A data frame with the calculated summary values for each window.
 ## See also
 
 Other Disease modeling:
+[`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md),
 [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md),
 [`get_nasapower()`](https://emdelponte.github.io/r4pde/reference/get_nasapower.md)

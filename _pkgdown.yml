@@ -40,6 +40,7 @@ reference:
       - fit_gradients
       - get_nasapower
       - get_era5
+      - get_brdwgd
 
   - title: "Datasets"
     desc: "Datasets used in the examples and analyses."

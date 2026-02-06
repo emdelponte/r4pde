@@ -59,6 +59,7 @@ performs the daily aggregation manually:
 }
 \seealso{
 Other Disease modeling: 
+\code{\link{get_brdwgd}()},
 \code{\link{get_nasapower}()},
 \code{\link{windowpane}()}
 }

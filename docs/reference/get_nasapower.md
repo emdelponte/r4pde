@@ -62,5 +62,6 @@ download process, and the results are combined into a single data frame.
 ## See also
 
 Other Disease modeling:
+[`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md),
 [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md),
 [`windowpane()`](https://emdelponte.github.io/r4pde/reference/windowpane.md)

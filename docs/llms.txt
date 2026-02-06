@@ -98,6 +98,8 @@ Functions for fitting gradient models and retrieving climate data.
   : Fetch NASA POWER Data for Multiple Locations with a Progress Bar
 - [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md)
   : Fetch ERA5 Data from Open-Meteo for Multiple Locations
+- [`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md)
+  : Fetch BR-DWGD Data for Multiple Locations
 
 ## Datasets
 

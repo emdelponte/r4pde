@@ -82,5 +82,6 @@ variables (like mean relative humidity) directly, this function fetches
 ## See also
 
 Other Disease modeling:
+[`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md),
 [`get_nasapower()`](https://emdelponte.github.io/r4pde/reference/get_nasapower.md),
 [`windowpane()`](https://emdelponte.github.io/r4pde/reference/windowpane.md)

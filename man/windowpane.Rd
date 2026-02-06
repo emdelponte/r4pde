@@ -50,6 +50,7 @@ directions of window calculations based on a user-defined variable and window le
 }
 \seealso{
 Other Disease modeling: 
+\code{\link{get_brdwgd}()},
 \code{\link{get_era5}()},
 \code{\link{get_nasapower}()}
 }
