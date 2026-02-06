@@ -3,12 +3,12 @@
 #' This function downloads daily NASA POWER data for specified weather variables over a specified number of days
 #' around a given date column for multiple locations. It includes a progress bar to show the download progress.
 #'
-#' @param data A data frame containing the input data, including columns for latitude, longitude, and 
+#' @param data A data frame containing the input data, including columns for latitude, longitude, and
 #' the date column.
 #' @param days_around An integer specifying the number of days before and after the date in the date column
 #' to download data.
 #' @param date_col A character string specifying the name of the date column in the data frame.
-#' @param study_col A character string specifying the name of the column containing the study identifier 
+#' @param study_col A character string specifying the name of the column containing the study identifier
 #' in the input data frame (default: "study").
 #' @param pars A character vector specifying the weather variables to fetch from NASA POWER
 #' (default: c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")).
@@ -29,16 +29,26 @@
 #' @importFrom progress progress_bar
 #' @export
 #' @family Disease modeling
-get_nasapower <- function(data, days_around, date_col, study_col = "study", 
-                          pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")) {
+get_nasapower <- function(data, days_around, date_col, study_col = "study",
+                          pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW"),
+                          direction = "both") {
   # Helper function to fetch data for a single location
-  get_nasa_data <- function(data, index, days_around, date_col, study_col, pars) {
+  get_nasa_data <- function(data, index, days_around, date_col, study_col, pars, direction) {
     # Dynamically extract the date column
     given_date <- as.Date(data[[date_col]][index])
 
     # Calculate start and end dates based on the specified given date and days_around
-    start_date <- given_date - days(days_around)
-    end_date <- given_date + days(days_around)
+    if (direction == "back") {
+      start_date <- given_date - days(days_around)
+      end_date <- given_date
+    } else if (direction == "forth") {
+      start_date <- given_date
+      end_date <- given_date + days(days_around)
+    } else {
+      # "both" or default
+      start_date <- given_date - days(days_around)
+      end_date <- given_date + days(days_around)
+    }
 
     # Identify coordinate columns (flexible matching)
     lon_col <- if ("longitude" %in% names(data)) "longitude" else if ("lon" %in% names(data)) "lon" else stop("Longitude column not found.")
@@ -69,8 +79,8 @@ get_nasapower <- function(data, days_around, date_col, study_col = "study",
 
   # Use map_dfr with progress bar
   results <- map_dfr(1:nrow(data), function(index) {
-    pb$tick()  # Update the progress bar
-    get_nasa_data(data, index, days_around, date_col, study_col, pars)
+    pb$tick() # Update the progress bar
+    get_nasa_data(data, index, days_around, date_col, study_col, pars, direction)
   })
 
   return(results)

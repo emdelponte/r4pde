@@ -10,7 +10,8 @@ get_era5(
   date_col,
   study_col = "study",
   pars = c("temperature_2m", "relative_humidity_2m", "precipitation", "dewpoint_2m"),
-  models = NULL
+  models = NULL,
+  direction = "both"
 )
 }
 \arguments{

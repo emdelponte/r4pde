@@ -9,7 +9,8 @@ get_nasapower(
   days_around,
   date_col,
   study_col = "study",
-  pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")
+  pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW"),
+  direction = "both"
 )
 }
 \arguments{

@@ -10,7 +10,8 @@ get_brdwgd(
   date_col,
   study_col = "study",
   path = "netcdf_files",
-  vars = c("pr", "Tmax", "Tmin", "Rs", "RH")
+  vars = c("pr", "Tmax", "Tmin", "Rs", "RH"),
+  direction = "both"
 )
 }
 \arguments{
