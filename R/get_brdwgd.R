@@ -16,6 +16,11 @@
 #' @param vars A character vector specifying the weather variables to fetch.
 #' These are expected to be the prefix of the NetCDF files (e.g., "pr", "Tmax").
 #' Default: `c("pr", "Tmax", "Tmin", "Rs", "RH")`.
+#' @param direction Character string specifying the direction of the date range relative to the reference date.
+#' Options are "both" (default), "back", or "forth".
+#' "back" retrieves data from `date - days_around` to `date`.
+#' "forth" retrieves data from `date` to `date + days_around`.
+#' "both" retrieves data from `date - days_around` to `date + days_around`.
 #'
 #' @return A data frame (tibble) with daily weather data. Columns are named to match
 #' `nasapower` conventions where possible: `date`, `PRECTOTCORR` (from `pr`),

@@ -22,6 +22,7 @@ Imports:
     igraph,
     lubridate,
     mgcv,
+    magrittr,
     nasapower,
     progress,
     purrr,

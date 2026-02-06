@@ -18,6 +18,11 @@
 #' "temperature_2m" (T2M), "relative_humidity_2m" (RH2M), "precipitation" (PRECTOTCORR), etc.
 #' @param models A character string specifying the reanalysis model(s) to use. If `NULL` (default),
 #' Open-Meteo uses its "best_match" logic (ERA5, ERA5-Land, etc.).
+#' @param direction Character string specifying the direction of the date range relative to the reference date.
+#' Options are "both" (default), "back", or "forth".
+#' "back" retrieves data from `date - days_around` to `date`.
+#' "forth" retrieves data from `date` to `date + days_around`.
+#' "both" retrieves data from `date - days_around` to `date + days_around`.
 #'
 #' @return A data frame (tibble) with daily weather data. Columns are named to match
 #' `nasapower` conventions: `date`, `T2M`, `T2M_MAX`, `T2M_MIN`, `RH2M`, `PRECTOTCORR`,

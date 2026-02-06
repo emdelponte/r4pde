@@ -27,6 +27,12 @@ in the input data frame (default: "study").}
 
 \item{pars}{A character vector specifying the weather variables to fetch from NASA POWER
 (default: c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")).}
+
+\item{direction}{Character string specifying the direction of the date range relative to the reference date.
+Options are "both" (default), "back", or "forth".
+"back" retrieves data from \code{date - days_around} to \code{date}.
+"forth" retrieves data from \code{date} to \code{date + days_around}.
+"both" retrieves data from \code{date - days_around} to \code{date + days_around}.}
 }
 \value{
 A data frame with the downloaded weather data from NASA POWER, combined for all specified locations.

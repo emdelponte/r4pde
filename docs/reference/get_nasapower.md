@@ -13,7 +13,8 @@ get_nasapower(
   days_around,
   date_col,
   study_col = "study",
-  pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")
+  pars = c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW"),
+  direction = "both"
 )
 ```
 
@@ -44,6 +45,14 @@ get_nasapower(
   A character vector specifying the weather variables to fetch from NASA
   POWER (default: c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN",
   "T2MDEW")).
+
+- direction:
+
+  Character string specifying the direction of the date range relative
+  to the reference date. Options are "both" (default), "back", or
+  "forth". "back" retrieves data from `date - days_around` to `date`.
+  "forth" retrieves data from `date` to `date + days_around`. "both"
+  retrieves data from `date - days_around` to `date + days_around`.
 
 ## Value
 

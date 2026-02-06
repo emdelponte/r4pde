@@ -32,6 +32,12 @@ These are mapped to \code{nasapower} equivalents:
 
 \item{models}{A character string specifying the reanalysis model(s) to use. If \code{NULL} (default),
 Open-Meteo uses its "best_match" logic (ERA5, ERA5-Land, etc.).}
+
+\item{direction}{Character string specifying the direction of the date range relative to the reference date.
+Options are "both" (default), "back", or "forth".
+"back" retrieves data from \code{date - days_around} to \code{date}.
+"forth" retrieves data from \code{date} to \code{date + days_around}.
+"both" retrieves data from \code{date - days_around} to \code{date + days_around}.}
 }
 \value{
 A data frame (tibble) with daily weather data. Columns are named to match

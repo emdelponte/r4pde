@@ -31,6 +31,12 @@ in the input data frame (default: "study").}
 \item{vars}{A character vector specifying the weather variables to fetch.
 These are expected to be the prefix of the NetCDF files (e.g., "pr", "Tmax").
 Default: \code{c("pr", "Tmax", "Tmin", "Rs", "RH")}.}
+
+\item{direction}{Character string specifying the direction of the date range relative to the reference date.
+Options are "both" (default), "back", or "forth".
+"back" retrieves data from \code{date - days_around} to \code{date}.
+"forth" retrieves data from \code{date} to \code{date + days_around}.
+"both" retrieves data from \code{date - days_around} to \code{date + days_around}.}
 }
 \value{
 A data frame (tibble) with daily weather data. Columns are named to match

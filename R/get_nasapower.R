@@ -12,6 +12,11 @@
 #' in the input data frame (default: "study").
 #' @param pars A character vector specifying the weather variables to fetch from NASA POWER
 #' (default: c("T2M", "RH2M", "PRECTOTCORR", "T2M_MAX", "T2M_MIN", "T2MDEW")).
+#' @param direction Character string specifying the direction of the date range relative to the reference date.
+#' Options are "both" (default), "back", or "forth".
+#' "back" retrieves data from `date - days_around` to `date`.
+#' "forth" retrieves data from `date` to `date + days_around`.
+#' "both" retrieves data from `date - days_around` to `date + days_around`.
 #'
 #' @return A data frame with the downloaded weather data from NASA POWER, combined for all specified locations.
 #' Includes a variable `study` indicating the study identifier from the input data.

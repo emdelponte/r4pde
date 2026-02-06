@@ -23,6 +23,7 @@
 #' @importFrom dplyr mutate group_by summarize ungroup as_tibble select everything filter distinct pull bind_rows bind_cols rename_with across all_of
 #' @importFrom rlang enquo !! as_label
 #' @importFrom magrittr %>%
+#' @importFrom tibble tibble
 #' @export
 #' @family Disease modeling
 windowpane <- function(data,
@@ -35,7 +36,6 @@ windowpane <- function(data,
                        direction = "backward",
                        group_by_cols = NULL,
                        date_format = "%Y-%m-%d") {
-
   # Convert columns to symbols for tidy evaluation
   end_date_col <- enquo(end_date_col)
   date_col <- enquo(date_col)
@@ -99,8 +99,7 @@ windowpane <- function(data,
             dplyr::filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
 
           # Calculate summary value
-          value <- switch(
-            summary_type,
+          value <- switch(summary_type,
             "mean" = mean(pull(window_data, !!variable), na.rm = TRUE),
             "sum" = sum(pull(window_data, !!variable), na.rm = TRUE),
             "above_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) > threshold, na.rm = TRUE),
@@ -148,8 +147,7 @@ windowpane <- function(data,
             dplyr::filter((!!date_col) >= window_start_date & (!!date_col) <= window_end_date)
 
           # Calculate summary value
-          value <- switch(
-            summary_type,
+          value <- switch(summary_type,
             "mean" = mean(pull(window_data, !!variable), na.rm = TRUE),
             "sum" = sum(pull(window_data, !!variable), na.rm = TRUE),
             "above_threshold" = if (!is.null(threshold)) sum(pull(window_data, !!variable) > threshold, na.rm = TRUE),

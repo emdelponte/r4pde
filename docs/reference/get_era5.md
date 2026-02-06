@@ -16,7 +16,8 @@ get_era5(
   date_col,
   study_col = "study",
   pars = c("temperature_2m", "relative_humidity_2m", "precipitation", "dewpoint_2m"),
-  models = NULL
+  models = NULL,
+  direction = "both"
 )
 ```
 
@@ -54,6 +55,14 @@ get_era5(
   A character string specifying the reanalysis model(s) to use. If
   `NULL` (default), Open-Meteo uses its "best_match" logic (ERA5,
   ERA5-Land, etc.).
+
+- direction:
+
+  Character string specifying the direction of the date range relative
+  to the reference date. Options are "both" (default), "back", or
+  "forth". "back" retrieves data from `date - days_around` to `date`.
+  "forth" retrieves data from `date` to `date + days_around`. "both"
+  retrieves data from `date - days_around` to `date + days_around`.
 
 ## Value
 
