@@ -2,6 +2,7 @@ url: https://emdelponte.github.io/r4pde/
 
 template:
   bootstrap: 5
+  light-switch: true
 
 home:
   title: r4pde

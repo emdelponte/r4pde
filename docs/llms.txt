@@ -33,10 +33,6 @@ if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("emdelponte/r4pde")
 ```
 
-> Note: The package depends on `Icens`, which is available from
-> Bioconductor. Both `pak` and `remotes` will install it automatically
-> if needed.
-
 ## Reporting Issues
 
 Please [report any bugs or
