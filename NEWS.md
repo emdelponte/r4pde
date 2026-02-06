@@ -1,6 +1,7 @@
-# r4pde 0.1.1 (2025-12-31)
+# r4pde 0.1.1 (2026-02-05)
 
 ## Enhancements
+- Added `get_era5()` for retrieving ERA5 reanalysis weather data via Open-Meteo API.
 - Added `compare_curves()` for functional comparison and clustering of epidemic curves.
 - Added plotting and diagnostic helpers for curve models.
 
