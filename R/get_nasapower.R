@@ -40,12 +40,16 @@ get_nasapower <- function(data, days_around, date_col, study_col = "study",
     start_date <- given_date - days(days_around)
     end_date <- given_date + days(days_around)
 
+    # Identify coordinate columns (flexible matching)
+    lon_col <- if ("longitude" %in% names(data)) "longitude" else if ("lon" %in% names(data)) "lon" else stop("Longitude column not found.")
+    lat_col <- if ("latitude" %in% names(data)) "latitude" else if ("lat" %in% names(data)) "lat" else stop("Latitude column not found.")
+
     # Fetch data using get_power
     response <- get_power(
       community = "ag",
       temporal_api = "daily",
       dates = c(start_date, end_date),
-      lonlat = c(data$longitude[index], data$latitude[index]),
+      lonlat = c(data[[lon_col]][index], data[[lat_col]][index]),
       pars = pars
     )
 

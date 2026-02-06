@@ -59,10 +59,14 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
     # Open-Meteo Archive API URL
     url <- "https://archive-api.open-meteo.com/v1/archive"
     
+    # Identify coordinate columns (flexible matching)
+    lon_col <- if ("longitude" %in% names(data_row)) "longitude" else if ("lon" %in% names(data_row)) "lon" else stop("Longitude column not found.")
+    lat_col <- if ("latitude" %in% names(data_row)) "latitude" else if ("lat" %in% names(data_row)) "lat" else stop("Latitude column not found.")
+
     # Query parameters - requesting HOURLY to ensure we can calculate all means
     query <- list(
-      latitude = data_row$latitude,
-      longitude = data_row$longitude,
+      latitude = data_row[[lat_col]],
+      longitude = data_row[[lon_col]],
       start_date = as.character(start_date),
       end_date = as.character(end_date),
       hourly = paste(pars, collapse = ","),
@@ -75,7 +79,7 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
     res <- tryCatch({
       httr::GET(url, query = query)
     }, error = function(e) {
-      warning(paste("Failed to fetch data for location:", data_row$latitude, data_row$longitude, "-", e$message))
+      warning(paste("Failed to fetch data for location:", data_row[[lat_col]], data_row[[lon_col]], "-", e$message))
       return(NULL)
     })
     
@@ -86,7 +90,7 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
         jsonlite::fromJSON(httr::content(res, as = "text"))$reason
       }, error = function(e) "Unknown error")
       
-      warning(paste("Open-Meteo API error", httr::status_code(res), " (", error_msg, ") for location:", data_row$latitude, data_row$longitude))
+      warning(paste("Open-Meteo API error", httr::status_code(res), " (", error_msg, ") for location:", data_row[[lat_col]], data_row[[lon_col]]))
       return(data.frame())
     }
     
