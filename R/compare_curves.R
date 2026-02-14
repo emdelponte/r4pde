@@ -134,6 +134,7 @@ compare_curves <- function(
     boot_seed = 1,
     boot_ci = c(0.025, 0.975),
     bootstrap_mode = c("predicted","refit"),  # default predicted (fast)
+    show_progress = TRUE,
     ...
 
 ){
@@ -142,7 +143,7 @@ compare_curves <- function(
   bootstrap_mode <- match.arg(bootstrap_mode)
 
   # deps
-  req <- c("dplyr","tidyr","tibble","purrr","ggplot2","mgcv","rlang")
+  req <- c("dplyr", "tidyr", "tibble", "purrr", "ggplot2", "mgcv", "rlang", "progress")
   miss <- req[!vapply(req, requireNamespace, logical(1), quietly = TRUE)]
   if(length(miss)) stop("Missing required packages: ", paste(miss, collapse = ", "))
 
@@ -582,10 +583,24 @@ compare_curves <- function(
     # global
     obs <- permanova_F(D_curve, g_curve)
     set.seed(1)
-    F_perm <- replicate(n_perm, {
-      gperm <- if (is.null(strata_curve)) sample(g_curve, replace = FALSE) else permute_within_strata(g_curve, strata_curve)
-      permanova_F(D_curve, gperm)$F
-    })
+    
+    if (show_progress) {
+      pb_glob <- progress::progress_bar$new(
+        format = "  Global permutation test [:bar] :percent eta: :eta",
+        total = n_perm, clear = FALSE, width = 60)
+    }
+    
+    F_perm <- numeric(n_perm)
+    for (i in seq_len(n_perm)) {
+      if (show_progress) pb_glob$tick()
+      gperm <- if (is.null(strata_curve)) {
+        sample(g_curve, replace = FALSE)
+      } else {
+        permute_within_strata(g_curve, strata_curve)
+      }
+      F_perm[i] <- permanova_F(D_curve, gperm)$F
+    }
+    
     p_global <- (1 + sum(F_perm >= obs$F, na.rm = TRUE)) / (n_perm + 1)
 
     # pairwise (optional)
@@ -593,6 +608,14 @@ compare_curves <- function(
     lev <- levels(g_curve)
     if (pairwise_allowed && length(lev) > 2) {
       pairs <- utils::combn(lev, 2, simplify = FALSE)
+      n_pairs <- length(pairs)
+      
+      if (show_progress) {
+        pb_pair <- progress::progress_bar$new(
+          format = "  Pairwise permutation tests [:bar] :percent eta: :eta",
+          total = n_pairs * n_perm, clear = FALSE, width = 60)
+      }
+
       pairwise <- purrr::map_dfr(pairs, function(pp) {
         keep2 <- g_curve %in% pp
         D2 <- D_curve[keep2, keep2, drop = FALSE]
@@ -600,10 +623,18 @@ compare_curves <- function(
         s2 <- if (is.null(strata_curve)) NULL else droplevels(strata_curve[keep2])
 
         ob2 <- permanova_F(D2, g2)
-        Fp2 <- replicate(n_perm, {
-          gp <- if (is.null(s2)) sample(g2, replace = FALSE) else permute_within_strata(g2, s2)
-          permanova_F(D2, gp)$F
-        })
+        
+        Fp2 <- numeric(n_perm)
+        for (j in seq_len(n_perm)) {
+          if (show_progress) pb_pair$tick()
+          gp <- if (is.null(s2)) {
+            sample(g2, replace = FALSE)
+          } else {
+            permute_within_strata(g2, s2)
+          }
+          Fp2[j] <- permanova_F(D2, gp)$F
+        }
+        
         p2 <- (1 + sum(Fp2 >= ob2$F, na.rm = TRUE)) / (n_perm + 1)
         tibble::tibble(group1 = pp[1], group2 = pp[2], F = ob2$F, p = p2)
       }) |>
@@ -656,9 +687,14 @@ compare_curves <- function(
         boot_unit_label <- "unit"
       }
 
-      boot_pred_list <- vector("list", boot_B)
+      if (show_progress) {
+        pb_boot <- progress::progress_bar$new(
+          format = "  Bootstrapping predictions [:bar] :percent eta: :eta",
+          total = boot_B, clear = FALSE, width = 60)
+      }
 
       for (b in seq_len(boot_B)) {
+        if (show_progress) pb_boot$tick()
         ids_b <- sample(ids0, replace = TRUE)
 
         w_draw <- tibble::tibble(id = factor(ids_b, levels = ids0)) |>
@@ -709,9 +745,18 @@ compare_curves <- function(
         })
       }
 
+      if (show_progress) {
+        pb_dist <- progress::progress_bar$new(
+          format = "  Calculating bootstrap distances [:bar] :percent eta: :eta",
+          total = boot_B, clear = FALSE, width = 60)
+      }
+
       dist_boot <- boot_pred |>
         dplyr::group_by(.iter) |>
-        dplyr::group_modify(~ boot_dist_one_iter(.x)) |>
+        dplyr::group_modify(~ {
+          if (show_progress) pb_dist$tick()
+          boot_dist_one_iter(.x)
+        }) |>
         dplyr::ungroup()
 
       dist_summary <- dist_boot |>
@@ -782,7 +827,8 @@ compare_curves <- function(
       perm_strata = perm_strata,
       bootstrap = bootstrap, boot_B = boot_B, boot_seed = boot_seed,
       boot_ci = boot_ci, bootstrap_mode = bootstrap_mode,
-      min_strata_for_pairwise = min_strata_for_pairwise
+      min_strata_for_pairwise = min_strata_for_pairwise,
+      show_progress = show_progress
     ),
     family_used = fam_used,
     gam = m_gam,

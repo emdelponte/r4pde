@@ -35,6 +35,7 @@ compare_curves(
   boot_seed = 1,
   boot_ci = c(0.025, 0.975),
   bootstrap_mode = c("predicted", "refit"),
+  show_progress = TRUE,
   ...
 )
 }
