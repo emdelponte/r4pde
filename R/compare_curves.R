@@ -62,6 +62,9 @@
 #' @param boot_ci Length-2 numeric vector of quantiles for bootstrap intervals (e.g., \code{c(0.025, 0.975)}).
 #' @param bootstrap_mode Character; bootstrap strategy. Currently supports \code{"predicted"}
 #'   (resampling predicted curves). \code{"refit"} is not implemented in this version.
+#' @param show_progress Logical; whether to show progress bars for long-running tasks.
+#' @param curve_level Logical; whether to compute curve-level distance matrix. If \code{NULL} (default),
+#'   it is automatically set to \code{TRUE} if \code{test_factor} is provided.
 #' @param ... Reserved for future extensions.
 #'
 #' @details
@@ -135,6 +138,7 @@ compare_curves <- function(
     boot_ci = c(0.025, 0.975),
     bootstrap_mode = c("predicted","refit"),  # default predicted (fast)
     show_progress = TRUE,
+    curve_level = NULL, 
     ...
 
 ){
@@ -244,13 +248,21 @@ compare_curves <- function(
   if(!is.null(.env)) k_env_eff <- min(k_env, max(2, length(unique(df[[.env]])) - 1))
 
   # ---- model formula ----
+  # Using 'by' smooths + trt main effect is generally more stable and faster than 'fs' 
   f_terms <- c(
-    sprintf("s(%s, k=%s)", .time, k_smooth_eff),
-    sprintf("s(%s, %s, bs='fs', k=%s, m=1)", .time, .trt, k_trt_eff),
-    sprintf("s(%s, bs='re')", .unit)
+    sprintf("%s", .trt),                                 # genotype main effect
+    sprintf("s(%s, k=%s)", .time, k_smooth_eff),          # global smooth
+    sprintf("s(%s, by=%s, k=%s)", .time, .trt, k_trt_eff) # genotype deviations
   )
+
+  # environment: random intercept (adjustment), not a full time-by-env smooth
   if(!is.null(.env)){
-    f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s, m=1)", .time, .env, k_env_eff))
+    f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .env))
+  }
+
+  # unit RE: only keep if you truly have replication within env×genotype (blocks/plots)
+  if(!is.null(.blk) || !is.null(unit)){
+    f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .unit))
   }
 
   f_gam_beta <- stats::as.formula(paste0(".y ~ ", paste(f_terms, collapse = " + ")))
@@ -308,15 +320,23 @@ compare_curves <- function(
   }
 
   # ---- treatment mean curves (env-adjusted) ----
+  # Global adjusted means exclude environment and unit random effects
   pred_trt <- purrr::map_dfr(trt_levels0, function(trt_i){
     newd <- tibble::tibble(tmp_time = t_grid)
     names(newd)[1] <- .time
     newd[[.trt]] <- factor(trt_i, levels = trt_levels0)
-    if(!is.null(.env)) newd[[.env]] <- factor(env_ref, levels = env_levels0)
-    newd[[.unit]] <- factor(unit_levels0[1], levels = unit_levels0)
 
-    excl <- c(sprintf("s(%s)", .unit))
-    if(!is.null(.env)) excl <- c(excl, sprintf("s(%s,%s)", .time, .env))
+    if(!is.null(.env)) newd[[.env]] <- factor(env_levels0[1], levels = env_levels0)
+
+    # exclude random effects for "global adjusted" mean
+    excl <- character()
+    if(!is.null(.env)) excl <- c(excl, sprintf("s(%s)", .env))
+
+    # if unit RE is in the model, exclude it too
+    if(any(grepl(sprintf("s\\(%s\\)", .unit), names(m_gam$smooth), fixed = TRUE))) {
+      newd[[.unit]] <- factor(unit_levels0[1], levels = unit_levels0)
+      excl <- c(excl, sprintf("s(%s)", .unit))
+    }
 
     mu <- mgcv::predict.gam(m_gam, newdata = newd, type = "response", exclude = excl)
 
@@ -374,76 +394,91 @@ compare_curves <- function(
   # ------------------------------------------------------------
   # Curve-level fitted trajectories (exclude unit RE) + distance matrix
   # ------------------------------------------------------------
-  col_name1 <- function(x){
-    if (is.null(x)) return(NULL)
-    if (is.character(x) && length(x) == 1L) return(x)
-    if (rlang::is_quosure(x)) return(rlang::as_name(rlang::quo_get_expr(x)))
-    if (rlang::is_symbol(x))  return(rlang::as_name(x))
-    if (is.list(x) && length(x) == 1L) return(col_name1(x[[1]]))
-    stop("Could not coerce column spec to a single name. Got: ", paste(class(x), collapse = "/"))
+  D_curve <- NULL
+  
+  # Auto-resolve curve_level
+  if (is.null(curve_level)) {
+    curve_level <- !is.null(test_factor)
   }
 
-  env_col <- col_name1(.env)
-  blk_col <- col_name1(.blk)
-  ab_cols <- c(env_col, blk_col)
-  ab_cols <- ab_cols[!is.na(ab_cols) & nzchar(ab_cols)]
+  if (isTRUE(curve_level)) {
+    col_name1 <- function(x){
+      if (is.null(x)) return(NULL)
+      if (is.character(x) && length(x) == 1L) return(x)
+      if (rlang::is_quosure(x)) return(rlang::as_name(rlang::quo_get_expr(x)))
+      if (rlang::is_symbol(x))  return(rlang::as_name(x))
+      if (is.list(x) && length(x) == 1L) return(col_name1(x[[1]]))
+      stop("Could not coerce column spec to a single name. Got: ", paste(class(x), collapse = "/"))
+    }
 
-  curve_meta <- df |>
-    dplyr::distinct(.data[[unit_used]], .data[[.trt]], dplyr::across(dplyr::all_of(ab_cols))) |>
-    dplyr::mutate(
-      curve_id_chr = as.character(.data[[unit_used]]),
-      trt_chr      = as.character(.data[[.trt]])
+    env_col <- col_name1(.env)
+    blk_col <- col_name1(.blk)
+    ab_cols <- c(env_col, blk_col)
+    ab_cols <- ab_cols[!is.na(ab_cols) & nzchar(ab_cols)]
+
+    curve_meta <- df |>
+      dplyr::distinct(.data[[unit_used]], .data[[.trt]], dplyr::across(dplyr::all_of(ab_cols))) |>
+      dplyr::mutate(
+        curve_id_chr = as.character(.data[[unit_used]]),
+        trt_chr      = as.character(.data[[.trt]])
+      )
+
+    dup <- curve_meta |>
+      dplyr::count(curve_id_chr) |>
+      dplyr::filter(n > 1)
+    if (nrow(dup) > 0) {
+      stop("Each curve (unit) must map to one treatment/block/env. Duplicates for: ",
+           paste(dup$curve_id_chr, collapse = ", "))
+    }
+
+    new_curve_grid <- tidyr::crossing(
+      curve_id_chr = curve_meta$curve_id_chr,
+      !!.time := t_grid
+    ) |>
+      dplyr::left_join(curve_meta, by = "curve_id_chr") |>
+      dplyr::mutate(
+        !!unit_used := factor(curve_id_chr, levels = unit_levels0),
+        !!.trt      := factor(trt_chr, levels = trt_levels0)
+      )
+
+    if (!is.null(.env) && .env %in% names(new_curve_grid)) {
+      new_curve_grid[[.env]] <- factor(new_curve_grid[[.env]], levels = env_levels0)
+    }
+    if (!is.null(.blk) && .blk %in% names(new_curve_grid)) {
+      new_curve_grid[[.blk]] <- factor(new_curve_grid[[.blk]], levels = blk_levels0)
+    }
+
+    # Exclude unit RE to get smooth curve-level fitted trajectories
+    excl_c <- character()
+    if(any(grepl(sprintf("s\\(%s\\)", unit_used), names(m_gam$smooth), fixed = TRUE))) {
+       excl_c <- c(excl_c, sprintf("s(%s)", unit_used))
+    }
+
+    new_curve_grid$y_hat <- as.numeric(
+      mgcv::predict.gam(
+        m_gam,
+        newdata = new_curve_grid,
+        type = "response",
+        exclude = excl_c
+      )
     )
 
-  dup <- curve_meta |>
-    dplyr::count(curve_id_chr) |>
-    dplyr::filter(n > 1)
-  if (nrow(dup) > 0) {
-    stop("Each curve (unit) must map to one treatment/block/env. Duplicates for: ",
-         paste(dup$curve_id_chr, collapse = ", "))
+    Yhat <- new_curve_grid |>
+      dplyr::select(curve_id_chr, !!.time, y_hat) |>
+      tidyr::pivot_wider(names_from = !!.time, values_from = y_hat) |>
+      dplyr::arrange(curve_id_chr)
+
+    curve_ids <- Yhat$curve_id_chr
+    Ymat <- as.matrix(Yhat[, -1, drop = FALSE])
+
+    dt <- mean(diff(t_grid))
+    D_curve <- as.matrix(stats::dist(Ymat, method = "euclidean")) * sqrt(dt)
+    rownames(D_curve) <- curve_ids
+    colnames(D_curve) <- curve_ids
+
+    # scaling for numerical stability (keep, but be explicit in interpretation)
+    D_curve <- D_curve / stats::median(D_curve[D_curve > 0])
   }
-
-  new_curve_grid <- tidyr::crossing(
-    curve_id_chr = curve_meta$curve_id_chr,
-    !!.time := t_grid
-  ) |>
-    dplyr::left_join(curve_meta, by = "curve_id_chr") |>
-    dplyr::mutate(
-      !!unit_used := factor(curve_id_chr, levels = unit_levels0),
-      !!.trt      := factor(trt_chr, levels = trt_levels0)
-    )
-
-  if (!is.null(.env) && .env %in% names(new_curve_grid)) {
-    new_curve_grid[[.env]] <- factor(new_curve_grid[[.env]], levels = env_levels0)
-  }
-  if (!is.null(.blk) && .blk %in% names(new_curve_grid)) {
-    new_curve_grid[[.blk]] <- factor(new_curve_grid[[.blk]], levels = blk_levels0)
-  }
-
-  new_curve_grid$y_hat <- as.numeric(
-    mgcv::predict.gam(
-      m_gam,
-      newdata = new_curve_grid,
-      type = "response",
-      exclude = c(sprintf("s(%s)", unit_used))
-    )
-  )
-
-  Yhat <- new_curve_grid |>
-    dplyr::select(curve_id_chr, !!.time, y_hat) |>
-    tidyr::pivot_wider(names_from = !!.time, values_from = y_hat) |>
-    dplyr::arrange(curve_id_chr)
-
-  curve_ids <- Yhat$curve_id_chr
-  Ymat <- as.matrix(Yhat[, -1, drop = FALSE])
-
-  dt <- mean(diff(t_grid))
-  D_curve <- as.matrix(stats::dist(Ymat, method = "euclidean")) * sqrt(dt)
-  rownames(D_curve) <- curve_ids
-  colnames(D_curve) <- curve_ids
-
-  # scaling for numerical stability (keep, but be explicit in interpretation)
-  D_curve <- D_curve / stats::median(D_curve[D_curve > 0])
 
   # ------------------------------------------------------------
   # Permutation test: GLOBAL by default; pairwise only if supported
@@ -830,7 +865,8 @@ compare_curves <- function(
       bootstrap = bootstrap, boot_B = boot_B, boot_seed = boot_seed,
       boot_ci = boot_ci, bootstrap_mode = bootstrap_mode,
       min_strata_for_pairwise = min_strata_for_pairwise,
-      show_progress = show_progress
+      show_progress = show_progress,
+      curve_level = curve_level
     ),
     family_used = fam_used,
     gam = m_gam,

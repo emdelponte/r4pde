@@ -36,6 +36,7 @@ compare_curves(
   boot_ci = c(0.025, 0.975),
   bootstrap_mode = c("predicted", "refit"),
   show_progress = TRUE,
+  curve_level = NULL,
   ...
 )
 }
@@ -113,6 +114,11 @@ from resampled predicted curves.}
 
 \item{bootstrap_mode}{Character; bootstrap strategy. Currently supports \code{"predicted"}
 (resampling predicted curves). \code{"refit"} is not implemented in this version.}
+
+\item{show_progress}{Logical; whether to show progress bars for long-running tasks.}
+
+\item{curve_level}{Logical; whether to compute curve-level distance matrix. If \code{NULL} (default),
+it is automatically set to \code{TRUE} if \code{test_factor} is provided.}
 
 \item{...}{Reserved for future extensions.}
 }
