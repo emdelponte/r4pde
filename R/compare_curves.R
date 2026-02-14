@@ -279,6 +279,8 @@ compare_curves <- function(
     )
   }
 
+  if (show_progress) message("Fitting GAM model (this may take a moment)...")
+  
   w <- character()
   m_try <- withCallingHandlers(
     try(fit_betar(df), silent = TRUE),
@@ -587,7 +589,7 @@ compare_curves <- function(
     if (show_progress) {
       pb_glob <- progress::progress_bar$new(
         format = "  Global permutation test [:bar] :percent eta: :eta",
-        total = n_perm, clear = FALSE, width = 60)
+        total = n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
     }
     
     F_perm <- numeric(n_perm)
@@ -613,7 +615,7 @@ compare_curves <- function(
       if (show_progress) {
         pb_pair <- progress::progress_bar$new(
           format = "  Pairwise permutation tests [:bar] :percent eta: :eta",
-          total = n_pairs * n_perm, clear = FALSE, width = 60)
+          total = n_pairs * n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
       }
 
       pairwise <- purrr::map_dfr(pairs, function(pp) {
@@ -690,7 +692,7 @@ compare_curves <- function(
       if (show_progress) {
         pb_boot <- progress::progress_bar$new(
           format = "  Bootstrapping predictions [:bar] :percent eta: :eta",
-          total = boot_B, clear = FALSE, width = 60)
+          total = boot_B, clear = FALSE, width = 60, force = TRUE, show_after = 0)
       }
 
       for (b in seq_len(boot_B)) {
@@ -748,7 +750,7 @@ compare_curves <- function(
       if (show_progress) {
         pb_dist <- progress::progress_bar$new(
           format = "  Calculating bootstrap distances [:bar] :percent eta: :eta",
-          total = boot_B, clear = FALSE, width = 60)
+          total = boot_B, clear = FALSE, width = 60, force = TRUE, show_after = 0)
       }
 
       dist_boot <- boot_pred |>
