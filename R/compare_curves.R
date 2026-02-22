@@ -286,7 +286,7 @@ compare_curves <- function(
       family   = mgcv::betar(link = "logit"),
       data     = dat_fit,
       method   = "fREML",
-      discrete = FALSE,   # <- force off for beta; much more stable
+      discrete = discrete,   # <- use user-controlled discrete (defaults to TRUE for speed)
       gamma    = gamma,
       select   = TRUE
     )
