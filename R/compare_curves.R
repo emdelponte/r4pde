@@ -37,6 +37,10 @@
 #' @param k_trt Basis dimension for the treatment-specific smooth.
 #' @param gamma Penalization parameter passed to \code{mgcv::bam()}.
 #' @param discrete Logical; whether to use discrete (approximate) fitting in \code{mgcv::bam()}.
+#' @param family_try Character string specifying the GAM family to try:
+#'   \code{"betar"} (beta regression) or \code{"quasibinomial"}. If \code{"betar"}
+#'   is selected but precision estimation fails, the model falls back to
+#'   \code{"quasibinomial"}.
 #' @param cluster_k Number of clusters used to cut the hierarchical tree for treatments.
 #' @param hc_method Clustering linkage method passed to \code{stats::hclust()}.
 #'
@@ -114,6 +118,7 @@ compare_curves <- function(
     k_trt = 6,
     gamma = 1.4,
     discrete = TRUE,
+    family_try = c("betar","quasibinomial"),
     cluster_k = 4,
     hc_method = "ward.D2",
 
@@ -145,6 +150,7 @@ compare_curves <- function(
   response_scale <- match.arg(response_scale)
   test_mode <- match.arg(test_mode)
   bootstrap_mode <- match.arg(bootstrap_mode)
+  family_try <- match.arg(family_try)
 
   # deps
   req <- c("dplyr", "tidyr", "tibble", "purrr", "ggplot2", "mgcv", "rlang", "progress")
@@ -187,11 +193,17 @@ compare_curves <- function(
   }
 
   y_raw <- pmin(pmax(y_raw, 0), 1)
-  df$.y_raw <- y_raw
 
-  n_eff <- sum(is.finite(y_raw))
+  # clamp away from {0,1} for beta stability (eps is now meaningful)
+  y_raw_clipped <- pmin(pmax(y_raw, eps), 1 - eps)
+
+  df$.y_raw <- y_raw_clipped
+
+  n_eff <- sum(is.finite(y_raw_clipped))
   if (!is.finite(n_eff) || n_eff < 2) stop("Not enough finite response values to fit the model.")
-  df$.y <- (y_raw * (n_eff - 1) + 0.5) / n_eff
+
+  # Smithson–Verkuilen adjustment on the clipped proportions
+  df$.y <- (y_raw_clipped * (n_eff - 1) + 0.5) / n_eff
 
   # ---- unit id ----
   unit_used <- .unit
@@ -274,7 +286,7 @@ compare_curves <- function(
       family   = mgcv::betar(link = "logit"),
       data     = dat_fit,
       method   = "fREML",
-      discrete = discrete,
+      discrete = FALSE,   # <- force off for beta; much more stable
       gamma    = gamma,
       select   = TRUE
     )
@@ -292,21 +304,30 @@ compare_curves <- function(
   }
 
   if (show_progress) message("Fitting GAM model (this may take a moment)...")
-  
-  w <- character()
-  m_try <- withCallingHandlers(
-    try(fit_betar(df), silent = TRUE),
-    warning = function(cnd) { w <<- c(w, conditionMessage(cnd)); invokeRestart("muffleWarning") }
-  )
-  theta_failed <- inherits(m_try, "try-error") || any(grepl("theta estimation", w, fixed = TRUE))
 
-  if(theta_failed){
-    warning("beta-GAM precision (theta) estimation failed; refitting with quasibinomial().")
+  w <- character()
+
+  if (family_try == "quasibinomial") {
     m_gam <- fit_qb(df)
     fam_used <- "quasibinomial"
   } else {
-    m_gam <- m_try
-    fam_used <- "betar"
+    m_try <- withCallingHandlers(
+      try(fit_betar(df), silent = TRUE),
+      warning = function(cnd) { w <<- c(w, conditionMessage(cnd)); invokeRestart("muffleWarning") }
+    )
+
+    # broaden detection: any theta-related warning OR try-error
+    theta_failed <- inherits(m_try, "try-error") ||
+      any(grepl("theta", w, ignore.case = TRUE))
+
+    if (theta_failed) {
+      warning("beta-GAM precision (theta) estimation failed or stalled; refitting with quasibinomial().")
+      m_gam <- fit_qb(df)
+      fam_used <- "quasibinomial"
+    } else {
+      m_gam <- m_try
+      fam_used <- "betar"
+    }
   }
 
   # ---- common time grid ----
@@ -730,6 +751,8 @@ compare_curves <- function(
           total = boot_B, clear = FALSE, width = 60, force = TRUE, show_after = 0)
       }
 
+      boot_pred_list <- vector("list", boot_B)
+
       for (b in seq_len(boot_B)) {
         if (show_progress) pb_boot$tick()
         ids_b <- sample(ids0, replace = TRUE)
@@ -857,6 +880,7 @@ compare_curves <- function(
       k_env_eff = k_env_eff,
       k_trt_eff = k_trt_eff,
       gamma = gamma, discrete = discrete,
+      family_try = family_try,
       cluster_k = cluster_k, hc_method = hc_method,
       test_factor = test_factor, n_perm = n_perm,
       test_mode = test_mode,

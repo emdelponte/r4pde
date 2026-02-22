@@ -22,6 +22,7 @@ compare_curves(
   k_trt = 6,
   gamma = 1.4,
   discrete = TRUE,
+  family_try = c("betar", "quasibinomial"),
   cluster_k = 4,
   hc_method = "ward.D2",
   test_factor = NULL,
@@ -78,6 +79,11 @@ If \code{NULL}, the first level of \code{environment} is used.}
 \item{gamma}{Penalization parameter passed to \code{mgcv::bam()}.}
 
 \item{discrete}{Logical; whether to use discrete (approximate) fitting in \code{mgcv::bam()}.}
+
+\item{family_try}{Character string specifying the GAM family to try:
+\code{"betar"} (beta regression) or \code{"quasibinomial"}. If \code{"betar"}
+is selected but precision estimation fails, the model falls back to
+\code{"quasibinomial"}.}
 
 \item{cluster_k}{Number of clusters used to cut the hierarchical tree for treatments.}
 
