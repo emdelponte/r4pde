@@ -193,17 +193,11 @@ compare_curves <- function(
   }
 
   y_raw <- pmin(pmax(y_raw, 0), 1)
+  df$.y_raw <- y_raw
 
-  # clamp away from {0,1} for beta stability (eps is now meaningful)
-  y_raw_clipped <- pmin(pmax(y_raw, eps), 1 - eps)
-
-  df$.y_raw <- y_raw_clipped
-
-  n_eff <- sum(is.finite(y_raw_clipped))
+  n_eff <- sum(is.finite(y_raw))
   if (!is.finite(n_eff) || n_eff < 2) stop("Not enough finite response values to fit the model.")
-
-  # Smithson–Verkuilen adjustment on the clipped proportions
-  df$.y <- (y_raw_clipped * (n_eff - 1) + 0.5) / n_eff
+  df$.y <- (y_raw * (n_eff - 1) + 0.5) / n_eff
 
   # ---- unit id ----
   unit_used <- .unit
@@ -316,9 +310,9 @@ compare_curves <- function(
       warning = function(cnd) { w <<- c(w, conditionMessage(cnd)); invokeRestart("muffleWarning") }
     )
 
-    # broaden detection: any theta-related warning OR try-error
+    # check for failure: any try-error OR "theta estimation" warnings
     theta_failed <- inherits(m_try, "try-error") ||
-      any(grepl("theta", w, ignore.case = TRUE))
+      any(grepl("theta estimation", w, fixed = TRUE))
 
     if (theta_failed) {
       warning("beta-GAM precision (theta) estimation failed or stalled; refitting with quasibinomial().")
