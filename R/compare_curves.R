@@ -227,6 +227,7 @@ compare_curves <- function(
     !is.na(df[[.trt]]) &
     !is.na(df[[.unit]])
   if(!is.null(.env)) keep <- keep & !is.na(df[[.env]])
+  if (show_progress) message("  - Pre-processing data...")
   df <- df[keep, , drop = FALSE]
 
   # keep curves with >= min_points
@@ -246,6 +247,8 @@ compare_curves <- function(
   env_levels0  <- if(!is.null(.env)) levels(df[[.env]]) else NULL
   blk_levels0  <- if(!is.null(.blk)) levels(df[[.blk]]) else NULL
   unit_levels0 <- levels(df[[.unit]])
+
+  if (show_progress) message("  - Setting up smoothness and formula...")
 
   # ---- choose safe k ----
   k_smooth_eff <- min(k_smooth, max(3, length(unique(df[[.time]])) - 1))
@@ -297,7 +300,7 @@ compare_curves <- function(
     )
   }
 
-  if (show_progress) message("Fitting GAM model (this may take a moment)...")
+  if (show_progress) message("  - Fitting GAM model (this may take a moment)...")
 
   w <- character()
 
@@ -324,7 +327,7 @@ compare_curves <- function(
     }
   }
 
-  # ---- common time grid ----
+  if (show_progress) message("  - Model fit successful. Calculating mean curves...")
   tmin <- min(df[[.time]], na.rm = TRUE)
   tmax <- max(df[[.time]], na.rm = TRUE)
   t_grid <- seq(tmin, tmax, length.out = grid_n)
@@ -375,6 +378,7 @@ compare_curves <- function(
     ggplot2::geom_line(linewidth = 1) +
     ggplot2::theme_classic()
 
+  if (show_progress) message("  - Clustering treatments...")
   # ---- functional distance + clustering (treatment means) ----
   mat <- pred_trt |>
     dplyr::select(.data[[.time]], .data[[.trt]], .data[["mu"]]) |>
@@ -495,6 +499,7 @@ compare_curves <- function(
     D_curve <- D_curve / stats::median(D_curve[D_curve > 0])
   }
 
+  if (show_progress) message("  - Finalizing results...")
   # ------------------------------------------------------------
   # Permutation test: GLOBAL by default; pairwise only if supported
   # ------------------------------------------------------------
