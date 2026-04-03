@@ -113,11 +113,19 @@ functional_instability <- function(x,
     stop("`x$data` must contain columns `geno`, `env`, and `time`.", call. = FALSE)
   }
 
-  trapz_vec <- function(x, y) {
-    n <- length(x)
-    if (n < 2) return(NA_real_)
-    sum(diff(x) * (head(y, -1) + tail(y, -1)) / 2)
-  }
+ trapz_vec <- function(x, y) {
+  ok <- !(is.na(x) | is.na(y))
+  x <- x[ok]
+  y <- y[ok]
+  
+  if (length(x) < 2) return(NA_real_)
+  
+  ord <- order(x)
+  x <- x[ord]
+  y <- y[ord]
+  
+  sum(diff(x) * (head(y, -1) + tail(y, -1)) / 2)
+}
 
   predict_geno_env_curves <- function(dat, mod, n_time = 200) {
     pairs <- dat %>%
@@ -247,7 +255,8 @@ functional_instability <- function(x,
 
     fi_geno %>%
       dplyr::left_join(mean_energy, by = "geno") %>%
-      dplyr::mutate(nFI_time = FI_time / mean_energy_time)
+      dplyr::mutate(nFI_time = FI_time / pmax(mean_energy_time, 1e-8))%>%
+      dplyr::mutate(nFI_time = pmax(nFI_time, 0))
   }
 
   curves <- predict_geno_env_curves(dat, x$gam, n_time = n_time)
