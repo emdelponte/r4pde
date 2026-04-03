@@ -143,6 +143,15 @@ Utility functions for plotting and customization.
 - [`plot(`*`<r4pde_compare_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.md)
   : Plot method for compare_curves objects
 
+## Functional Instability
+
+Functions to quantify and visualize normalized functional instability.
+
+- [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md)
+  : Normalized functional instability from compare_curves output
+- [`plot_functional_instability()`](https://emdelponte.github.io/r4pde/reference/plot_functional_instability.md)
+  : Plot method for functional instability results
+
 ## Diagnostics
 
 - [`diagnose_curves()`](https://emdelponte.github.io/r4pde/reference/diagnose_curves.md)

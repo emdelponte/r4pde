@@ -1,3 +1,9 @@
+# r4pde 0.1.2 (2026-04-03)
+
+## New functions
+- Added `functional_instability()` for computing normalized functional instability (NFI) of genotype-by-environment epidemic curves, with optional decomposition into spatial and temporal components.
+- Added `plot_functional_instability()` for visualizing overall, spatial, and temporal NFI results as bar charts.
+
 # r4pde 0.1.1 (2026-02-05)
 
 ## Enhancements

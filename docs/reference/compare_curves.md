@@ -36,6 +36,7 @@ compare_curves(
   k_trt = 6,
   gamma = 1.4,
   discrete = TRUE,
+  family_try = c("betar", "quasibinomial"),
   cluster_k = 4,
   hc_method = "ward.D2",
   test_factor = NULL,
@@ -49,6 +50,8 @@ compare_curves(
   boot_seed = 1,
   boot_ci = c(0.025, 0.975),
   bootstrap_mode = c("predicted", "refit"),
+  show_progress = TRUE,
+  curve_level = NULL,
   ...
 )
 ```
@@ -136,6 +139,12 @@ compare_curves(
   Logical; whether to use discrete (approximate) fitting in
   [`mgcv::bam()`](https://rdrr.io/pkg/mgcv/man/bam.html).
 
+- family_try:
+
+  Character string specifying the GAM family to try: `"betar"` (beta
+  regression) or `"quasibinomial"`. If `"betar"` is selected but
+  precision estimation fails, the model falls back to `"quasibinomial"`.
+
 - cluster_k:
 
   Number of clusters used to cut the hierarchical tree for treatments.
@@ -203,6 +212,16 @@ compare_curves(
   Character; bootstrap strategy. Currently supports `"predicted"`
   (resampling predicted curves). `"refit"` is not implemented in this
   version.
+
+- show_progress:
+
+  Logical; whether to show progress bars for long-running tasks.
+
+- curve_level:
+
+  Logical; whether to compute curve-level distance matrix. If `NULL`
+  (default), it is automatically set to `TRUE` if `test_factor` is
+  provided.
 
 - ...:
 

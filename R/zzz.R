@@ -13,7 +13,14 @@ if (getRversion() >= "2.15.1") {
 utils::globalVariables(c(
   ".mu_hat", ".res_dev", ".res_pear", ".y",
   "time", "mu", "cluster", "trt_lab",
-  "label", "label_short", "xend", "yend"
+  "label", "label_short", "xend", "yend",
+  # functional_instability variables
+  "geno", "env", "mean_mu", "sq_dev", "int_sq_dev",
+  "FI", "nFI", "FI_space", "mean_energy_space", "nFI_space",
+  "FI_time", "mean_energy_time", "nFI_time",
+  "location", "year",
+  # plot_functional_instability variables
+  "nFI", "nFI_space", "nFI_time"
 ))
 .onLoad <- function(libname, pkgname) {
   utils::globalVariables(c(
@@ -22,7 +29,7 @@ utils::globalVariables(c(
 }
 # Import from base and recommended packages to suppress NOTES on undefined functions
 #' @importFrom stats aggregate coef complete.cases cor.test lm median sd var
-#' @importFrom utils install.packages
+#' @importFrom utils install.packages head tail
 #' @importFrom car linearHypothesis
 #' @importFrom ggplot2 theme element_rect
 #' @importFrom dplyr across distinct ungroup pull rename_with bind_cols row_number

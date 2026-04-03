@@ -5,4 +5,7 @@
 ^pkgdown$
 ^LICENSE\.md$
 ˆMeta$
+^.*\.qmd$
+^.*\.quarto$
+^\.quarto$
 

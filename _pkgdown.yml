@@ -66,6 +66,13 @@ reference:
       - plot_curves
       - plot_dendrogram
       - plot.r4pde_compare_curves
+
+  - title: "Functional Instability"
+    desc: "Functions to quantify and visualize normalized functional instability."
+    contents:
+      - functional_instability
+      - plot_functional_instability
+
   - title: "Diagnostics"
     contents:
       - diagnose_curves
