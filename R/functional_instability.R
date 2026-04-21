@@ -117,13 +117,13 @@ functional_instability <- function(x,
   ok <- !(is.na(x) | is.na(y))
   x <- x[ok]
   y <- y[ok]
-  
+
   if (length(x) < 2) return(NA_real_)
-  
+
   ord <- order(x)
   x <- x[ord]
   y <- y[ord]
-  
+
   sum(diff(x) * (head(y, -1) + tail(y, -1)) / 2)
 }
 
@@ -255,7 +255,7 @@ functional_instability <- function(x,
 
     fi_geno %>%
       dplyr::left_join(mean_energy, by = "geno") %>%
-      dplyr::mutate(nFI_time = FI_time / pmax(mean_energy_time, 1e-8))%>%
+      dplyr::mutate(nFI_time = FI_time / pmax(mean_energy_time, 1e-8)) %>%
       dplyr::mutate(nFI_time = pmax(nFI_time, 0))
   }
 
