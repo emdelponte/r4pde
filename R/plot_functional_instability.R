@@ -14,6 +14,8 @@ plot_functional_instability <- function(object, type = c("overall", "space", "ti
   }
 
   dat <- tibble::as_tibble(object)
+  trt_col <- names(dat)[1]
+  names(dat)[1] <- "geno"
 
   if (type == "overall") {
     p <- dat |>
@@ -22,7 +24,7 @@ plot_functional_instability <- function(object, type = c("overall", "space", "ti
       ggplot2::geom_col() +
       ggplot2::coord_flip() +
       ggplot2::labs(
-        x = "Genotype",
+        x = trt_col,
         y = "Normalized functional instability (nFI)"
       ) +
       ggplot2::theme_minimal()
@@ -40,7 +42,7 @@ plot_functional_instability <- function(object, type = c("overall", "space", "ti
       ggplot2::geom_col() +
       ggplot2::coord_flip() +
       ggplot2::labs(
-        x = "Genotype",
+        x = trt_col,
         y = "Spatial normalized functional instability (nFI_space)"
       ) +
       ggplot2::theme_minimal()
@@ -57,7 +59,7 @@ plot_functional_instability <- function(object, type = c("overall", "space", "ti
     ggplot2::geom_col() +
     ggplot2::coord_flip() +
     ggplot2::labs(
-      x = "Genotype",
+      x = trt_col,
       y = "Temporal normalized functional instability (nFI_time)"
     ) +
     ggplot2::theme_minimal()
