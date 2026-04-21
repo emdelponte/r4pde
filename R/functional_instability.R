@@ -109,8 +109,12 @@ functional_instability <- function(x,
 
   dat <- x$data
 
-  if (!all(c("geno", "env", "time") %in% names(dat))) {
-    stop("`x$data` must contain columns `geno`, `env`, and `time`.", call. = FALSE)
+  trt_col <- if (!is.null(x$vars$treatment)) x$vars$treatment else "geno"
+  env_col <- if (!is.null(x$vars$environment)) x$vars$environment else "env"
+  time_col <- if (!is.null(x$vars$time)) x$vars$time else "time"
+
+  if (!all(c(trt_col, env_col, time_col) %in% names(dat))) {
+    stop(sprintf("`x$data` must contain columns `%s`, `%s`, and `%s`.", trt_col, env_col, time_col), call. = FALSE)
   }
 
  trapz_vec <- function(x, y) {
@@ -127,24 +131,32 @@ functional_instability <- function(x,
   sum(diff(x) * (head(y, -1) + tail(y, -1)) / 2)
 }
 
-  predict_geno_env_curves <- function(dat, mod, n_time = 200) {
+  predict_geno_env_curves <- function(dat, mod, trt_c, env_c, time_c, n_time = 200) {
     pairs <- dat %>%
-      dplyr::distinct(geno, env)
+      dplyr::distinct(.data[[trt_c]], .data[[env_c]])
 
     time_seq <- seq(
-      min(dat$time, na.rm = TRUE),
-      max(dat$time, na.rm = TRUE),
+      min(dat[[time_c]], na.rm = TRUE),
+      max(dat[[time_c]], na.rm = TRUE),
       length.out = n_time
     )
 
-    newdata <- pairs %>%
-      tidyr::expand_grid(time = time_seq)
+    time_df <- tibble::tibble(time_seq)
+    names(time_df) <- time_c
+
+    newdata <- tidyr::expand_grid(pairs, time_df)
 
     mu  <- stats::predict(mod, newdata = newdata, type = "response")
     eta <- stats::predict(mod, newdata = newdata, type = "link")
 
-    newdata %>%
-      dplyr::mutate(mu = mu, eta = eta)
+    newdata <- newdata %>%
+      dplyr::mutate(mu = as.numeric(mu), eta = as.numeric(eta))
+
+    names(newdata)[names(newdata) == trt_c] <- "geno"
+    names(newdata)[names(newdata) == env_c] <- "env"
+    names(newdata)[names(newdata) == time_c] <- "time"
+
+    newdata
   }
 
   calc_nfi_general <- function(curves) {
@@ -259,7 +271,7 @@ functional_instability <- function(x,
       dplyr::mutate(nFI_time = pmax(nFI_time, 0))
   }
 
-  curves <- predict_geno_env_curves(dat, x$gam, n_time = n_time)
+  curves <- predict_geno_env_curves(dat, x$gam, trt_col, env_col, time_col, n_time = n_time)
   out <- calc_nfi_general(curves)
 
   if (!is.null(env_sep)) {
@@ -285,7 +297,14 @@ functional_instability <- function(x,
 
   class(out) <- c("fi_tbl", class(out))
 
+  if ("geno" %in% names(out)) {
+    names(out)[names(out) == "geno"] <- trt_col
+  }
+
   if (return_curves) {
+    names(curves)[names(curves) == "geno"] <- trt_col
+    names(curves)[names(curves) == "env"] <- env_col
+    names(curves)[names(curves) == "time"] <- time_col
     return(list(metrics = out, curves = curves))
   }
 
