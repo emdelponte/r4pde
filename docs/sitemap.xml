@@ -18,7 +18,10 @@
 <url><loc>https://emdelponte.github.io/r4pde/reference/DSI2.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/FHBWheat.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/fit_gradients.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/functional_curves.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/functional_distances.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/functional_instability.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/functional_resistance.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/FusariumBanana.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/get_brdwgd.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/get_era5.html</loc></url>
@@ -28,12 +31,16 @@
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test_boustrophedon.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/oruns_test_byrowcol.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/plot.functional_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_AFSD.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_curves.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_dendrogram.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_diagnostics.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/plot_functional_instability.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/print.functional_curves.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/print.functional_distances.html</loc></url>
+<url><loc>https://emdelponte.github.io/r4pde/reference/print.functional_resistance.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/print.r4pde_curve_diagnostics.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/RustSoybean.html</loc></url>
 <url><loc>https://emdelponte.github.io/r4pde/reference/SpatialAggregated.html</loc></url>

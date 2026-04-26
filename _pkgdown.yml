@@ -60,16 +60,20 @@ reference:
     contents:
       - theme_r4pde
 
-  - title: "Curve comparison"
+  - title: "Functional Analysis"
+    desc: "Functions for functional modeling and comparison of epidemic curves."
     contents:
+      - functional_curves
+      - functional_distances
+      - functional_resistance
+      - plot.functional_curves
+      - print.functional_curves
+      - print.functional_distances
+      - print.functional_resistance
       - compare_curves
       - plot_curves
       - plot_dendrogram
       - plot.r4pde_compare_curves
-
-  - title: "Functional Instability"
-    desc: "Functions to quantify and visualize normalized functional instability."
-    contents:
       - functional_instability
       - plot_functional_instability
 

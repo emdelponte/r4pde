@@ -7,7 +7,7 @@
 diagnose_curves(x, grid_n = 200)
 }
 \arguments{
-\item{x}{An object of class \code{"r4pde_compare_curves"}.}
+\item{x}{An object of class \code{"functional_curves"} or \code{"r4pde_compare_curves"}.}
 
 \item{grid_n}{Number of points used for the diagnostic smooth curve.}
 }

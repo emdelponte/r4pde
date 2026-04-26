@@ -11,7 +11,7 @@
 #' mean curve across environments, normalized by the integrated squared mean
 #' curve.
 #'
-#' @param x An object returned by [functional_curves()] or [compare_curves()].
+#' @param x An object returned by \code{\link{functional_curves}} or \code{\link{compare_curves}}.
 #' @param n_time Number of points in the prediction grid over the time domain.
 #' @param env_sep Optional separator used to split `env` into spatial and
 #'   temporal components, for example `"_"` or `"-"`. If `NULL`, only the
@@ -67,7 +67,7 @@
 #' Numerical integration is performed with the trapezoidal rule on a regular
 #' prediction grid over the observed time domain.
 #'
-#' @seealso [functional_curves()], [compare_curves()]
+#' @seealso \code{\link{functional_curves}}, \code{\link{compare_curves}}
 #'
 #' @examples
 #' \dontrun{

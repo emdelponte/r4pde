@@ -7,7 +7,7 @@
 plot_curves(x, label_fun = NULL, palette = NULL, alpha = 0.9, linewidth = 1.1)
 }
 \arguments{
-\item{x}{An object of class \code{"r4pde_compare_curves"}.}
+\item{x}{An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.}
 
 \item{label_fun}{Optional function to modify treatment labels.}
 

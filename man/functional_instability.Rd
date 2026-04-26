@@ -13,7 +13,7 @@ functional_instability(
 )
 }
 \arguments{
-\item{x}{An object returned by \code{\link[=compare_curves]{compare_curves()}}.}
+\item{x}{An object returned by \code{\link{functional_curves}} or \code{\link{compare_curves}}.}
 
 \item{n_time}{Number of points in the prediction grid over the time domain.}
 
@@ -114,5 +114,5 @@ head(out$curves)
 
 }
 \seealso{
-\code{\link[=compare_curves]{compare_curves()}}
+\code{\link{functional_curves}}, \code{\link{compare_curves}}
 }

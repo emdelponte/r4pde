@@ -16,7 +16,8 @@ plot_curves(x, label_fun = NULL, palette = NULL, alpha = 0.9, linewidth = 1.1)
 
 - x:
 
-  An object of class `"r4pde_compare_curves"`.
+  An object of class `"r4pde_compare_curves"` or
+  `"functional_distances"`.
 
 - label_fun:
 

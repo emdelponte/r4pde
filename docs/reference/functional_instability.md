@@ -24,7 +24,9 @@ functional_instability(
 - x:
 
   An object returned by
-  [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md).
+  [`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
+  or
+  [`compare_curves`](https://emdelponte.github.io/r4pde/reference/compare_curves.md).
 
 - n_time:
 
@@ -117,7 +119,8 @@ regular prediction grid over the observed time domain.
 
 ## See also
 
-[`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
+[`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md),
+[`compare_curves`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
 
 ## Examples
 

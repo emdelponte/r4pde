@@ -15,7 +15,7 @@ diagnose_curves(x, grid_n = 200)
 
 - x:
 
-  An object of class `"r4pde_compare_curves"`.
+  An object of class `"functional_curves"` or `"r4pde_compare_curves"`.
 
 - grid_n:
 

@@ -131,8 +131,25 @@ Utility functions for plotting and customization.
 - [`theme_r4pde()`](https://emdelponte.github.io/r4pde/reference/theme_r4pde.md)
   : Custom ggplot2 theme based on cowplot::theme_half_open
 
-## Curve comparison
+## Functional Analysis
 
+Functions for functional modeling and comparison of epidemic curves.
+
+- [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
+  : Fit genotype-specific epidemic trajectories using GAM
+- [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md)
+  : Compute pairwise functional distances and cluster curves
+- [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md)
+  : Compute functional resistance and stability-adjusted functional
+  resistance
+- [`plot(`*`<functional_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_curves.md)
+  : Plot functional_curves
+- [`print(`*`<functional_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_curves.md)
+  : Print functional_curves
+- [`print(`*`<functional_distances>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_distances.md)
+  : Print functional_distances
+- [`print(`*`<functional_resistance>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_resistance.md)
+  : Print functional_resistance
 - [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
   : Compare epidemic curves using GAM smoothing, functional distances,
   clustering, and optional permutation/bootstrapping
@@ -142,11 +159,6 @@ Utility functions for plotting and customization.
   : Plot functional dendrogram of epidemic curves
 - [`plot(`*`<r4pde_compare_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.md)
   : Plot method for compare_curves objects
-
-## Functional Instability
-
-Functions to quantify and visualize normalized functional instability.
-
 - [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md)
   : Normalized functional instability from compare_curves output
 - [`plot_functional_instability()`](https://emdelponte.github.io/r4pde/reference/plot_functional_instability.md)
