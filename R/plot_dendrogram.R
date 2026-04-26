@@ -4,7 +4,7 @@
 #' Visualizes the hierarchical clustering of treatments based on
 #' functional distances among epidemic curves.
 #'
-#' @param x An object of class \code{"r4pde_compare_curves"}.
+#' @param x An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.
 #' @param label_fun Optional function to modify treatment labels.
 #' @param palette Optional named vector of colors for clusters.
 #' @param show_cut Logical; whether to display the cluster cut height.
@@ -18,12 +18,20 @@ plot_dendrogram <- function(
     palette = NULL,
     show_cut = TRUE
 ){
-  stopifnot(inherits(x, "r4pde_compare_curves"))
+  stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_distances"))
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
   if(!requireNamespace("dplyr", quietly = TRUE)) stop("Need dplyr.")
   if(!requireNamespace("ggdendro", quietly = TRUE)) stop("Need ggdendro.")
 
-  trt <- x$vars$treatment
+  if (inherits(x, "functional_distances")) {
+    fc <- x$functional_curves
+    trt <- fc$vars$treatment
+    k <- length(unique(x$clusters$cluster))
+  } else {
+    trt <- x$vars$treatment
+    k <- x$settings$cluster_k
+  }
+
   if(is.null(label_fun)) label_fun <- function(z) z
 
   dd <- ggdendro::dendro_data(stats::as.dendrogram(x$hc), type = "rectangle")
@@ -62,7 +70,6 @@ plot_dendrogram <- function(
     ggplot2::coord_cartesian(clip = "off")
 
   if(show_cut){
-    k <- x$settings$cluster_k
     h_cut <- x$hc$height[length(x$hc$height) - (k - 1)]
     p <- p + ggplot2::geom_hline(yintercept = h_cut, linetype = "dashed", linewidth = 0.5)
   }

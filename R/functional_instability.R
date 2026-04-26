@@ -11,7 +11,7 @@
 #' mean curve across environments, normalized by the integrated squared mean
 #' curve.
 #'
-#' @param x An object returned by [compare_curves()].
+#' @param x An object returned by [functional_curves()] or [compare_curves()].
 #' @param n_time Number of points in the prediction grid over the time domain.
 #' @param env_sep Optional separator used to split `env` into spatial and
 #'   temporal components, for example `"_"` or `"-"`. If `NULL`, only the
@@ -67,7 +67,7 @@
 #' Numerical integration is performed with the trapezoidal rule on a regular
 #' prediction grid over the observed time domain.
 #'
-#' @seealso [compare_curves()]
+#' @seealso [functional_curves()], [compare_curves()]
 #'
 #' @examples
 #' \dontrun{
@@ -102,12 +102,13 @@ functional_instability <- function(x,
                 env_names = c("location", "year"),
                 return_curves = FALSE) {
 
-  if (is.null(names(x)) || !all(c("gam", "data") %in% names(x))) {
-    stop("`x` must be a valid `compare_curves()` object containing `gam` and `data`.",
+  has_data <- "data" %in% names(x) || "observed_data" %in% names(x)
+  if (is.null(names(x)) || !("gam" %in% names(x)) || !has_data) {
+    stop("`x` must be a valid `functional_curves()` or `compare_curves()` object containing `gam` and `observed_data`/`data`.",
          call. = FALSE)
   }
 
-  dat <- x$data
+  dat <- if (!is.null(x$observed_data)) x$observed_data else x$data
 
   trt_col <- if (!is.null(x$vars$treatment)) x$vars$treatment else "geno"
   env_col <- if (!is.null(x$vars$environment)) x$vars$environment else "env"

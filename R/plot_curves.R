@@ -7,7 +7,7 @@
 #' The returned object is a \code{ggplot} and can be further modified
 #' using standard ggplot2 layers.
 #'
-#' @param x An object of class \code{"r4pde_compare_curves"}.
+#' @param x An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.
 #' @param label_fun Optional function to modify treatment labels.
 #' @param palette Optional named vector of colors for clusters.
 #' @param alpha Line transparency.
@@ -23,15 +23,24 @@ plot_curves <- function(
     alpha = 0.9,
     linewidth = 1.1
 ){
-  stopifnot(inherits(x, "r4pde_compare_curves"))
+  stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_distances"))
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
   if(!requireNamespace("dplyr", quietly = TRUE)) stop("Need dplyr.")
 
-  trt <- x$vars$treatment
-  tim <- x$vars$time
+  if (inherits(x, "functional_distances")) {
+    fc <- x$functional_curves
+    trt <- fc$vars$treatment
+    tim <- fc$vars$time
+    pred_df <- fc$curves
+  } else {
+    trt <- x$vars$treatment
+    tim <- x$vars$time
+    pred_df <- x$pred
+  }
+
   if(is.null(label_fun)) label_fun <- function(z) z
 
-  df <- dplyr::left_join(x$pred, x$clusters, by = trt) |>
+  df <- dplyr::left_join(pred_df, x$clusters, by = trt) |>
     dplyr::mutate(
       trt_lab = label_fun(.data[[trt]]),
       cluster = factor(cluster)
