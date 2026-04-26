@@ -27,6 +27,9 @@ functional_curves(
   discrete = TRUE,
   family_try = c("betar", "quasibinomial"),
   show_progress = TRUE,
+  covariates = NULL,
+  include_covariates = FALSE,
+  covariate_smooths = FALSE,
   ...
 )
 ```
@@ -112,6 +115,20 @@ functional_curves(
 
   Logical; whether to show progress.
 
+- covariates:
+
+  Optional character vector of genotype-level covariates (e.g.,
+  `c("heading_group")`).
+
+- include_covariates:
+
+  Logical; whether to include covariates as fixed effects in the model.
+
+- covariate_smooths:
+
+  Logical; if TRUE and `include_covariates = TRUE`, adds smooth
+  interactions `s(time, by=covariate)` for factor covariates.
+
 - ...:
 
   Additional arguments.
@@ -129,6 +146,9 @@ An object of class `"functional_curves"` containing:
 
 - `observed_data`: the processed input data;
 
+- `genotype_info`: a tibble with one row per genotype containing
+  covariates;
+
 - `vars`: variable names used;
 
 - `settings`: model settings;
@@ -136,6 +156,17 @@ An object of class `"functional_curves"` containing:
 - `warnings_betar`: any warnings caught during beta fitting;
 
 - `plot_mean`: ggplot object of the mean curves.
+
+## Details
+
+Genotype-level covariates are descriptors that do not vary within a
+genotype, such as phenological groups. For example, in wheat blast
+studies, a cultivar's `heading_group` (early, intermediate, late) can be
+supplied. This helps distinguish between true genetic resistance and
+phenological escape, as cultivars with different heading dates may
+encounter different infection-risk windows in the same environment. When
+`include_covariates = TRUE`, the model accounts for these covariates,
+yielding heading-adjusted functional resistance.
 
 ## Examples
 
@@ -146,7 +177,10 @@ fc <- functional_curves(
   time = "time_var",
   response = "severity",
   treatment = "cultivar",
-  block = "rep"
+  environment = "env",
+  covariates = c("heading_group"),
+  include_covariates = TRUE,
+  covariate_smooths = TRUE
 )
 plot(fc)
 } # }

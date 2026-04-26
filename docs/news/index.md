@@ -1,5 +1,43 @@
 # Changelog
 
+## r4pde 0.2.0 (2026-04-26)
+
+### Major changes
+
+- Refactored the monolithic
+  [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
+  workflow into a modular functional analysis API.
+- [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
+  is now a soft-deprecated wrapper around the new modular functions.
+
+### New functions
+
+- [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md):
+  Fits genotype-specific epidemic trajectories using GAM, with support
+  for genotype-level covariates.
+- [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md):
+  Computes pairwise functional distances among fitted curves and
+  performs hierarchical clustering and permutation testing.
+- [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md):
+  Calculates Functional Resistance Index (FRI) and Stability-Adjusted
+  Functional Resistance Index (SAFRI) with support for stratified
+  rankings and bootstrap-supported classification.
+
+### Enhancements
+
+- Added support for genotype-level auxiliary covariates (e.g.,
+  `heading_group`) to adjust functional curves and resistance rankings,
+  allowing for better distinction between genetic resistance and
+  phenological escape.
+- Improved bootstrap methodology for resistance classification with
+  support for stratified group comparisons.
+- Updated
+  [`diagnose_curves()`](https://emdelponte.github.io/r4pde/reference/diagnose_curves.md),
+  [`plot_curves()`](https://emdelponte.github.io/r4pde/reference/plot_curves.md),
+  and
+  [`plot_dendrogram()`](https://emdelponte.github.io/r4pde/reference/plot_dendrogram.md)
+  to support the new functional analysis object classes.
+
 ## r4pde 0.1.2 (2026-04-03)
 
 ### New functions

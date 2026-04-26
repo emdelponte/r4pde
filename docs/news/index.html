@@ -38,6 +38,30 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="r4pde-020-2026-04-26">r4pde 0.2.0 (2026-04-26)<a class="anchor" aria-label="anchor" href="#r4pde-020-2026-04-26"></a></h2>
+<div class="section level3">
+<h3 id="major-changes-0-2-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-2-0"></a></h3>
+<ul><li>Refactored the monolithic <code><a href="../reference/compare_curves.html">compare_curves()</a></code> workflow into a modular functional analysis API.</li>
+<li>
+<code><a href="../reference/compare_curves.html">compare_curves()</a></code> is now a soft-deprecated wrapper around the new modular functions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-functions-0-2-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/functional_curves.html">functional_curves()</a></code>: Fits genotype-specific epidemic trajectories using GAM, with support for genotype-level covariates.</li>
+<li>
+<code><a href="../reference/functional_distances.html">functional_distances()</a></code>: Computes pairwise functional distances among fitted curves and performs hierarchical clustering and permutation testing.</li>
+<li>
+<code><a href="../reference/functional_resistance.html">functional_resistance()</a></code>: Calculates Functional Resistance Index (FRI) and Stability-Adjusted Functional Resistance Index (SAFRI) with support for stratified rankings and bootstrap-supported classification.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-2-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-2-0"></a></h3>
+<ul><li>Added support for genotype-level auxiliary covariates (e.g., <code>heading_group</code>) to adjust functional curves and resistance rankings, allowing for better distinction between genetic resistance and phenological escape.</li>
+<li>Improved bootstrap methodology for resistance classification with support for stratified group comparisons.</li>
+<li>Updated <code><a href="../reference/diagnose_curves.html">diagnose_curves()</a></code>, <code><a href="../reference/plot_curves.html">plot_curves()</a></code>, and <code><a href="../reference/plot_dendrogram.html">plot_dendrogram()</a></code> to support the new functional analysis object classes.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.2" id="r4pde-012-2026-04-03">r4pde 0.1.2 (2026-04-03)<a class="anchor" aria-label="anchor" href="#r4pde-012-2026-04-03"></a></h2>
 <div class="section level3">
 <h3 id="new-functions-0-1-2">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-1-2"></a></h3>

@@ -67,6 +67,9 @@ genotypes into classes based on quantiles, clustering, or bootstrap-supported di
 <span>  n_boot <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  clustering_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"hclust"</span>, <span class="st">"kmeans"</span><span class="op">)</span>,</span>
+<span>  adjust_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  reference_within_group <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  group_within_adjust_by <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -84,7 +87,7 @@ genotypes into classes based on quantiles, clustering, or bootstrap-supported di
 
 
 <dt id="arg-reference">reference<a class="anchor" aria-label="anchor" href="#arg-reference"></a></dt>
-<dd><p>Character string naming the reference genotype.</p></dd>
+<dd><p>Character string naming the reference genotype, or a named vector if <code>reference_within_group = TRUE</code>.</p></dd>
 
 
 <dt id="arg-lambda">lambda<a class="anchor" aria-label="anchor" href="#arg-lambda"></a></dt>
@@ -125,6 +128,18 @@ genotypes into classes based on quantiles, clustering, or bootstrap-supported di
 
 <dt id="arg-clustering-method">clustering_method<a class="anchor" aria-label="anchor" href="#arg-clustering-method"></a></dt>
 <dd><p>Character string for clustering method if <code>group_method = "clustering"</code>.</p></dd>
+
+
+<dt id="arg-adjust-by">adjust_by<a class="anchor" aria-label="anchor" href="#arg-adjust-by"></a></dt>
+<dd><p>Optional character string naming a genotype-level covariate to stratify by.</p></dd>
+
+
+<dt id="arg-reference-within-group">reference_within_group<a class="anchor" aria-label="anchor" href="#arg-reference-within-group"></a></dt>
+<dd><p>Logical; if <code>TRUE</code>, the reference is evaluated within each <code>adjust_by</code> group.</p></dd>
+
+
+<dt id="arg-group-within-adjust-by">group_within_adjust_by<a class="anchor" aria-label="anchor" href="#arg-group-within-adjust-by"></a></dt>
+<dd><p>Logical; if <code>TRUE</code>, resistance classes are assigned within each <code>adjust_by</code> group.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

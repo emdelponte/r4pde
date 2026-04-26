@@ -23,6 +23,9 @@ functional_resistance(
   n_boot = 1000,
   ci_level = 0.95,
   clustering_method = c("hclust", "kmeans"),
+  adjust_by = NULL,
+  reference_within_group = FALSE,
+  group_within_adjust_by = TRUE,
   ...
 )
 ```
@@ -40,7 +43,8 @@ functional_resistance(
 
 - reference:
 
-  Character string naming the reference genotype.
+  Character string naming the reference genotype, or a named vector if
+  `reference_within_group = TRUE`.
 
 - lambda:
 
@@ -83,6 +87,21 @@ functional_resistance(
 
   Character string for clustering method if
   `group_method = "clustering"`.
+
+- adjust_by:
+
+  Optional character string naming a genotype-level covariate to
+  stratify by.
+
+- reference_within_group:
+
+  Logical; if `TRUE`, the reference is evaluated within each `adjust_by`
+  group.
+
+- group_within_adjust_by:
+
+  Logical; if `TRUE`, resistance classes are assigned within each
+  `adjust_by` group.
 
 - ...:
 

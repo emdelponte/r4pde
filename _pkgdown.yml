@@ -15,9 +15,9 @@ reference:
   - title: "Disease Quantification"
     desc: "Functions for calculating disease indices and survival-based metrics."
     contents:
+      - CompMuCens
       - DSI
       - DSI2
-      - CompMuCens
 
   - title: "Spatial analysis"
     desc: "Functions to detect and quantify spatial structure in disease data."
@@ -28,19 +28,19 @@ reference:
       - count_subareas_random
       - join_count
       - oruns_test
-      - oruns_test_byrowcol
       - oruns_test_boustrophedon
+      - oruns_test_byrowcol
+      - plot_AFSD
       - windowpane
       - windowpane_tests
-      - plot_AFSD
 
   - title: "Disease modeling"
     desc: "Functions for fitting gradient models and retrieving climate data."
     contents:
       - fit_gradients
-      - get_nasapower
-      - get_era5
       - get_brdwgd
+      - get_era5
+      - get_nasapower
 
   - title: "Datasets"
     desc: "Datasets used in the examples and analyses."
@@ -51,9 +51,9 @@ reference:
       - FHBWheat
       - FusariumBanana
       - RustSoybean
-      - WhiteMoldSoybean
       - SpatialAggregated
       - SpatialRandom
+      - WhiteMoldSoybean
 
   - title: "Miscellaneous"
     desc: "Utility functions for plotting and customization."
@@ -63,19 +63,19 @@ reference:
   - title: "Functional Analysis"
     desc: "Functions for functional modeling and comparison of epidemic curves."
     contents:
+      - compare_curves
       - functional_curves
       - functional_distances
+      - functional_instability
       - functional_resistance
       - plot.functional_curves
+      - plot.r4pde_compare_curves
+      - plot_curves
+      - plot_dendrogram
+      - plot_functional_instability
       - print.functional_curves
       - print.functional_distances
       - print.functional_resistance
-      - compare_curves
-      - plot_curves
-      - plot_dendrogram
-      - plot.r4pde_compare_curves
-      - functional_instability
-      - plot_functional_instability
 
   - title: "Diagnostics"
     contents:

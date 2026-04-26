@@ -18,6 +18,9 @@ functional_resistance(
   n_boot = 1000,
   ci_level = 0.95,
   clustering_method = c("hclust", "kmeans"),
+  adjust_by = NULL,
+  reference_within_group = FALSE,
+  group_within_adjust_by = TRUE,
   ...
 )
 }
@@ -26,7 +29,7 @@ functional_resistance(
 
 \item{instability}{Optional output from \code{functional_instability()}.}
 
-\item{reference}{Character string naming the reference genotype.}
+\item{reference}{Character string naming the reference genotype, or a named vector if \code{reference_within_group = TRUE}.}
 
 \item{lambda}{Numeric penalty weight for instability. Default is 1.}
 
@@ -47,6 +50,12 @@ functional_resistance(
 \item{ci_level}{Numeric confidence level for bootstrap intervals.}
 
 \item{clustering_method}{Character string for clustering method if \code{group_method = "clustering"}.}
+
+\item{adjust_by}{Optional character string naming a genotype-level covariate to stratify by.}
+
+\item{reference_within_group}{Logical; if \code{TRUE}, the reference is evaluated within each \code{adjust_by} group.}
+
+\item{group_within_adjust_by}{Logical; if \code{TRUE}, resistance classes are assigned within each \code{adjust_by} group.}
 
 \item{...}{Additional arguments.}
 }

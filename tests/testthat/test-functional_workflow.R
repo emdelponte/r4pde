@@ -128,3 +128,65 @@ test_that("functional_resistance bootstrap output", {
   # A > B > C in resistance
   expect_true(as.numeric(factor(grp_a, levels = LETTERS)) < as.numeric(factor(grp_b, levels = LETTERS)))
 })
+
+test_that("functional_curves processes covariates correctly", {
+  set.seed(123)
+  df <- data.frame(
+    time = rep(1:5, 4),
+    treatment = rep(c("A", "B"), each = 10),
+    block = rep(rep(1:2, each = 5), 2),
+    covar = rep(c("early", "late"), each = 10),
+    y = pmax(0, pmin(1, rep(c(0.1, 0.3, 0.5, 0.7, 0.9), 4) + rnorm(20, 0, 0.05)))
+  )
+  
+  fc <- functional_curves(
+    data = df, time = "time", response = "y", treatment = "treatment",
+    block = "block", covariates = "covar", include_covariates = TRUE,
+    covariate_smooths = TRUE, min_points = 3, show_progress = FALSE, family_try = "quasibinomial"
+  )
+  
+  expect_true(!is.null(fc$genotype_info))
+  expect_true("covar" %in% names(fc$genotype_info))
+  expect_equal(as.character(fc$genotype_info$covar), c("early", "late"))
+  
+  # Error if covariate varies within genotype
+  df_bad <- df
+  df_bad$covar[1] <- "late"
+  expect_error(functional_curves(
+    data = df_bad, time = "time", response = "y", treatment = "treatment",
+    block = "block", covariates = "covar", include_covariates = TRUE,
+    min_points = 3, show_progress = FALSE, family_try = "quasibinomial"
+  ), "multiple values")
+})
+
+test_that("functional_resistance works with adjust_by and reference_within_group", {
+  set.seed(123)
+  df <- data.frame(
+    time = rep(1:5, 8),
+    treatment = rep(c("A_E", "B_E", "A_L", "B_L"), each = 10),
+    block = rep(rep(1:2, each = 5), 4),
+    covar = rep(c("E", "E", "L", "L"), each = 10),
+    y = pmax(0, pmin(1, c(
+      rep(c(0.1, 0.2, 0.3, 0.4, 0.5), 2), # A_E
+      rep(c(0.2, 0.4, 0.6, 0.8, 0.9), 2), # B_E (Susc Early)
+      rep(c(0.1, 0.2, 0.3, 0.4, 0.5), 2), # A_L
+      rep(c(0.2, 0.4, 0.6, 0.8, 0.9), 2)  # B_L (Susc Late)
+    ) + rnorm(40, 0, 0.01)))
+  )
+  fc <- functional_curves(
+    data = df, time = "time", response = "y", treatment = "treatment",
+    block = "block", covariates = "covar", include_covariates = FALSE,
+    min_points = 3, show_progress = FALSE, family_try = "quasibinomial"
+  )
+  
+  # adjust_by = covar, reference_within_group = TRUE
+  refs <- c(E = "B_E", L = "B_L")
+  fr <- functional_resistance(fc, reference = refs, adjust_by = "covar", reference_within_group = TRUE, group_method = "quantile", n_groups = 2, group_within_adjust_by = TRUE)
+  
+  expect_true(!is.null(fr$table$covar))
+  expect_true("rank_within_group" %in% names(fr$table))
+  
+  # reference missing
+  refs_bad <- c(E = "B_E", L = "Missing")
+  expect_error(functional_resistance(fc, reference = refs_bad, adjust_by = "covar", reference_within_group = TRUE), "not found in group")
+})

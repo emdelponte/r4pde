@@ -24,6 +24,9 @@ functional_curves(
   discrete = TRUE,
   family_try = c("betar", "quasibinomial"),
   show_progress = TRUE,
+  covariates = NULL,
+  include_covariates = FALSE,
+  covariate_smooths = FALSE,
   ...
 )
 }
@@ -66,6 +69,12 @@ functional_curves(
 
 \item{show_progress}{Logical; whether to show progress.}
 
+\item{covariates}{Optional character vector of genotype-level covariates (e.g., \code{c("heading_group")}).}
+
+\item{include_covariates}{Logical; whether to include covariates as fixed effects in the model.}
+
+\item{covariate_smooths}{Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.}
+
 \item{...}{Additional arguments.}
 }
 \value{
@@ -75,6 +84,7 @@ An object of class \code{"functional_curves"} containing:
 \item \code{curves}: environment-adjusted treatment mean curves on the common grid;
 \item \code{grid}: the time grid used;
 \item \code{observed_data}: the processed input data;
+\item \code{genotype_info}: a tibble with one row per genotype containing covariates;
 \item \code{vars}: variable names used;
 \item \code{settings}: model settings;
 \item \code{warnings_betar}: any warnings caught during beta fitting;
@@ -85,6 +95,14 @@ An object of class \code{"functional_curves"} containing:
 Fits a generalized additive model (GAM) to replicated disease progress curves,
 returning adjusted treatment mean curves evaluated on a common time grid.
 }
+\details{
+Genotype-level covariates are descriptors that do not vary within a genotype, such as phenological groups.
+For example, in wheat blast studies, a cultivar's \code{heading_group} (early, intermediate, late)
+can be supplied. This helps distinguish between true genetic resistance and phenological escape, as
+cultivars with different heading dates may encounter different infection-risk windows in the same
+environment. When \code{include_covariates = TRUE}, the model accounts for these covariates,
+yielding heading-adjusted functional resistance.
+}
 \examples{
 \dontrun{
 fc <- functional_curves(
@@ -92,7 +110,10 @@ fc <- functional_curves(
   time = "time_var",
   response = "severity",
   treatment = "cultivar",
-  block = "rep"
+  environment = "env",
+  covariates = c("heading_group"),
+  include_covariates = TRUE,
+  covariate_smooths = TRUE
 )
 plot(fc)
 }

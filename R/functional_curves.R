@@ -23,7 +23,18 @@
 #' @param discrete Logical; whether to use discrete (approximate) fitting.
 #' @param family_try Character string specifying the GAM family to try.
 #' @param show_progress Logical; whether to show progress.
+#' @param covariates Optional character vector of genotype-level covariates (e.g., \code{c("heading_group")}).
+#' @param include_covariates Logical; whether to include covariates as fixed effects in the model.
+#' @param covariate_smooths Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.
 #' @param ... Additional arguments.
+#'
+#' @details
+#' Genotype-level covariates are descriptors that do not vary within a genotype, such as phenological groups.
+#' For example, in wheat blast studies, a cultivar's \code{heading_group} (early, intermediate, late)
+#' can be supplied. This helps distinguish between true genetic resistance and phenological escape, as
+#' cultivars with different heading dates may encounter different infection-risk windows in the same
+#' environment. When \code{include_covariates = TRUE}, the model accounts for these covariates,
+#' yielding heading-adjusted functional resistance.
 #'
 #' @return An object of class \code{"functional_curves"} containing:
 #' \itemize{
@@ -31,6 +42,7 @@
 #'   \item \code{curves}: environment-adjusted treatment mean curves on the common grid;
 #'   \item \code{grid}: the time grid used;
 #'   \item \code{observed_data}: the processed input data;
+#'   \item \code{genotype_info}: a tibble with one row per genotype containing covariates;
 #'   \item \code{vars}: variable names used;
 #'   \item \code{settings}: model settings;
 #'   \item \code{warnings_betar}: any warnings caught during beta fitting;
@@ -44,7 +56,10 @@
 #'   time = "time_var",
 #'   response = "severity",
 #'   treatment = "cultivar",
-#'   block = "rep"
+#'   environment = "env",
+#'   covariates = c("heading_group"),
+#'   include_covariates = TRUE,
+#'   covariate_smooths = TRUE
 #' )
 #' plot(fc)
 #' }
@@ -69,6 +84,9 @@ functional_curves <- function(
     discrete = TRUE,
     family_try = c("betar","quasibinomial"),
     show_progress = TRUE,
+    covariates = NULL,
+    include_covariates = FALSE,
+    covariate_smooths = FALSE,
     ...
 ) {
   response_scale <- match.arg(response_scale)
@@ -80,6 +98,7 @@ functional_curves <- function(
   if(!is.null(environment)) needed <- c(needed, environment)
   if(!is.null(block))       needed <- c(needed, block)
   if(!is.null(unit))        needed <- c(needed, unit)
+  if(!is.null(covariates))  needed <- c(needed, covariates)
   needed <- unique(needed)
 
   bad <- setdiff(needed, names(dat))
@@ -93,6 +112,11 @@ functional_curves <- function(
   df[[.trt]] <- as.factor(df[[.trt]])
   if(!is.null(.env)) df[[.env]] <- as.factor(df[[.env]])
   if(!is.null(.blk)) df[[.blk]] <- as.factor(df[[.blk]])
+  if(!is.null(covariates)) {
+    for (cov in covariates) {
+      if (is.character(df[[cov]])) df[[cov]] <- as.factor(df[[cov]])
+    }
+  }
   df[[.time]] <- as.numeric(df[[.time]])
 
   y_raw <- as.numeric(df[[.y]])
@@ -140,7 +164,26 @@ functional_curves <- function(
     !is.na(df[[.trt]]) &
     !is.na(df[[.unit]])
   if(!is.null(.env)) keep <- keep & !is.na(df[[.env]])
+  if(!is.null(covariates)) {
+    for (cov in covariates) {
+      keep <- keep & !is.na(df[[cov]])
+    }
+  }
   df <- df[keep, , drop = FALSE]
+
+  if(!is.null(covariates)) {
+    genotype_info <- df |> dplyr::select(dplyr::all_of(c(.trt, covariates))) |> dplyr::distinct()
+    if (nrow(genotype_info) > length(unique(df[[.trt]]))) {
+      for (cov in covariates) {
+        check <- df |> dplyr::group_by(.data[[.trt]]) |> dplyr::summarise(n = dplyr::n_distinct(.data[[cov]]))
+        if (any(check$n > 1)) {
+          stop(sprintf("Covariate '%s' has multiple values within at least one genotype. Covariates must be genotype-level.", cov))
+        }
+      }
+    }
+  } else {
+    genotype_info <- tibble::tibble(!!.trt := unique(df[[.trt]]))
+  }
 
   n_by_unit <- df |>
     dplyr::group_by(.data[[.unit]]) |>
@@ -168,6 +211,15 @@ functional_curves <- function(
     sprintf("s(%s, k=%s)", .time, k_smooth_eff),
     sprintf("s(%s, by=%s, k=%s)", .time, .trt, k_trt_eff)
   )
+
+  if (include_covariates && !is.null(covariates)) {
+    for (cov in covariates) {
+      f_terms <- c(f_terms, sprintf("%s", cov))
+      if (covariate_smooths && is.factor(df[[cov]])) {
+        f_terms <- c(f_terms, sprintf("s(%s, by=%s, k=%s)", .time, cov, k_trt_eff))
+      }
+    }
+  }
 
   if(!is.null(.env)){
     f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .env))
@@ -241,6 +293,13 @@ functional_curves <- function(
     names(newd)[1] <- .time
     newd[[.trt]] <- factor(trt_i, levels = trt_levels0)
 
+    if (!is.null(covariates)) {
+      cov_vals <- genotype_info |> dplyr::filter(.data[[.trt]] == trt_i)
+      for (cov in covariates) {
+        newd[[cov]] <- cov_vals[[cov]][1]
+      }
+    }
+
     if(!is.null(.env)) newd[[.env]] <- factor(env_levels0[1], levels = env_levels0)
 
     excl <- character()
@@ -278,8 +337,10 @@ functional_curves <- function(
     curves = pred_trt,
     grid = t_grid,
     observed_data = df,
+    genotype_info = genotype_info,
     vars = list(time = .time, response = .y, treatment = .trt,
-                environment = .env, block = .blk, unit = unit_used),
+                environment = .env, block = .blk, unit = unit_used,
+                covariates = covariates),
     settings = list(
       response_scale = response_scale, eps = eps, min_points = min_points,
       grid_n = grid_n, env_ref = env_ref,

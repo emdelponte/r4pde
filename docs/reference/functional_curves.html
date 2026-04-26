@@ -67,6 +67,9 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 <span>  discrete <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  family_try <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"betar"</span>, <span class="st">"quasibinomial"</span><span class="op">)</span>,</span>
 <span>  show_progress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  include_covariates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  covariate_smooths <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -151,6 +154,18 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 <dd><p>Logical; whether to show progress.</p></dd>
 
 
+<dt id="arg-covariates">covariates<a class="anchor" aria-label="anchor" href="#arg-covariates"></a></dt>
+<dd><p>Optional character vector of genotype-level covariates (e.g., <code>c("heading_group")</code>).</p></dd>
+
+
+<dt id="arg-include-covariates">include_covariates<a class="anchor" aria-label="anchor" href="#arg-include-covariates"></a></dt>
+<dd><p>Logical; whether to include covariates as fixed effects in the model.</p></dd>
+
+
+<dt id="arg-covariate-smooths">covariate_smooths<a class="anchor" aria-label="anchor" href="#arg-covariate-smooths"></a></dt>
+<dd><p>Logical; if TRUE and <code>include_covariates = TRUE</code>, adds smooth interactions <code>s(time, by=covariate)</code> for factor covariates.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments.</p></dd>
 
@@ -161,11 +176,21 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 <li><p><code>curves</code>: environment-adjusted treatment mean curves on the common grid;</p></li>
 <li><p><code>grid</code>: the time grid used;</p></li>
 <li><p><code>observed_data</code>: the processed input data;</p></li>
+<li><p><code>genotype_info</code>: a tibble with one row per genotype containing covariates;</p></li>
 <li><p><code>vars</code>: variable names used;</p></li>
 <li><p><code>settings</code>: model settings;</p></li>
 <li><p><code>warnings_betar</code>: any warnings caught during beta fitting;</p></li>
 <li><p><code>plot_mean</code>: ggplot object of the mean curves.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Genotype-level covariates are descriptors that do not vary within a genotype, such as phenological groups.
+For example, in wheat blast studies, a cultivar's <code>heading_group</code> (early, intermediate, late)
+can be supplied. This helps distinguish between true genetic resistance and phenological escape, as
+cultivars with different heading dates may encounter different infection-risk windows in the same
+environment. When <code>include_covariates = TRUE</code>, the model accounts for these covariates,
+yielding heading-adjusted functional resistance.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -175,7 +200,10 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 <span class="r-in"><span>  time <span class="op">=</span> <span class="st">"time_var"</span>,</span></span>
 <span class="r-in"><span>  response <span class="op">=</span> <span class="st">"severity"</span>,</span></span>
 <span class="r-in"><span>  treatment <span class="op">=</span> <span class="st">"cultivar"</span>,</span></span>
-<span class="r-in"><span>  block <span class="op">=</span> <span class="st">"rep"</span></span></span>
+<span class="r-in"><span>  environment <span class="op">=</span> <span class="st">"env"</span>,</span></span>
+<span class="r-in"><span>  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"heading_group"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  include_covariates <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  covariate_smooths <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
