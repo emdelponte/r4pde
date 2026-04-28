@@ -8,6 +8,7 @@
 - `functional_curves()`: Fits genotype-specific epidemic trajectories using GAM, with support for genotype-level covariates.
 - `functional_distances()`: Computes pairwise functional distances among fitted curves and performs hierarchical clustering and permutation testing.
 - `functional_resistance()`: Calculates Functional Resistance Index (FRI) and Stability-Adjusted Functional Resistance Index (SAFRI) with support for stratified rankings and bootstrap-supported classification.
+- `suggest_k()`: Helper function to recommend GAM smoothing parameters (`k_smooth`, `k_trt`, `k_env`, `gamma`) based on data structure; supports tidy-eval column names and can infer replication from a data frame.
 
 ## Enhancements
 - Added support for genotype-level auxiliary covariates (e.g., `heading_group`) to adjust functional curves and resistance rankings, allowing for better distinction between genetic resistance and phenological escape.

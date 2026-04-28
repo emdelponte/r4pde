@@ -22,6 +22,10 @@
   Calculates Functional Resistance Index (FRI) and Stability-Adjusted
   Functional Resistance Index (SAFRI) with support for stratified
   rankings and bootstrap-supported classification.
+- [`suggest_k()`](https://emdelponte.github.io/r4pde/reference/suggest_k.md):
+  Helper function to recommend GAM smoothing parameters (`k_smooth`,
+  `k_trt`, `k_env`, `gamma`) based on data structure; supports tidy-eval
+  column names and can infer replication from a data frame.
 
 ### Enhancements
 

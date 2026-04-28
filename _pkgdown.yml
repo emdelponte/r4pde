@@ -76,6 +76,8 @@ reference:
       - print.functional_curves
       - print.functional_distances
       - print.functional_resistance
+      - print.suggest_k
+      - suggest_k
 
   - title: "Diagnostics"
     contents:

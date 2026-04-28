@@ -163,6 +163,10 @@ Functions for functional modeling and comparison of epidemic curves.
   : Print functional_distances
 - [`print(`*`<functional_resistance>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_resistance.md)
   : Print functional_resistance
+- [`print(`*`<suggest_k>`*`)`](https://emdelponte.github.io/r4pde/reference/print.suggest_k.md)
+  : Print method for suggest_k
+- [`suggest_k()`](https://emdelponte.github.io/r4pde/reference/suggest_k.md)
+  : Suggest GAM smoothing parameters for epidemic curve models
 
 ## Diagnostics
 
