@@ -5,6 +5,7 @@
 - `compare_curves()` is now a soft-deprecated wrapper around the new modular functions.
 
 ## New functions
+- `functional_pca()`: Performs functional principal component analysis on fitted disease progress curves to decompose variation among epidemic trajectories into orthogonal temporal components. Includes plotting and extractor functions.
 - `functional_curves()`: Fits genotype-specific epidemic trajectories using GAM, with support for genotype-level covariates.
 - `functional_distances()`: Computes pairwise functional distances among fitted curves and performs hierarchical clustering and permutation testing.
 - `functional_resistance()`: Calculates Functional Resistance Index (FRI) and Stability-Adjusted Functional Resistance Index (SAFRI) with support for stratified rankings and bootstrap-supported classification.
