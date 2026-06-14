@@ -9,7 +9,7 @@ returning adjusted treatment mean curves evaluated on a common time grid."><meta
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,6 +70,7 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 <span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  include_covariates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  covariate_smooths <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  global_smooth <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -164,6 +165,10 @@ returning adjusted treatment mean curves evaluated on a common time grid.</p>
 
 <dt id="arg-covariate-smooths">covariate_smooths<a class="anchor" aria-label="anchor" href="#arg-covariate-smooths"></a></dt>
 <dd><p>Logical; if TRUE and <code>include_covariates = TRUE</code>, adds smooth interactions <code>s(time, by=covariate)</code> for factor covariates.</p></dd>
+
+
+<dt id="arg-global-smooth">global_smooth<a class="anchor" aria-label="anchor" href="#arg-global-smooth"></a></dt>
+<dd><p>Logical; if <code>TRUE</code>, fits a shared global curve plus treatment deviations. If <code>FALSE</code> (default), fits independent smooths per treatment.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

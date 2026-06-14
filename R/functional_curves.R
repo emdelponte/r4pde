@@ -26,6 +26,7 @@
 #' @param covariates Optional character vector of genotype-level covariates (e.g., \code{c("heading_group")}).
 #' @param include_covariates Logical; whether to include covariates as fixed effects in the model.
 #' @param covariate_smooths Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.
+#' @param global_smooth Logical; if \code{TRUE}, fits a shared global curve plus treatment deviations. If \code{FALSE} (default), fits independent smooths per treatment.
 #' @param ... Additional arguments.
 #'
 #' @details
@@ -87,6 +88,7 @@ functional_curves <- function(
     covariates = NULL,
     include_covariates = FALSE,
     covariate_smooths = FALSE,
+    global_smooth = FALSE,
     ...
 ) {
   response_scale <- match.arg(response_scale)
@@ -206,11 +208,18 @@ functional_curves <- function(
   k_env_eff <- NULL
   if(!is.null(.env)) k_env_eff <- min(k_env, max(2, length(unique(df[[.env]])) - 1))
 
-  f_terms <- c(
-    sprintf("%s", .trt),
-    sprintf("s(%s, k=%s)", .time, k_smooth_eff),
-    sprintf("s(%s, by=%s, k=%s)", .time, .trt, k_trt_eff)
-  )
+  if (global_smooth) {
+    f_terms <- c(
+      sprintf("%s", .trt),
+      sprintf("s(%s, k=%s)", .time, k_smooth_eff),
+      sprintf("s(%s, by=%s, k=%s)", .time, .trt, k_trt_eff)
+    )
+  } else {
+    f_terms <- c(
+      sprintf("%s", .trt),
+      sprintf("s(%s, by=%s, k=%s)", .time, .trt, k_smooth_eff)
+    )
+  }
 
   if (include_covariates && !is.null(covariates)) {
     for (cov in covariates) {
@@ -361,6 +370,8 @@ functional_curves <- function(
 }
 
 #' Print functional_curves
+#' @param x An object of class \code{"functional_curves"}.
+#' @param ... Additional arguments.
 #' @export
 print.functional_curves <- function(x, ...) {
   cat("A functional_curves object\n")
@@ -371,6 +382,8 @@ print.functional_curves <- function(x, ...) {
 }
 
 #' Plot functional_curves
+#' @param x An object of class \code{"functional_curves"}.
+#' @param ... Additional arguments.
 #' @export
 plot.functional_curves <- function(x, ...) {
   x$plot_mean

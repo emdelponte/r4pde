@@ -19,7 +19,7 @@ treatment-by-environment combination, guarding against over-fitting.'><meta prop
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,7 +180,14 @@ smoother fits.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Using explicit values</span></span></span>
 <span class="r-in"><span><span class="fu">suggest_k</span><span class="op">(</span>n_time <span class="op">=</span> <span class="fl">5</span>, n_env <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in suggest_k(n_time = 5, n_env = 8):</span> could not find function "suggest_k"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -- suggest_k: GAM parameter recommendations ----------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   effective_n_time = 5 (minimum across combinations)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   effective_n_env = 8 (minimum across treatments)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   smoothness = 'conservative'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   k_smooth = 4, k_trt = 3, k_env = 3, gamma = 1.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Suggested call to functional_curves():</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   functional_curves(..., k_smooth = 4, k_trt = 3, k_env = 3, gamma = 1.8)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Inferring from a data frame (unquoted column names)</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
@@ -197,7 +204,19 @@ smoother fits.</p></li>
 <span class="r-in"><span>  rule        <span class="op">=</span> <span class="st">"minimum"</span>,</span></span>
 <span class="r-in"><span>  smoothness  <span class="op">=</span> <span class="st">"conservative"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in suggest_k(data = df, time = time, treatment = cultivar, environment = env,     rule = "minimum", smoothness = "conservative"):</span> could not find function "suggest_k"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -- suggest_k: GAM parameter recommendations ----------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   effective_n_time = 6 (minimum across combinations)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   effective_n_env = 2 (minimum across treatments)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   smoothness = 'conservative'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   k_smooth = 5, k_trt = 4, k_env = 2, gamma = 1.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Suggested call to functional_curves():</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   functional_curves(..., k_smooth = 5, k_trt = 4, k_env = 2, gamma = 1.8)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Time points per treatment-by-environment:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min = 6, median = 6, max = 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Environments per treatment:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   min = 2, median = 2, max = 2</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

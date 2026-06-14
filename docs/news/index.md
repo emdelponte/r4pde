@@ -1,5 +1,36 @@
 # Changelog
 
+## r4pde 0.2.1 (2026-06-14)
+
+### New functions
+
+- Added a suite of tools for Disease Suppression Profiles (DSP) to
+  evaluate fungicide efficacy over time:
+  [`functional_contrast()`](https://emdelponte.github.io/r4pde/reference/functional_contrast.md),
+  [`functional_summary()`](https://emdelponte.github.io/r4pde/reference/functional_summary.md),
+  [`plot_dsp()`](https://emdelponte.github.io/r4pde/reference/plot_dsp.md),
+  [`rank_dsp()`](https://emdelponte.github.io/r4pde/reference/rank_dsp.md),
+  [`plot_dsp_rank_heatmap()`](https://emdelponte.github.io/r4pde/reference/plot_dsp_rank_heatmap.md),
+  and
+  [`simulate_dsp_data()`](https://emdelponte.github.io/r4pde/reference/simulate_dsp_data.md).
+
+### Bug fixes and improvements
+
+- [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md):
+  Updated the GAM formula to fit independent smooths per treatment by
+  default (`trt + s(time, by=trt)`), avoiding artifactual drops
+  (“caimento”) at the tails of flat curves. Added the `global_smooth`
+  parameter to allow users to opt-in to the previous Global-Specific
+  smoothing behavior.
+- [`simulate_dsp_data()`](https://emdelponte.github.io/r4pde/reference/simulate_dsp_data.md):
+  Adjusted the amplitudes of the simulated suppression profiles
+  (“Early”, “Late”, “Persistent”) to achieve exactly a 70% reduction in
+  AUDPC compared to the unsprayed control, representing a realistic
+  fungicide efficacy scenario.
+- Updated `_pkgdown.yml` to include the newly exported functional PCA
+  and DSP functions in the “Functional Analysis” reference index,
+  resolving site build errors.
+
 ## r4pde 0.2.0 (2026-04-26)
 
 ### Major changes
@@ -12,6 +43,11 @@
 
 ### New functions
 
+- [`functional_pca()`](https://emdelponte.github.io/r4pde/reference/functional_pca.md):
+  Performs functional principal component analysis on fitted disease
+  progress curves to decompose variation among epidemic trajectories
+  into orthogonal temporal components. Includes plotting and extractor
+  functions.
 - [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md):
   Fits genotype-specific epidemic trajectories using GAM, with support
   for genotype-level covariates.

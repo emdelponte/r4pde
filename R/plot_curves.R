@@ -12,18 +12,26 @@
 #' @param palette Optional named vector of colors for clusters.
 #' @param alpha Line transparency.
 #' @param linewidth Line width.
+#' @param ... Additional arguments.
 #'
 #' @return A \code{ggplot} object.
 #'
 #' @export
-plot_curves <- function(
+plot_curves <- function(x, ...) {
+  UseMethod("plot_curves")
+}
+
+#' @export
+#' @rdname plot_curves
+plot_curves.r4pde_compare_curves <- function(
     x,
     label_fun = NULL,
     palette = NULL,
     alpha = 0.9,
-    linewidth = 1.1
+    linewidth = 1.1,
+    ...
 ){
-  stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_distances"))
+
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
   if(!requireNamespace("dplyr", quietly = TRUE)) stop("Need dplyr.")
 
@@ -73,4 +81,14 @@ plot_curves <- function(
   }
 
   p
+}
+
+#' @export
+#' @rdname plot_curves
+plot_curves.functional_distances <- plot_curves.r4pde_compare_curves
+
+#' @export
+#' @rdname plot_curves
+plot_curves.functional_dsp <- function(x, ...) {
+  plot_dsp(x, ...)
 }

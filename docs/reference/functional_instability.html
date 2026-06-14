@@ -15,7 +15,7 @@ be split into location and year."><meta property="og:image" content="https://emd
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,12 +56,25 @@ be split into location and year.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">functional_instability</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">functional_instability</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'functional_curves'</span></span>
+<span><span class="fu">functional_instability</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  n_time <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  env_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  env_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"location"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
-<span>  return_curves <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  return_curves <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'functional_dsp'</span></span>
+<span><span class="fu">functional_instability</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  env_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  env_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"location"</span>, <span class="st">"year"</span><span class="op">)</span>,</span>
+<span>  return_curves <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -71,6 +84,10 @@ be split into location and year.</p>
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>An object returned by <code><a href="functional_curves.html">functional_curves</a></code> or <code><a href="compare_curves.html">compare_curves</a></code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments.</p></dd>
 
 
 <dt id="arg-n-time">n_time<a class="anchor" aria-label="anchor" href="#arg-n-time"></a></dt>

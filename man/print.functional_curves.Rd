@@ -6,6 +6,11 @@
 \usage{
 \method{print}{functional_curves}(x, ...)
 }
+\arguments{
+\item{x}{An object of class \code{"functional_curves"}.}
+
+\item{...}{Additional arguments.}
+}
 \description{
 Print functional_curves
 }

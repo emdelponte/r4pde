@@ -10,12 +10,25 @@ location and year.
 ## Usage
 
 ``` r
+functional_instability(x, ...)
+
+# S3 method for class 'functional_curves'
 functional_instability(
   x,
   n_time = 200,
   env_sep = NULL,
   env_names = c("location", "year"),
-  return_curves = FALSE
+  return_curves = FALSE,
+  ...
+)
+
+# S3 method for class 'functional_dsp'
+functional_instability(
+  x,
+  env_sep = NULL,
+  env_names = c("location", "year"),
+  return_curves = FALSE,
+  ...
 )
 ```
 
@@ -27,6 +40,10 @@ functional_instability(
   [`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
   or
   [`compare_curves`](https://emdelponte.github.io/r4pde/reference/compare_curves.md).
+
+- ...:
+
+  Additional arguments.
 
 - n_time:
 

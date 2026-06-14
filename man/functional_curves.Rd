@@ -27,6 +27,7 @@ functional_curves(
   covariates = NULL,
   include_covariates = FALSE,
   covariate_smooths = FALSE,
+  global_smooth = FALSE,
   ...
 )
 }
@@ -74,6 +75,8 @@ functional_curves(
 \item{include_covariates}{Logical; whether to include covariates as fixed effects in the model.}
 
 \item{covariate_smooths}{Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.}
+
+\item{global_smooth}{Logical; if \code{TRUE}, fits a shared global curve plus treatment deviations. If \code{FALSE} (default), fits independent smooths per treatment.}
 
 \item{...}{Additional arguments.}
 }

@@ -63,20 +63,34 @@ reference:
   - title: "Functional Analysis"
     desc: "Functions for functional modeling and comparison of epidemic curves."
     contents:
+      - augment_functional_pca
       - compare_curves
+      - functional_contrast
       - functional_curves
       - functional_distances
       - functional_instability
+      - functional_pca
+      - functional_pca_clusters
       - functional_resistance
+      - functional_summary
+      - get_fpca_eigenfunctions
+      - get_fpca_scores
+      - get_fpca_variance
       - plot.functional_curves
       - plot.r4pde_compare_curves
+      - plot.r4pde_functional_pca
       - plot_curves
       - plot_dendrogram
+      - plot_dsp
+      - plot_dsp_rank_heatmap
       - plot_functional_instability
       - print.functional_curves
       - print.functional_distances
       - print.functional_resistance
       - print.suggest_k
+      - rank_dsp
+      - reconstruct_curves
+      - simulate_dsp_data
       - suggest_k
 
   - title: "Diagnostics"

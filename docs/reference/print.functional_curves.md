@@ -8,3 +8,13 @@ Print functional_curves
 # S3 method for class 'functional_curves'
 print(x, ...)
 ```
+
+## Arguments
+
+- x:
+
+  An object of class `"functional_curves"`.
+
+- ...:
+
+  Additional arguments.

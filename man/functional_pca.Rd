@@ -2,9 +2,23 @@
 % Please edit documentation in R/functional_pca.R
 \name{functional_pca}
 \alias{functional_pca}
+\alias{functional_pca.functional_curves}
+\alias{functional_pca.functional_dsp}
 \title{Functional principal component analysis of disease progress curves}
 \usage{
-functional_pca(
+functional_pca(object, ...)
+
+\method{functional_pca}{functional_curves}(
+  object,
+  n_components = NULL,
+  var_explained = 0.95,
+  center = TRUE,
+  scale = FALSE,
+  method = c("pca_on_grid"),
+  ...
+)
+
+\method{functional_pca}{functional_dsp}(
   object,
   n_components = NULL,
   var_explained = 0.95,
@@ -17,6 +31,8 @@ functional_pca(
 \arguments{
 \item{object}{An object returned by \code{\link{functional_curves}}.}
 
+\item{...}{Additional arguments for future extensions.}
+
 \item{n_components}{Optional integer number of functional principal components to retain.}
 
 \item{var_explained}{Cumulative variance threshold used when \code{n_components = NULL}.}
@@ -26,8 +42,6 @@ functional_pca(
 \item{scale}{Logical; whether to scale grid columns before PCA. Default FALSE.}
 
 \item{method}{Character; method for FPCA, currently only \code{"pca_on_grid"} is supported.}
-
-\item{...}{Additional arguments for future extensions.}
 }
 \value{
 An object of class \code{"r4pde_functional_pca"} containing:
@@ -58,7 +72,7 @@ Interpretation:
 \itemize{
 \item FPC1 often captures the largest mode of variation, commonly overall epidemic intensity or speed.
 \item Later FPCs may capture timing of disease onset, curve crossing, late acceleration, or other shape-related deviations.
-\item Interpretation must be data-driven and should be based on eigenfunction plots and mean ± perturbation plots.
+\item Interpretation must be data-driven and should be based on eigenfunction plots and mean +/- perturbation plots.
 }
 }
 \examples{

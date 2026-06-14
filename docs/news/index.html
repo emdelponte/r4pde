@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,21 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="r4pde-021-2026-06-14">r4pde 0.2.1 (2026-06-14)<a class="anchor" aria-label="anchor" href="#r4pde-021-2026-06-14"></a></h2>
+<div class="section level3">
+<h3 id="new-functions-0-2-1">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-1"></a></h3>
+<ul><li>Added a suite of tools for Disease Suppression Profiles (DSP) to evaluate fungicide efficacy over time: <code><a href="../reference/functional_contrast.html">functional_contrast()</a></code>, <code><a href="../reference/functional_summary.html">functional_summary()</a></code>, <code><a href="../reference/plot_dsp.html">plot_dsp()</a></code>, <code><a href="../reference/rank_dsp.html">rank_dsp()</a></code>, <code><a href="../reference/plot_dsp_rank_heatmap.html">plot_dsp_rank_heatmap()</a></code>, and <code><a href="../reference/simulate_dsp_data.html">simulate_dsp_data()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-and-improvements-0-2-1">Bug fixes and improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-0-2-1"></a></h3>
+<ul><li>
+<code><a href="../reference/functional_curves.html">functional_curves()</a></code>: Updated the GAM formula to fit independent smooths per treatment by default (<code>trt + s(time, by=trt)</code>), avoiding artifactual drops (“caimento”) at the tails of flat curves. Added the <code>global_smooth</code> parameter to allow users to opt-in to the previous Global-Specific smoothing behavior.</li>
+<li>
+<code><a href="../reference/simulate_dsp_data.html">simulate_dsp_data()</a></code>: Adjusted the amplitudes of the simulated suppression profiles (“Early”, “Late”, “Persistent”) to achieve exactly a 70% reduction in AUDPC compared to the unsprayed control, representing a realistic fungicide efficacy scenario.</li>
+<li>Updated <code>_pkgdown.yml</code> to include the newly exported functional PCA and DSP functions in the “Functional Analysis” reference index, resolving site build errors.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="r4pde-020-2026-04-26">r4pde 0.2.0 (2026-04-26)<a class="anchor" aria-label="anchor" href="#r4pde-020-2026-04-26"></a></h2>
 <div class="section level3">
 <h3 id="major-changes-0-2-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-0-2-0"></a></h3>
@@ -48,6 +63,8 @@
 <div class="section level3">
 <h3 id="new-functions-0-2-0">New functions<a class="anchor" aria-label="anchor" href="#new-functions-0-2-0"></a></h3>
 <ul><li>
+<code><a href="../reference/functional_pca.html">functional_pca()</a></code>: Performs functional principal component analysis on fitted disease progress curves to decompose variation among epidemic trajectories into orthogonal temporal components. Includes plotting and extractor functions.</li>
+<li>
 <code><a href="../reference/functional_curves.html">functional_curves()</a></code>: Fits genotype-specific epidemic trajectories using GAM, with support for genotype-level covariates.</li>
 <li>
 <code><a href="../reference/functional_distances.html">functional_distances()</a></code>: Computes pairwise functional distances among fitted curves and performs hierarchical clustering and permutation testing.</li>

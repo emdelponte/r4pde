@@ -314,6 +314,8 @@ functional_resistance <- function(
 }
 
 #' Print functional_resistance
+#' @param x An object of class \code{"functional_resistance"}.
+#' @param ... Additional arguments.
 #' @export
 print.functional_resistance <- function(x, ...) {
   cat("A functional_resistance object\n")

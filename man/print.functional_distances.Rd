@@ -6,6 +6,11 @@
 \usage{
 \method{print}{functional_distances}(x, ...)
 }
+\arguments{
+\item{x}{An object of class \code{"functional_distances"}.}
+
+\item{...}{Additional arguments.}
+}
 \description{
 Print functional_distances
 }

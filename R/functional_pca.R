@@ -23,7 +23,7 @@
 #' \itemize{
 #'   \item FPC1 often captures the largest mode of variation, commonly overall epidemic intensity or speed.
 #'   \item Later FPCs may capture timing of disease onset, curve crossing, late acceleration, or other shape-related deviations.
-#'   \item Interpretation must be data-driven and should be based on eigenfunction plots and mean ± perturbation plots.
+#'   \item Interpretation must be data-driven and should be based on eigenfunction plots and mean +/- perturbation plots.
 #' }
 #'
 #' @return An object of class \code{"r4pde_functional_pca"} containing:
@@ -52,7 +52,13 @@
 #' scores <- get_fpca_scores(fpca)
 #' }
 #' @export
-functional_pca <- function(
+functional_pca <- function(object, ...) {
+  UseMethod("functional_pca")
+}
+
+#' @export
+#' @rdname functional_pca
+functional_pca.functional_curves <- function(
     object,
     n_components = NULL,
     var_explained = 0.95,
@@ -343,12 +349,14 @@ plot.r4pde_functional_pca <- function(
       ggplot2::geom_line(ggplot2::aes(y = .data$plus_2sd), color = "blue", linetype = "dashed", size = 0.8) +
       ggplot2::geom_line(ggplot2::aes(y = .data$minus_2sd), color = "red", linetype = "dashed", size = 0.8) +
       ggplot2::facet_wrap(~FPC) +
-      ggplot2::labs(x = "Time", y = "Value", title = "Mean Curve ± 2 SD Perturbation") +
+      ggplot2::labs(x = "Time", y = "Value", title = "Mean Curve +/- 2 SD Perturbation") +
       ggplot2::theme_classic()
     return(p)
   }
 }
 
+#' @rdname plot.r4pde_functional_pca
+#' @param object An object of class \code{"r4pde_functional_pca"}.
 #' @export
 autoplot.r4pde_functional_pca <- function(object, ...) {
   plot.r4pde_functional_pca(object, ...)
@@ -488,4 +496,167 @@ functional_pca_clusters <- function(
     curve_id = curve_ids,
     cluster = factor(clusters)
   )
+}
+
+#' @export
+#' @rdname functional_pca
+functional_pca.functional_dsp <- function(
+    object,
+    n_components = NULL,
+    var_explained = 0.95,
+    center = TRUE,
+    scale = FALSE,
+    method = c("pca_on_grid"),
+    ...
+) {
+  method <- match.arg(method)
+  
+  vars <- attr(object, "dsp_vars")
+  .time <- vars$time
+  .trt <- vars$treatment
+  
+  if (is.null(.time) || is.null(.trt)) {
+    stop("Time or treatment variable information is missing from the functional_dsp object.")
+  }
+  
+  # Ensure only distinct time points exist per treatment for matrix formatting
+  # If there are groups, we need to handle them (PCA on DSPs assumes a single set of curves or curves per group*trt)
+  if (length(vars$group) > 0) {
+    # Combine group and treatment into a single identifier for curves
+    object <- object |>
+      dplyr::mutate(.curve_id = interaction(dplyr::select(object, dplyr::all_of(c(vars$group, .trt))), sep = "_"))
+    curve_id_col <- ".curve_id"
+  } else {
+    curve_id_col <- .trt
+  }
+  
+  pred_trt <- object |> dplyr::rename(mu = DSP)
+  t_grid <- sort(unique(pred_trt[[.time]]))
+  
+  if (length(t_grid) < 3) {
+    stop("There must be at least three time points in the common grid.")
+  }
+  
+  # Reshape to a wide matrix: rows = individual curves, columns = common time grid
+  wide_mat <- pred_trt |>
+    dplyr::select(dplyr::all_of(c(curve_id_col, .time, "mu"))) |>
+    tidyr::pivot_wider(names_from = dplyr::all_of(.time), values_from = "mu")
+  
+  curve_ids <- wide_mat[[curve_id_col]]
+  
+  if (length(unique(curve_ids)) < 2) {
+    stop("There must be at least two curves.")
+  }
+  
+  # Extract curve matrix
+  curve_mat <- as.matrix(wide_mat[, -1, drop = FALSE])
+  rownames(curve_mat) <- as.character(curve_ids)
+  
+  if (any(is.na(curve_mat))) {
+    stop("Missing fitted values found in the curve matrix. Ensure times are uniform across treatments.")
+  }
+  
+  # Perform PCA
+  pca_res <- stats::prcomp(curve_mat, center = center, scale. = scale)
+  
+  # Variance explained
+  eigenvalues <- pca_res$sdev^2
+  prop_var <- eigenvalues / sum(eigenvalues)
+  cum_var <- cumsum(prop_var)
+  
+  # Select retained components
+  if (!is.null(n_components)) {
+    k <- min(n_components, length(eigenvalues))
+  } else {
+    k <- which(cum_var >= var_explained)[1]
+    if (is.na(k)) k <- length(eigenvalues)
+  }
+  
+  # Create variance tibble
+  var_tbl <- tibble::tibble(
+    FPC = paste0("FPC", seq_along(eigenvalues)),
+    eigenvalue = eigenvalues,
+    prop_var = prop_var,
+    cum_var = cum_var
+  ) |>
+    dplyr::slice(1:k)
+  
+  # Create scores tibble
+  scores_tbl <- tibble::as_tibble(pca_res$x[, 1:k, drop = FALSE])
+  scores_tbl <- dplyr::bind_cols(tibble::tibble(curve_id = curve_ids), scores_tbl)
+  
+  # Create eigenfunctions tibble
+  ef_mat <- pca_res$rotation[, 1:k, drop = FALSE]
+  ef_tbl <- tibble::as_tibble(ef_mat) |>
+    dplyr::mutate(time = t_grid) |>
+    tidyr::pivot_longer(
+      cols = dplyr::starts_with("PC"),
+      names_to = "FPC",
+      values_to = "value"
+    ) |>
+    dplyr::mutate(FPC = gsub("^PC", "FPC", .data$FPC))
+  
+  # Create mean curve tibble
+  if (center) {
+    mean_val <- pca_res$center
+  } else {
+    mean_val <- colMeans(curve_mat)
+  }
+  
+  mean_curve_tbl <- tibble::tibble(
+    time = t_grid,
+    mean = as.numeric(mean_val)
+  )
+  
+  # Create reconstructed curves using retained components
+  recon_mat <- t(t(pca_res$x[, 1:k, drop = FALSE] %*% t(pca_res$rotation[, 1:k, drop = FALSE])) + pca_res$center)
+  
+  recon_tbl <- tibble::as_tibble(recon_mat) |>
+    dplyr::mutate(curve_id = curve_ids) |>
+    tidyr::pivot_longer(
+      cols = -curve_id,
+      names_to = "time",
+      values_to = "reconstructed"
+    ) |>
+    dplyr::mutate(time = as.numeric(.data$time))
+  
+  # Input curves
+  input_tbl <- wide_mat |>
+    dplyr::rename(curve_id = dplyr::all_of(curve_id_col)) |>
+    tidyr::pivot_longer(
+      cols = -curve_id,
+      names_to = "time",
+      values_to = "fitted"
+    ) |>
+    dplyr::mutate(time = as.numeric(.data$time))
+  
+  # Combine for reconstructed output
+  recon_combined <- input_tbl |>
+    dplyr::left_join(recon_tbl, by = c("curve_id", "time"))
+  
+  settings <- list(
+    n_components = n_components,
+    var_explained = var_explained,
+    center = center,
+    scale = scale,
+    method = method,
+    n_retained = k,
+    time_var = .time,
+    trt_var = .trt
+  )
+  
+  out <- list(
+    scores = scores_tbl,
+    eigenfunctions = ef_tbl,
+    variance = var_tbl,
+    mean_curve = mean_curve_tbl,
+    reconstructed = recon_combined,
+    input_curves = input_tbl,
+    pca = pca_res,
+    settings = settings,
+    call = match.call()
+  )
+  
+  class(out) <- "r4pde_functional_pca"
+  return(out)
 }

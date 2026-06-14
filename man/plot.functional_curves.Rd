@@ -6,6 +6,11 @@
 \usage{
 \method{plot}{functional_curves}(x, ...)
 }
+\arguments{
+\item{x}{An object of class \code{"functional_curves"}.}
+
+\item{...}{Additional arguments.}
+}
 \description{
 Plot functional_curves
 }

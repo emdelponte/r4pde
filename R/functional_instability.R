@@ -21,6 +21,7 @@
 #'   `c("location", "year")`.
 #' @param return_curves Logical. If `TRUE`, the predicted genotype-by-environment
 #'   curves are also returned.
+#' @param ... Additional arguments.
 #'
 #' @return If `return_curves = FALSE`, a tibble with one row per genotype and
 #'   columns:
@@ -96,11 +97,18 @@
 #' }
 #'
 #' @export
-functional_instability <- function(x,
+functional_instability <- function(x, ...) {
+  UseMethod("functional_instability")
+}
+
+#' @export
+#' @rdname functional_instability
+functional_instability.functional_curves <- function(x,
                 n_time = 200,
                 env_sep = NULL,
                 env_names = c("location", "year"),
-                return_curves = FALSE) {
+                return_curves = FALSE,
+                ...) {
 
   has_data <- "data" %in% names(x) || "observed_data" %in% names(x)
   if (is.null(names(x)) || !("gam" %in% names(x)) || !has_data) {
@@ -273,6 +281,200 @@ functional_instability <- function(x,
   }
 
   curves <- predict_geno_env_curves(dat, x$gam, trt_col, env_col, time_col, n_time = n_time)
+  out <- calc_nfi_general(curves)
+
+  if (!is.null(env_sep)) {
+    if (length(env_names) != 2) {
+      stop("`env_names` must have length 2.", call. = FALSE)
+    }
+
+    curves2 <- curves %>%
+      tidyr::separate(
+        env,
+        into = env_names,
+        sep = env_sep,
+        remove = FALSE
+      )
+
+    names(curves2)[names(curves2) == env_names[1]] <- "location"
+    names(curves2)[names(curves2) == env_names[2]] <- "year"
+
+    out <- out %>%
+      dplyr::left_join(calc_nfi_space(curves2), by = "geno") %>%
+      dplyr::left_join(calc_nfi_time(curves2), by = "geno")
+  }
+
+  class(out) <- c("fi_tbl", class(out))
+
+  if ("geno" %in% names(out)) {
+    names(out)[names(out) == "geno"] <- trt_col
+  }
+
+  if (return_curves) {
+    names(curves)[names(curves) == "geno"] <- trt_col
+    names(curves)[names(curves) == "env"] <- env_col
+    names(curves)[names(curves) == "time"] <- time_col
+    return(list(metrics = out, curves = curves))
+  }
+
+  out
+}
+
+#' @export
+#' @rdname functional_instability
+functional_instability.functional_dsp <- function(x,
+                env_sep = NULL,
+                env_names = c("location", "year"),
+                return_curves = FALSE,
+                ...) {
+
+  vars <- attr(x, "dsp_vars")
+  if (is.null(vars)) stop("`x` is missing `dsp_vars` attribute.")
+  
+  trt_col <- vars$treatment
+  time_col <- vars$time
+  resp_col <- vars$response
+  group_cols <- vars$group
+  
+  if (length(group_cols) == 0) {
+    stop("functional_dsp object must have grouping variables (environments) to calculate instability.")
+  }
+  
+  # For instability, we need exactly one environment column. If there are multiple, combine them.
+  if (length(group_cols) > 1) {
+    x <- x |> dplyr::mutate(env = interaction(dplyr::select(x, dplyr::all_of(group_cols)), sep = "_"))
+    env_col <- "env"
+  } else {
+    env_col <- group_cols[1]
+  }
+
+  curves <- x |>
+    dplyr::rename(geno = dplyr::all_of(trt_col), env = dplyr::all_of(env_col), time = dplyr::all_of(time_col), mu = dplyr::all_of(resp_col)) |>
+    dplyr::select(geno, env, time, mu)
+    
+  trapz_vec <- function(x, y) {
+    ok <- !(is.na(x) | is.na(y))
+    x <- x[ok]
+    y <- y[ok]
+    if (length(x) < 2) return(NA_real_)
+    ord <- order(x)
+    x <- x[ord]
+    y <- y[ord]
+    sum(diff(x) * (head(y, -1) + tail(y, -1)) / 2)
+  }
+
+  calc_nfi_general <- function(curves) {
+    mean_curve <- curves %>%
+      dplyr::group_by(geno, time) %>%
+      dplyr::summarise(mean_mu = mean(mu, na.rm = TRUE), .groups = "drop")
+
+    fi_env <- curves %>%
+      dplyr::left_join(mean_curve, by = c("geno", "time")) %>%
+      dplyr::mutate(sq_dev = (mu - mean_mu)^2) %>%
+      dplyr::group_by(geno, env) %>%
+      dplyr::summarise(
+        int_sq_dev = trapz_vec(time, sq_dev),
+        .groups = "drop"
+      )
+
+    fi_geno <- fi_env %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        n_env = dplyr::n(),
+        FI = mean(int_sq_dev, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    mean_energy <- mean_curve %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        mean_energy = trapz_vec(time, mean_mu^2),
+        .groups = "drop"
+      )
+
+    fi_geno %>%
+      dplyr::left_join(mean_energy, by = "geno") %>%
+      dplyr::mutate(nFI = FI / mean_energy) %>%
+      dplyr::arrange(nFI)
+  }
+
+  calc_nfi_space <- function(curves) {
+    mean_curve <- curves %>%
+      dplyr::group_by(geno, year, time) %>%
+      dplyr::summarise(mean_mu = mean(mu, na.rm = TRUE), .groups = "drop")
+
+    fi_units <- curves %>%
+      dplyr::left_join(mean_curve, by = c("geno", "year", "time")) %>%
+      dplyr::mutate(sq_dev = (mu - mean_mu)^2) %>%
+      dplyr::group_by(geno, year, location) %>%
+      dplyr::summarise(
+        int_sq_dev = trapz_vec(time, sq_dev),
+        .groups = "drop"
+      )
+
+    fi_geno <- fi_units %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        FI_space = mean(int_sq_dev, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    mean_energy <- mean_curve %>%
+      dplyr::group_by(geno, year) %>%
+      dplyr::summarise(
+        mean_energy_space = trapz_vec(time, mean_mu^2),
+        .groups = "drop"
+      ) %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        mean_energy_space = mean(mean_energy_space, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    fi_geno %>%
+      dplyr::left_join(mean_energy, by = "geno") %>%
+      dplyr::mutate(nFI_space = FI_space / mean_energy_space)
+  }
+
+  calc_nfi_time <- function(curves) {
+    mean_curve <- curves %>%
+      dplyr::group_by(geno, location, time) %>%
+      dplyr::summarise(mean_mu = mean(mu, na.rm = TRUE), .groups = "drop")
+
+    fi_units <- curves %>%
+      dplyr::left_join(mean_curve, by = c("geno", "location", "time")) %>%
+      dplyr::mutate(sq_dev = (mu - mean_mu)^2) %>%
+      dplyr::group_by(geno, location, year) %>%
+      dplyr::summarise(
+        int_sq_dev = trapz_vec(time, sq_dev),
+        .groups = "drop"
+      )
+
+    fi_geno <- fi_units %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        FI_time = mean(int_sq_dev, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    mean_energy <- mean_curve %>%
+      dplyr::group_by(geno, location) %>%
+      dplyr::summarise(
+        mean_energy_time = trapz_vec(time, mean_mu^2),
+        .groups = "drop"
+      ) %>%
+      dplyr::group_by(geno) %>%
+      dplyr::summarise(
+        mean_energy_time = mean(mean_energy_time, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    fi_geno %>%
+      dplyr::left_join(mean_energy, by = "geno") %>%
+      dplyr::mutate(nFI_time = FI_time / pmax(mean_energy_time, 1e-8)) %>%
+      dplyr::mutate(nFI_time = pmax(nFI_time, 0))
+  }
+
   out <- calc_nfi_general(curves)
 
   if (!is.null(env_sep)) {

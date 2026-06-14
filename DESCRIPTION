@@ -1,7 +1,7 @@
 Package: r4pde
 Type: Package
 Title: Companion to R for Plant Disease Epidemiology Book
-Version: 0.1.0
+Version: 0.2.1
 Authors@R: 
     person(given = "Emerson", family = "Del Ponte", email = "delponte@ufv.br", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4398-409X"))

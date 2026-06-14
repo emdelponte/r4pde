@@ -6,6 +6,11 @@
 \usage{
 \method{print}{functional_resistance}(x, ...)
 }
+\arguments{
+\item{x}{An object of class \code{"functional_resistance"}.}
+
+\item{...}{Additional arguments.}
+}
 \description{
 Print functional_resistance
 }

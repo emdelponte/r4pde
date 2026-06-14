@@ -24,7 +24,8 @@ utils::globalVariables(c(
 ))
 .onLoad <- function(libname, pkgname) {
   utils::globalVariables(c(
-    "curve_id_chr", "trt_chr", "y_hat", "u_chr", "id", ".iter"
+    "curve_id_chr", "trt_chr", "y_hat", "u_chr", "id", ".iter",
+    "FPC", "prop_var", "cum_var", "curve_id", "DSP", "adjust_group"
   ))
 }
 # Import from base and recommended packages to suppress NOTES on undefined functions

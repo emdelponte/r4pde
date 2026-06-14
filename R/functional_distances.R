@@ -507,6 +507,8 @@ functional_distances <- function(
 }
 
 #' Print functional_distances
+#' @param x An object of class \code{"functional_distances"}.
+#' @param ... Additional arguments.
 #' @export
 print.functional_distances <- function(x, ...) {
   cat("A functional_distances object\n")

@@ -8,3 +8,13 @@ Plot functional_curves
 # S3 method for class 'functional_curves'
 plot(x, ...)
 ```
+
+## Arguments
+
+- x:
+
+  An object of class `"functional_curves"`.
+
+- ...:
+
+  Additional arguments.

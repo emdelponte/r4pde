@@ -137,7 +137,14 @@ Recommended k values follow these heuristics:
 ``` r
 # Using explicit values
 suggest_k(n_time = 5, n_env = 8)
-#> Error in suggest_k(n_time = 5, n_env = 8): could not find function "suggest_k"
+#> -- suggest_k: GAM parameter recommendations ----------------------
+#>   effective_n_time = 5 (minimum across combinations)
+#>   effective_n_env = 8 (minimum across treatments)
+#>   smoothness = 'conservative'
+#>   k_smooth = 4, k_trt = 3, k_env = 3, gamma = 1.8 
+#> 
+#> Suggested call to functional_curves():
+#>   functional_curves(..., k_smooth = 4, k_trt = 3, k_env = 3, gamma = 1.8)
 
 # Inferring from a data frame (unquoted column names)
 df <- data.frame(
@@ -154,5 +161,17 @@ suggest_k(
   rule        = "minimum",
   smoothness  = "conservative"
 )
-#> Error in suggest_k(data = df, time = time, treatment = cultivar, environment = env,     rule = "minimum", smoothness = "conservative"): could not find function "suggest_k"
+#> -- suggest_k: GAM parameter recommendations ----------------------
+#>   effective_n_time = 6 (minimum across combinations)
+#>   effective_n_env = 2 (minimum across treatments)
+#>   smoothness = 'conservative'
+#>   k_smooth = 5, k_trt = 4, k_env = 2, gamma = 1.8 
+#> 
+#> Suggested call to functional_curves():
+#>   functional_curves(..., k_smooth = 5, k_trt = 4, k_env = 2, gamma = 1.8)
+#> 
+#> Time points per treatment-by-environment:
+#>   min = 6, median = 6, max = 6
+#> Environments per treatment:
+#>   min = 2, median = 2, max = 2
 ```

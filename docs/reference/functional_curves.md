@@ -30,6 +30,7 @@ functional_curves(
   covariates = NULL,
   include_covariates = FALSE,
   covariate_smooths = FALSE,
+  global_smooth = FALSE,
   ...
 )
 ```
@@ -128,6 +129,12 @@ functional_curves(
 
   Logical; if TRUE and `include_covariates = TRUE`, adds smooth
   interactions `s(time, by=covariate)` for factor covariates.
+
+- global_smooth:
+
+  Logical; if `TRUE`, fits a shared global curve plus treatment
+  deviations. If `FALSE` (default), fits independent smooths per
+  treatment.
 
 - ...:
 

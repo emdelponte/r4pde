@@ -85,26 +85,49 @@ Utility functions for plotting and customization.
 
 Functions for functional modeling and comparison of epidemic curves.
 
+- [`augment_functional_pca()`](https://emdelponte.github.io/r4pde/reference/augment_functional_pca.md)
+  : Augment functional PCA
 - [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
   : Compare epidemic curves using GAM smoothing, functional distances,
   clustering, and optional permutation/bootstrapping
+- [`functional_contrast()`](https://emdelponte.github.io/r4pde/reference/functional_contrast.md)
+  : Functional Contrast (Disease Suppression Profiles)
 - [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
   : Fit genotype-specific epidemic trajectories using GAM
 - [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md)
   : Compute pairwise functional distances and cluster curves
 - [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md)
   : Normalized functional instability from compare_curves output
+- [`functional_pca()`](https://emdelponte.github.io/r4pde/reference/functional_pca.md)
+  : Functional principal component analysis of disease progress curves
+- [`functional_pca_clusters()`](https://emdelponte.github.io/r4pde/reference/functional_pca_clusters.md)
+  : Cluster curves based on FPCA scores
 - [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md)
   : Compute functional resistance and stability-adjusted functional
   resistance
+- [`functional_summary()`](https://emdelponte.github.io/r4pde/reference/functional_summary.md)
+  : Summarize Disease Suppression Profiles
+- [`get_fpca_eigenfunctions()`](https://emdelponte.github.io/r4pde/reference/get_fpca_eigenfunctions.md)
+  : Get FPCA eigenfunctions
+- [`get_fpca_scores()`](https://emdelponte.github.io/r4pde/reference/get_fpca_scores.md)
+  : Get FPCA scores
+- [`get_fpca_variance()`](https://emdelponte.github.io/r4pde/reference/get_fpca_variance.md)
+  : Get FPCA variance explained
 - [`plot(`*`<functional_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_curves.md)
   : Plot functional_curves
 - [`plot(`*`<r4pde_compare_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.md)
   : Plot method for compare_curves objects
+- [`plot(`*`<r4pde_functional_pca>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
+  [`autoplot(`*`<r4pde_functional_pca>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
+  : Plot functional PCA results
 - [`plot_curves()`](https://emdelponte.github.io/r4pde/reference/plot_curves.md)
   : Plot environment-adjusted epidemic curves by cluster
 - [`plot_dendrogram()`](https://emdelponte.github.io/r4pde/reference/plot_dendrogram.md)
   : Plot functional dendrogram of epidemic curves
+- [`plot_dsp()`](https://emdelponte.github.io/r4pde/reference/plot_dsp.md)
+  : Plot Disease Suppression Profiles
+- [`plot_dsp_rank_heatmap()`](https://emdelponte.github.io/r4pde/reference/plot_dsp_rank_heatmap.md)
+  : Plot DSP Rankings Heatmap
 - [`plot_functional_instability()`](https://emdelponte.github.io/r4pde/reference/plot_functional_instability.md)
   : Plot method for functional instability results
 - [`print(`*`<functional_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_curves.md)
@@ -115,6 +138,12 @@ Functions for functional modeling and comparison of epidemic curves.
   : Print functional_resistance
 - [`print(`*`<suggest_k>`*`)`](https://emdelponte.github.io/r4pde/reference/print.suggest_k.md)
   : Print method for suggest_k
+- [`rank_dsp()`](https://emdelponte.github.io/r4pde/reference/rank_dsp.md)
+  : Rank Treatments based on Functional DSP Descriptors
+- [`reconstruct_curves()`](https://emdelponte.github.io/r4pde/reference/reconstruct_curves.md)
+  : Reconstruct curves using specified FPCA components
+- [`simulate_dsp_data()`](https://emdelponte.github.io/r4pde/reference/simulate_dsp_data.md)
+  : \#' Simulate Disease Suppression Profile Data
 - [`suggest_k()`](https://emdelponte.github.io/r4pde/reference/suggest_k.md)
   : Suggest GAM smoothing parameters for epidemic curve models
 

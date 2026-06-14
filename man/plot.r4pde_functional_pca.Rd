@@ -2,6 +2,7 @@
 % Please edit documentation in R/functional_pca.R
 \name{plot.r4pde_functional_pca}
 \alias{plot.r4pde_functional_pca}
+\alias{autoplot.r4pde_functional_pca}
 \title{Plot functional PCA results}
 \usage{
 \method{plot}{r4pde_functional_pca}(
@@ -11,6 +12,8 @@
   curve_id = NULL,
   ...
 )
+
+autoplot.r4pde_functional_pca(object, ...)
 }
 \arguments{
 \item{x}{An object of class \code{"r4pde_functional_pca"}.}
@@ -22,6 +25,8 @@
 \item{curve_id}{Optional vector of curve IDs to include in reconstruction plot.}
 
 \item{...}{Additional arguments.}
+
+\item{object}{An object of class \code{"r4pde_functional_pca"}.}
 }
 \description{
 Plot functional PCA results

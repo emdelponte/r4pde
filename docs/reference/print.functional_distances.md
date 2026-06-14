@@ -8,3 +8,13 @@ Print functional_distances
 # S3 method for class 'functional_distances'
 print(x, ...)
 ```
+
+## Arguments
+
+- x:
+
+  An object of class `"functional_distances"`.
+
+- ...:
+
+  Additional arguments.

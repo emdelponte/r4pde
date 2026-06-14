@@ -8,3 +8,13 @@ Print functional_resistance
 # S3 method for class 'functional_resistance'
 print(x, ...)
 ```
+
+## Arguments
+
+- x:
+
+  An object of class `"functional_resistance"`.
+
+- ...:
+
+  Additional arguments.

@@ -2,18 +2,33 @@
 % Please edit documentation in R/functional_instability.R
 \name{functional_instability}
 \alias{functional_instability}
+\alias{functional_instability.functional_curves}
+\alias{functional_instability.functional_dsp}
 \title{Normalized functional instability from compare_curves output}
 \usage{
-functional_instability(
+functional_instability(x, ...)
+
+\method{functional_instability}{functional_curves}(
   x,
   n_time = 200,
   env_sep = NULL,
   env_names = c("location", "year"),
-  return_curves = FALSE
+  return_curves = FALSE,
+  ...
+)
+
+\method{functional_instability}{functional_dsp}(
+  x,
+  env_sep = NULL,
+  env_names = c("location", "year"),
+  return_curves = FALSE,
+  ...
 )
 }
 \arguments{
 \item{x}{An object returned by \code{\link{functional_curves}} or \code{\link{compare_curves}}.}
+
+\item{...}{Additional arguments.}
 
 \item{n_time}{Number of points in the prediction grid over the time domain.}
 

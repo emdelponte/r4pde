@@ -253,7 +253,7 @@ suggest_k <- function(
 #' @return Invisibly returns \code{x}.
 #' @export
 print.suggest_k <- function(x, ...) {
-  cat("── suggest_k: GAM parameter recommendations ──────────────────────\n")
+  cat("-- suggest_k: GAM parameter recommendations ----------------------\n")
   cat(" ", x$message, "\n")
   cat("\nSuggested call to functional_curves():\n")
   cat(sprintf(
