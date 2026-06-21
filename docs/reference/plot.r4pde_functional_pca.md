@@ -14,8 +14,7 @@ plot(
   ...
 )
 
-# S3 method for class 'r4pde_functional_pca'
-autoplot(object, ...)
+autoplot.r4pde_functional_pca(object, ...)
 ```
 
 ## Arguments

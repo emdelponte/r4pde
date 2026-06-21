@@ -113,6 +113,8 @@ Datasets used in the examples and analyses.
   : DidymellaWatermelon dataset
 - [`FHBWheat`](https://emdelponte.github.io/r4pde/reference/FHBWheat.md)
   : FHBWheat dataset
+- [`FHBWheatBrazil`](https://emdelponte.github.io/r4pde/reference/FHBWheatBrazil.md)
+  : FHBWheatBrazil dataset
 - [`FusariumBanana`](https://emdelponte.github.io/r4pde/reference/FusariumBanana.md)
   : FusariumBanana dataset
 - [`RustSoybean`](https://emdelponte.github.io/r4pde/reference/RustSoybean.md)
@@ -168,7 +170,7 @@ Functions for functional modeling and comparison of epidemic curves.
 - [`plot(`*`<r4pde_compare_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.md)
   : Plot method for compare_curves objects
 - [`plot(`*`<r4pde_functional_pca>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
-  [`autoplot(`*`<r4pde_functional_pca>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
+  [`autoplot.r4pde_functional_pca()`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
   : Plot functional PCA results
 - [`plot_curves()`](https://emdelponte.github.io/r4pde/reference/plot_curves.md)
   : Plot environment-adjusted epidemic curves by cluster
