@@ -136,4 +136,22 @@
 #' @source Simulated example
 "SpatialRandom"
 
-
+#' FHBWheatBrazil dataset
+#'
+#' Fusarium head blight (FHB) index in wheat in Brazil.
+#'
+#' @format A data frame with the following columns:
+#' \describe{
+#'   \item{study}{Study ID or code}
+#'   \item{year}{Crop year}
+#'   \item{location}{Experimental site name}
+#'   \item{state}{Brazilian state}
+#'   \item{lat}{Latitude coordinate}
+#'   \item{lon}{Longitude coordinate}
+#'   \item{cultivar}{Wheat cultivar}
+#'   \item{planting_date}{Planting date}
+#'   \item{flowering}{Flowering date}
+#'   \item{index}{FHB index}
+#' }
+#' @source Del Ponte Lab internal data
+"FHBWheatBrazil"
