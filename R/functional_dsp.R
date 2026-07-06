@@ -43,7 +43,8 @@ functional_contrast <- function(
     smooth = FALSE,
     grid = NULL,
     contrast = c("difference", "relative"),
-    keep_reference = FALSE
+    keep_reference = FALSE,
+    ...
 ) {
   contrast <- match.arg(contrast)
   
@@ -82,8 +83,8 @@ functional_contrast <- function(
     df <- df |>
       dplyr::group_by(dplyr::across(dplyr::all_of(c(group_cols, trt_col)))) |>
       dplyr::reframe(
-        !!time_col := grid,
-        !!resp_col := stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = grid, rule = 2)$y
+        !!resp_col := suppressWarnings(stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = grid, rule = 2)$y),
+        !!time_col := grid
       )
   } else {
     # If no grid, ensure same time points by interpolating treatments to match reference time points if needed
@@ -98,8 +99,8 @@ functional_contrast <- function(
         .x |>
           dplyr::group_by(.data[[trt_col]]) |>
           dplyr::reframe(
-            !!time_col := common_times,
-            !!resp_col := stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = common_times, rule = 2)$y
+            !!resp_col := suppressWarnings(stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = common_times, rule = 2)$y),
+            !!time_col := common_times
           )
       }) |>
       dplyr::ungroup()

@@ -4,7 +4,13 @@
 \alias{plot_dendrogram}
 \title{Plot functional dendrogram of epidemic curves}
 \usage{
-plot_dendrogram(x, label_fun = NULL, palette = NULL, show_cut = TRUE)
+plot_dendrogram(
+  x,
+  label_fun = NULL,
+  palette = NULL,
+  show_cut = TRUE,
+  label_size = 2.8
+)
 }
 \arguments{
 \item{x}{An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.}
@@ -14,6 +20,8 @@ plot_dendrogram(x, label_fun = NULL, palette = NULL, show_cut = TRUE)
 \item{palette}{Optional named vector of colors for clusters.}
 
 \item{show_cut}{Logical; whether to display the cluster cut height.}
+
+\item{label_size}{Numeric specifying the font size of the labels. Default is \code{2.8}.}
 }
 \value{
 A \code{ggplot} object.

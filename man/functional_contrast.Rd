@@ -14,7 +14,8 @@ functional_contrast(
   smooth = FALSE,
   grid = NULL,
   contrast = c("difference", "relative"),
-  keep_reference = FALSE
+  keep_reference = FALSE,
+  ...
 )
 }
 \arguments{

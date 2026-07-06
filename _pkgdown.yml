@@ -74,10 +74,12 @@ reference:
       - functional_pca_clusters
       - functional_resistance
       - functional_summary
+      - functional_suppression_profiles
       - get_fpca_eigenfunctions
       - get_fpca_scores
       - get_fpca_variance
       - plot.functional_curves
+      - plot.functional_suppression_profiles
       - plot.r4pde_compare_curves
       - plot.r4pde_functional_pca
       - plot_curves
@@ -88,11 +90,13 @@ reference:
       - print.functional_curves
       - print.functional_distances
       - print.functional_resistance
+      - print.functional_suppression_profiles
       - print.suggest_k
       - rank_dsp
       - reconstruct_curves
       - simulate_dsp_data
       - suggest_k
+      - summary.functional_suppression_profiles
 
   - title: "Diagnostics"
     contents:

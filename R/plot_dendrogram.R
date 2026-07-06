@@ -8,6 +8,7 @@
 #' @param label_fun Optional function to modify treatment labels.
 #' @param palette Optional named vector of colors for clusters.
 #' @param show_cut Logical; whether to display the cluster cut height.
+#' @param label_size Numeric specifying the font size of the labels. Default is \code{2.8}.
 #'
 #' @return A \code{ggplot} object.
 #'
@@ -16,7 +17,8 @@ plot_dendrogram <- function(
     x,
     label_fun = NULL,
     palette = NULL,
-    show_cut = TRUE
+    show_cut = TRUE,
+    label_size = 2.8
 ){
   stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_distances"))
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
@@ -56,7 +58,7 @@ plot_dendrogram <- function(
     ggplot2::geom_text(
       data = labs_df,
       ggplot2::aes(x = x, y = y, label = label_short, colour = cluster),
-      angle = 90, hjust = 1, vjust = 0.5, size = 3
+      angle = 90, hjust = 1, vjust = 0.5, size = label_size
     ) +
     ggplot2::labs(x = NULL, y = "Functional distance", colour = "Cluster") +
     ggplot2::theme_classic(base_size = 13) +
@@ -65,13 +67,23 @@ plot_dendrogram <- function(
       axis.ticks.x = ggplot2::element_blank(),
       axis.text.x  = ggplot2::element_blank(),
       legend.position = "none",
-      plot.margin = ggplot2::margin(t = 5.5, r = 5.5, b = 18, l = 5.5)
+      plot.margin = ggplot2::margin(t = 5.5, r = 5.5, b = 65, l = 5.5)
     ) +
     ggplot2::coord_cartesian(clip = "off")
 
   if(show_cut){
     h_cut <- x$hc$height[length(x$hc$height) - (k - 1)]
-    p <- p + ggplot2::geom_hline(yintercept = h_cut, linetype = "dashed", linewidth = 0.5)
+    p <- p + ggplot2::geom_hline(yintercept = h_cut, linetype = "dashed", linewidth = 0.5) +
+      ggplot2::annotate(
+        "text",
+        x = max(dd$segments$x, na.rm = TRUE),
+        y = h_cut,
+        label = paste("Profiles =", k),
+        hjust = 1,
+        vjust = -0.5,
+        size = 3.5,
+        color = "gray30"
+      )
   }
 
   if(!is.null(palette)) p <- p + ggplot2::scale_colour_manual(values = palette)
