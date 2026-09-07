@@ -9,7 +9,7 @@ home:
   description: Companion package to the book "R for Plant Disease Epidemiology"
   license: FALSE
 development:
-  mode: auto
+  mode: unreleased
 
 reference:
   - title: "Disease Quantification"
@@ -64,6 +64,7 @@ reference:
   - title: "Functional Analysis"
     desc: "Functions for functional modeling and comparison of epidemic curves."
     contents:
+      - augment
       - augment_functional_pca
       - augment.functional_rate
       - augment_functional_rate
@@ -84,6 +85,7 @@ reference:
       - plot.functional_curves
       - plot.functional_rate
       - plot.functional_suppression_profiles
+      - plot.functional_suppression_profiles_list
       - plot.r4pde_compare_curves
       - plot.r4pde_functional_pca
       - plot_curves
@@ -96,13 +98,17 @@ reference:
       - print.functional_rate
       - print.functional_resistance
       - print.functional_suppression_profiles
+      - print.functional_suppression_profiles_list
       - print.suggest_k
+      - print.summary.functional_suppression_profiles
+      - print.summary.functional_suppression_profiles_list
       - rank_dsp
       - reconstruct_curves
       - simulate_dsp_data
       - suggest_k
       - summary.functional_rate
       - summary.functional_suppression_profiles
+      - summary.functional_suppression_profiles_list
 
   - title: "Diagnostics"
     contents:

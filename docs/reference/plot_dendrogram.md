@@ -6,7 +6,13 @@ distances among epidemic curves.
 ## Usage
 
 ``` r
-plot_dendrogram(x, label_fun = NULL, palette = NULL, show_cut = TRUE)
+plot_dendrogram(
+  x,
+  label_fun = NULL,
+  palette = NULL,
+  show_cut = TRUE,
+  label_size = 2.8
+)
 ```
 
 ## Arguments
@@ -27,6 +33,10 @@ plot_dendrogram(x, label_fun = NULL, palette = NULL, show_cut = TRUE)
 - show_cut:
 
   Logical; whether to display the cluster cut height.
+
+- label_size:
+
+  Numeric specifying the font size of the labels. Default is `2.8`.
 
 ## Value
 

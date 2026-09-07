@@ -14,11 +14,14 @@ functional_suppression_profiles(
   time = "time",
   response = "severity",
   treatment = "treatment",
+  environment = NULL,
+  by_environment = FALSE,
+  env_ref = NULL,
   threshold = 5,
   metrics = c("protected_area", "max_suppression", "persistence", "centroid"),
   dist_method = "euclidean",
   hclust_method = "average",
-  k = NULL,
+  k = "auto",
   cut_height = NULL,
   ...
 )
@@ -48,6 +51,20 @@ functional_suppression_profiles(
   Character string specifying the treatment column. Default is
   `"treatment"`.
 
+- environment:
+
+  Character string specifying the environment column (optional).
+
+- by_environment:
+
+  Logical; if `TRUE`, the analysis is run separately for each
+  environment. Default is `FALSE`.
+
+- env_ref:
+
+  Character string specifying the reference environment for joint
+  analysis (optional).
+
 - threshold:
 
   Numeric threshold for the persistence metric. Default is `5`.
@@ -69,9 +86,9 @@ functional_suppression_profiles(
 
 - k:
 
-  Integer specifying the number of clusters. If `NULL` and `cut_height`
-  is `NULL`, defaults to 4 if there are 6 or more treatments, else
-  `min(3, n_treatments)`.
+  Integer specifying the number of functional profiles to create, or
+  `"auto"` (default). When `"auto"`, the optimal number of profiles is
+  estimated by maximizing the average silhouette width.
 
 - cut_height:
 
@@ -99,7 +116,12 @@ A list of class `"functional_suppression_profiles"` containing:
 
 - `hclust`: The hierarchical clustering object.
 
-- `clusters`: A tibble with treatment cluster assignments.
+- `clusters`: A tibble with treatment cluster assignments (internal).
+
+- `profiles`: A lightweight tibble mapping treatments to profiles.
+
+- `classification`: A tibble with the final classification combining
+  profiles, mean rank, and functional metrics, ordered by mean rank.
 
 - `summary`: A tibble with functional summary metrics.
 
@@ -114,10 +136,27 @@ A list of class `"functional_suppression_profiles"` containing:
 
 A Functional Suppression Profile (FSP) is the temporal trajectory of
 disease suppression produced by a treatment relative to an untreated or
-reference control. The workflow includes contrasting treatments against
-a reference, fitting functional curves, calculating distances,
-clustering, and summarizing the suppression using metrics like protected
-area, maximum suppression, and persistence.
+reference control. Functional distances and hierarchical clustering are
+computed from smoothed disease suppression trajectories rather than raw
+observed suppression values. Functional summary metrics are subsequently
+used to interpret the resulting suppression profiles.
+
+The workflow includes contrasting treatments against a reference,
+fitting functional curves, calculating distances, clustering, and
+summarizing the suppression using metrics like protected area, maximum
+suppression, and persistence.
+
+Treatments belonging to the same functional suppression profile are
+displayed using the same colour throughout all graphical summaries. This
+visual consistency facilitates interpretation of the relationship
+between suppression trajectories, functional clustering, and suppression
+metrics.
+
+The `classification` table combines functional profile membership,
+suppression metrics, and mean functional rank. Functional profiles are
+defined from distances among smoothed suppression trajectories, whereas
+mean rank summarizes the overall performance across functional
+suppression metrics.
 
 ## See also
 

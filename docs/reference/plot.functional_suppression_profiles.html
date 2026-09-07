@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dendrogram"</span>, <span class="st">"profiles"</span>, <span class="st">"heatmap"</span>, <span class="st">"rank"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  show_cut <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -69,6 +70,10 @@
 <dd><p>Logical; whether to display the cluster cut height in dendrogram. Default is <code>TRUE</code>.</p></dd>
 
 
+<dt id="arg-show-points">show_points<a class="anchor" aria-label="anchor" href="#arg-show-points"></a></dt>
+<dd><p>Logical; whether to overlay observed DSP values as points in the profiles plot. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to specific plot functions.</p></dd>
 
@@ -76,6 +81,13 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>ggplot</code> object or a list of <code>ggplot</code> objects.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The plot method visualizes the components of a Functional Suppression Profile.
+The dendrogram defines the Functional Suppression Profiles based on temporal similarity.
+The heatmap is ordered by the dendrogram to help interpret these functional groups
+using summary metrics.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

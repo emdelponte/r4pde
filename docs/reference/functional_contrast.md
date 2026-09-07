@@ -20,7 +20,8 @@ functional_contrast(
   smooth = FALSE,
   grid = NULL,
   contrast = c("difference", "relative"),
-  keep_reference = FALSE
+  keep_reference = FALSE,
+  ...
 )
 ```
 
@@ -72,6 +73,10 @@ functional_contrast(
 
   Logical; if `TRUE`, includes the reference treatment in the output
   (with DSP = 0). Default is `FALSE`.
+
+- ...:
+
+  Additional arguments.
 
 ## Value
 

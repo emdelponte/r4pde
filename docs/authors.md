@@ -12,13 +12,12 @@ Source:
 
 Del Ponte E (2026). *r4pde: Companion to R for Plant Disease
 Epidemiology Book*. R package version 0.2.1,
-https://github.com/emdelponte/r4pde,
 <https://emdelponte.github.io/r4pde/>.
 
     @Manual{,
       title = {r4pde: Companion to R for Plant Disease Epidemiology Book},
       author = {Emerson {Del Ponte}},
       year = {2026},
-      note = {R package version 0.2.1, https://github.com/emdelponte/r4pde},
+      note = {R package version 0.2.1},
       url = {https://emdelponte.github.io/r4pde/},
     }

@@ -14,7 +14,6 @@ quantification, spatial analysis and predictive modeling.
 Install the stable release from CRAN.
 
 ``` r
-
 install.packages("r4pde")
 ```
 
@@ -23,7 +22,6 @@ it along with its dependencies (including Bioconductor packages), use
 the [`pak`](https://pak.r-lib.org/) package:
 
 ``` r
-
 if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pkg_install("emdelponte/r4pde")
 ```
@@ -31,7 +29,6 @@ pak::pkg_install("emdelponte/r4pde")
 Alternatively, using remotes:
 
 ``` r
-
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("emdelponte/r4pde")
 ```
@@ -48,6 +45,5 @@ tracker.
 - To cite the package, please use:
 
 ``` r
-
 citation("r4pde")
 ```

@@ -87,8 +87,14 @@ Utility functions for plotting and customization.
 
 Functions for functional modeling and comparison of epidemic curves.
 
+- [`augment()`](https://emdelponte.github.io/r4pde/reference/augment.md)
+  : Augment generic for functional objects
 - [`augment_functional_pca()`](https://emdelponte.github.io/r4pde/reference/augment_functional_pca.md)
   : Augment functional PCA
+- [`augment(`*`<functional_rate>`*`)`](https://emdelponte.github.io/r4pde/reference/augment.functional_rate.md)
+  : Augment functional_rate
+- [`augment_functional_rate()`](https://emdelponte.github.io/r4pde/reference/augment_functional_rate.md)
+  : Augment functional_rate (alias)
 - [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
   : Compare epidemic curves using GAM smoothing, functional distances,
   clustering, and optional permutation/bootstrapping
@@ -104,6 +110,8 @@ Functions for functional modeling and comparison of epidemic curves.
   : Functional principal component analysis of disease progress curves
 - [`functional_pca_clusters()`](https://emdelponte.github.io/r4pde/reference/functional_pca_clusters.md)
   : Cluster curves based on FPCA scores
+- [`functional_rate()`](https://emdelponte.github.io/r4pde/reference/functional_rate.md)
+  : Instantaneous Disease Progress Rates from Functional Curves
 - [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md)
   : Compute functional resistance and stability-adjusted functional
   resistance
@@ -119,8 +127,12 @@ Functions for functional modeling and comparison of epidemic curves.
   : Get FPCA variance explained
 - [`plot(`*`<functional_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_curves.md)
   : Plot functional_curves
+- [`plot(`*`<functional_rate>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_rate.md)
+  : Plot functional_rate curves and rates
 - [`plot(`*`<functional_suppression_profiles>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_suppression_profiles.md)
   : Plot functional suppression profiles
+- [`plot(`*`<functional_suppression_profiles_list>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_suppression_profiles_list.md)
+  : Plot a list of functional suppression profiles
 - [`plot(`*`<r4pde_compare_curves>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_compare_curves.md)
   : Plot method for compare_curves objects
 - [`plot(`*`<r4pde_functional_pca>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.r4pde_functional_pca.md)
@@ -140,12 +152,20 @@ Functions for functional modeling and comparison of epidemic curves.
   : Print functional_curves
 - [`print(`*`<functional_distances>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_distances.md)
   : Print functional_distances
+- [`print(`*`<functional_rate>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_rate.md)
+  : Print a functional_rate object
 - [`print(`*`<functional_resistance>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_resistance.md)
   : Print functional_resistance
 - [`print(`*`<functional_suppression_profiles>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_suppression_profiles.md)
   : Print functional suppression profiles
+- [`print(`*`<functional_suppression_profiles_list>`*`)`](https://emdelponte.github.io/r4pde/reference/print.functional_suppression_profiles_list.md)
+  : Print a list of functional suppression profiles
 - [`print(`*`<suggest_k>`*`)`](https://emdelponte.github.io/r4pde/reference/print.suggest_k.md)
   : Print method for suggest_k
+- [`print(`*`<summary.functional_suppression_profiles>`*`)`](https://emdelponte.github.io/r4pde/reference/print.summary.functional_suppression_profiles.md)
+  : Print summary of functional suppression profiles
+- [`print(`*`<summary.functional_suppression_profiles_list>`*`)`](https://emdelponte.github.io/r4pde/reference/print.summary.functional_suppression_profiles_list.md)
+  : Print summary of a list of functional suppression profiles
 - [`rank_dsp()`](https://emdelponte.github.io/r4pde/reference/rank_dsp.md)
   : Rank Treatments based on Functional DSP Descriptors
 - [`reconstruct_curves()`](https://emdelponte.github.io/r4pde/reference/reconstruct_curves.md)
@@ -154,8 +174,12 @@ Functions for functional modeling and comparison of epidemic curves.
   : \#' Simulate Disease Suppression Profile Data
 - [`suggest_k()`](https://emdelponte.github.io/r4pde/reference/suggest_k.md)
   : Suggest GAM smoothing parameters for epidemic curve models
+- [`summary(`*`<functional_rate>`*`)`](https://emdelponte.github.io/r4pde/reference/summary.functional_rate.md)
+  : Summarize a functional_rate object
 - [`summary(`*`<functional_suppression_profiles>`*`)`](https://emdelponte.github.io/r4pde/reference/summary.functional_suppression_profiles.md)
   : Summarize functional suppression profiles
+- [`summary(`*`<functional_suppression_profiles_list>`*`)`](https://emdelponte.github.io/r4pde/reference/summary.functional_suppression_profiles_list.md)
+  : Summarize a list of functional suppression profiles
 
 ## Diagnostics
 

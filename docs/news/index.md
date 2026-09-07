@@ -1,5 +1,31 @@
 # Changelog
 
+## r4pde 0.2.2
+
+### New functions
+
+- Added
+  [`functional_rate()`](https://emdelponte.github.io/r4pde/reference/functional_rate.md):
+  Estimates instantaneous rates of plant disease progress () and
+  associated uncertainty from epidemic trajectories fitted by
+  [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md).
+  Supports response and link scale derivatives via GAM linear predictor
+  matrix differences, handles boundary conditions without extrapolation,
+  accounts for zero-epidemic curves and negative rates, and computes key
+  rate phenotypes (, , growth duration, cumulative positive growth, and
+  growth windows). Includes S3 methods:
+  [`print()`](https://rdrr.io/r/base/print.html),
+  [`summary()`](https://rdrr.io/r/base/summary.html),
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html), and
+  [`augment()`](https://emdelponte.github.io/r4pde/reference/augment.md).
+
+### Bug fixes and improvements
+
+- [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md):
+  Fixed smooth term label inspection during prediction so that `.unit`
+  experimental unit and block random effects are correctly identified
+  and supplied to `predict.gam()`.
+
 ## r4pde 0.2.1 (2026-06-14)
 
 ### New functions
