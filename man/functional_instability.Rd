@@ -4,7 +4,7 @@
 \alias{functional_instability}
 \alias{functional_instability.functional_curves}
 \alias{functional_instability.functional_dsp}
-\title{Normalized functional instability from compare_curves output}
+\title{Normalized functional instability from fitted functional disease curves}
 \usage{
 functional_instability(x, ...)
 
@@ -26,7 +26,7 @@ functional_instability(x, ...)
 )
 }
 \arguments{
-\item{x}{An object returned by \code{\link{functional_curves}} or \code{\link{compare_curves}}.}
+\item{x}{An object returned by \code{\link{functional_curves}} or a \code{functional_dsp} object.}
 
 \item{...}{Additional arguments.}
 
@@ -73,7 +73,7 @@ columns \code{geno}, \code{env}, \code{time}, \code{mu}, and \code{eta}.}
 \description{
 Computes normalized functional instability (NFI) for each treatment
 based on genotype-by-environment predicted curves extracted from a
-\code{compare_curves()} object. Optionally, instability can be decomposed
+\code{\link{functional_curves}} object. Optionally, instability can be decomposed
 into spatial and temporal components if the environment identifier can
 be split into location and year.
 }
@@ -103,13 +103,12 @@ prediction grid over the observed time domain.
 }
 \examples{
 \dontrun{
-m1 <- r4pde::compare_curves(
+m1 <- r4pde::functional_curves(
   data = dat_ready,
   time = "time",
   response = "y",
   treatment = "geno",
-  environment = "env",
-  cluster_k = 4
+  environment = "env"
 )
 
 # Overall instability
@@ -129,5 +128,5 @@ head(out$curves)
 
 }
 \seealso{
-\code{\link{functional_curves}}, \code{\link{compare_curves}}
+\code{\link{functional_curves}}
 }

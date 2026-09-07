@@ -7,7 +7,7 @@
 diagnose_curves(x, grid_n = 200)
 }
 \arguments{
-\item{x}{An object of class \code{"functional_curves"} or \code{"r4pde_compare_curves"}.}
+\item{x}{An object of class \code{"functional_curves"}.}
 
 \item{grid_n}{Number of points used for the diagnostic smooth curve.}
 }
@@ -21,7 +21,6 @@ An object of class \code{"r4pde_curve_diagnostics"} containing:
 }
 }
 \description{
-Computes residuals, fitted values, and model diagnostics for
-GAM-based epidemic curve models fitted with \code{compare_curves()}.
+Diagnostic tools for functional epidemic curve models fitted with \code{\link{functional_curves}()}.
 Produces diagnostic plots without invoking base graphics.
 }

@@ -2,21 +2,11 @@
 % Please edit documentation in R/plot_curves.R
 \name{plot_curves}
 \alias{plot_curves}
-\alias{plot_curves.r4pde_compare_curves}
 \alias{plot_curves.functional_distances}
 \alias{plot_curves.functional_dsp}
 \title{Plot environment-adjusted epidemic curves by cluster}
 \usage{
 plot_curves(x, ...)
-
-\method{plot_curves}{r4pde_compare_curves}(
-  x,
-  label_fun = NULL,
-  palette = NULL,
-  alpha = 0.9,
-  linewidth = 1.1,
-  ...
-)
 
 \method{plot_curves}{functional_distances}(
   x,
@@ -30,7 +20,7 @@ plot_curves(x, ...)
 \method{plot_curves}{functional_dsp}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.}
+\item{x}{An object of class \code{"functional_distances"}.}
 
 \item{...}{Additional arguments.}
 

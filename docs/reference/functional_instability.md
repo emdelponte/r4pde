@@ -1,8 +1,8 @@
-# Normalized functional instability from compare_curves output
+# Normalized functional instability from fitted functional disease curves
 
 Computes normalized functional instability (NFI) for each treatment
 based on genotype-by-environment predicted curves extracted from a
-[`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
+[`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
 object. Optionally, instability can be decomposed into spatial and
 temporal components if the environment identifier can be split into
 location and year.
@@ -38,8 +38,7 @@ functional_instability(
 
   An object returned by
   [`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
-  or
-  [`compare_curves`](https://emdelponte.github.io/r4pde/reference/compare_curves.md).
+  or a `functional_dsp` object.
 
 - ...:
 
@@ -136,20 +135,18 @@ regular prediction grid over the observed time domain.
 
 ## See also
 
-[`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md),
-[`compare_curves`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
+[`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-m1 <- r4pde::compare_curves(
+m1 <- r4pde::functional_curves(
   data = dat_ready,
   time = "time",
   response = "y",
   treatment = "geno",
-  environment = "env",
-  cluster_k = 4
+  environment = "env"
 )
 
 # Overall instability

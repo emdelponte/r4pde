@@ -1,11 +1,10 @@
 #' Diagnostic tools for functional epidemic curve models
 #'
 #' @description
-#' Computes residuals, fitted values, and model diagnostics for
-#' GAM-based epidemic curve models fitted with \code{compare_curves()}.
+#' Diagnostic tools for functional epidemic curve models fitted with \code{\link{functional_curves}()}.
 #' Produces diagnostic plots without invoking base graphics.
 #'
-#' @param x An object of class \code{"functional_curves"} or \code{"r4pde_compare_curves"}.
+#' @param x An object of class \code{"functional_curves"}.
 #' @param grid_n Number of points used for the diagnostic smooth curve.
 #'
 #' @return An object of class \code{"r4pde_curve_diagnostics"} containing:
@@ -18,13 +17,16 @@
 #'
 #' @export
 diagnose_curves <- function(x, grid_n = 200){
-  stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_curves"))
+  if (!inherits(x, "functional_curves")) {
+    stop("`x` must be an object returned by `functional_curves()`.",
+         call. = FALSE)
+  }
 
   req <- c("mgcv","ggplot2","dplyr","tibble")
   miss <- req[!vapply(req, requireNamespace, logical(1), quietly = TRUE)]
   if(length(miss)) stop("Missing packages: ", paste(miss, collapse = ", "))
 
-  df  <- if(!is.null(x$observed_data)) x$observed_data else x$data
+  df  <- x$observed_data
   tim <- x$vars$time
   trt <- x$vars$treatment
 
@@ -34,7 +36,7 @@ diagnose_curves <- function(x, grid_n = 200){
   res_dev  <- suppressWarnings(as.numeric(stats::residuals(x$gam, type = "deviance")))
 
   if(length(mu_hat) != nrow(df) || length(res_pear) != nrow(df)) {
-    stop("Diagnostics length mismatch: fitted/residuals not aligned with x$data (nrow).")
+    stop("Diagnostics length mismatch: fitted/residuals not aligned with x$observed_data (nrow).")
   }
   if(length(res_dev) != nrow(df)) res_dev <- rep(NA_real_, nrow(df))
 

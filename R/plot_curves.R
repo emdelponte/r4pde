@@ -7,7 +7,7 @@
 #' The returned object is a \code{ggplot} and can be further modified
 #' using standard ggplot2 layers.
 #'
-#' @param x An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.
+#' @param x An object of class \code{"functional_distances"}.
 #' @param label_fun Optional function to modify treatment labels.
 #' @param palette Optional named vector of colors for clusters.
 #' @param alpha Line transparency.
@@ -23,7 +23,7 @@ plot_curves <- function(x, ...) {
 
 #' @export
 #' @rdname plot_curves
-plot_curves.r4pde_compare_curves <- function(
+plot_curves.functional_distances <- function(
     x,
     label_fun = NULL,
     palette = NULL,
@@ -35,16 +35,10 @@ plot_curves.r4pde_compare_curves <- function(
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
   if(!requireNamespace("dplyr", quietly = TRUE)) stop("Need dplyr.")
 
-  if (inherits(x, "functional_distances")) {
-    fc <- x$functional_curves
-    trt <- fc$vars$treatment
-    tim <- fc$vars$time
-    pred_df <- fc$curves
-  } else {
-    trt <- x$vars$treatment
-    tim <- x$vars$time
-    pred_df <- x$pred
-  }
+  fc <- x$functional_curves
+  trt <- fc$vars$treatment
+  tim <- fc$vars$time
+  pred_df <- fc$curves
 
   if(is.null(label_fun)) label_fun <- function(z) z
 
@@ -82,10 +76,6 @@ plot_curves.r4pde_compare_curves <- function(
 
   p
 }
-
-#' @export
-#' @rdname plot_curves
-plot_curves.functional_distances <- plot_curves.r4pde_compare_curves
 
 #' @export
 #' @rdname plot_curves

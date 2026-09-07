@@ -19,8 +19,7 @@
 # r4pde 0.2.0 (2026-04-26)
 
 ## Major changes
-- Refactored the monolithic `compare_curves()` workflow into a modular functional analysis API.
-- `compare_curves()` is now a soft-deprecated wrapper around the new modular functions.
+- Introduced a modular functional-analysis workflow based on `functional_curves()`, `functional_distances()`, `functional_pca()`, `functional_resistance()`, and related methods.
 
 ## New functions
 - `functional_pca()`: Performs functional principal component analysis on fitted disease progress curves to decompose variation among epidemic trajectories into orthogonal temporal components. Includes plotting and extractor functions.
@@ -45,7 +44,6 @@
 ## Enhancements
 - Added `get_era5()` for retrieving ERA5 reanalysis weather data via Open-Meteo API.
 - Added `get_brdwgd()` for extracting daily weather data from the Brazilian Daily Weather Gridded Data (BR-DWGD) NetCDF files.
-- Added `compare_curves()` for functional comparison and clustering of epidemic curves.
 - Added plotting and diagnostic helpers for curve models.
 
 # r4pde 0.1.0 (2025-06-21)

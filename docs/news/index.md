@@ -61,11 +61,12 @@
 
 ### Major changes
 
-- Refactored the monolithic
-  [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
-  workflow into a modular functional analysis API.
-- [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
-  is now a soft-deprecated wrapper around the new modular functions.
+- Introduced a modular functional-analysis workflow based on
+  [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md),
+  [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md),
+  [`functional_pca()`](https://emdelponte.github.io/r4pde/reference/functional_pca.md),
+  [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md),
+  and related methods.
 
 ### New functions
 
@@ -129,9 +130,6 @@
   [`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md)
   for extracting daily weather data from the Brazilian Daily Weather
   Gridded Data (BR-DWGD) NetCDF files.
-- Added
-  [`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md)
-  for functional comparison and clustering of epidemic curves.
 - Added plotting and diagnostic helpers for curve models.
 
 ## r4pde 0.1.0 (2025-06-21)

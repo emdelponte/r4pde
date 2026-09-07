@@ -19,8 +19,7 @@ plot_dendrogram(
 
 - x:
 
-  An object of class `"r4pde_compare_curves"` or
-  `"functional_distances"`.
+  An object of class `"functional_distances"`.
 
 - label_fun:
 

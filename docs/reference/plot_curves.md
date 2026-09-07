@@ -11,16 +11,6 @@ standard ggplot2 layers.
 ``` r
 plot_curves(x, ...)
 
-# S3 method for class 'r4pde_compare_curves'
-plot_curves(
-  x,
-  label_fun = NULL,
-  palette = NULL,
-  alpha = 0.9,
-  linewidth = 1.1,
-  ...
-)
-
 # S3 method for class 'functional_distances'
 plot_curves(
   x,
@@ -39,8 +29,7 @@ plot_curves(x, ...)
 
 - x:
 
-  An object of class `"r4pde_compare_curves"` or
-  `"functional_distances"`.
+  An object of class `"functional_distances"`.
 
 - ...:
 

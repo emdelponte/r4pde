@@ -76,7 +76,9 @@ test_that("functional_resistance rankings and instability penalties", {
   expect_true(safri_a_inst < safri_a)
 })
 
-test_that("compare_curves works as wrapper", {
+test_that("modular functional workflow, plotting, and diagnostics work without legacy wrappers", {
+  expect_false("compare_curves" %in% getNamespaceExports("r4pde"))
+
   set.seed(123)
   df <- data.frame(
     time = rep(1:5, 4),
@@ -84,15 +86,17 @@ test_that("compare_curves works as wrapper", {
     block = rep(rep(1:2, each = 5), 2),
     y = pmax(0, pmin(1, rep(c(0.1, 0.3, 0.5, 0.7, 0.9), 4) + rnorm(20, 0, 0.05)))
   )
-  suppressWarnings({
-    cc <- compare_curves(
-      data = df, time = "time", response = "y", treatment = "treatment",
-      block = "block", min_points = 3, show_progress = FALSE, family_try = "quasibinomial"
-    )
-  })
-  expect_s3_class(cc, "r4pde_compare_curves")
-  expect_true(!is.null(cc$gam))
-  expect_true(!is.null(cc$distance))
+  fc <- functional_curves(
+    data = df, time = "time", response = "y", treatment = "treatment",
+    block = "block", min_points = 3, show_progress = FALSE, family_try = "quasibinomial"
+  )
+  fd <- functional_distances(fc, show_progress = FALSE)
+
+  expect_s3_class(fc, "functional_curves")
+  expect_s3_class(fd, "functional_distances")
+  expect_s3_class(plot_curves(fd), "ggplot")
+  expect_s3_class(plot_dendrogram(fd), "ggplot")
+  expect_s3_class(diagnose_curves(fc), "r4pde_curve_diagnostics")
 })
 
 test_that("functional_resistance bootstrap output", {

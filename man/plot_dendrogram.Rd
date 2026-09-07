@@ -13,7 +13,7 @@ plot_dendrogram(
 )
 }
 \arguments{
-\item{x}{An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.}
+\item{x}{An object of class \code{"functional_distances"}.}
 
 \item{label_fun}{Optional function to modify treatment labels.}
 

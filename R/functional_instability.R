@@ -1,8 +1,8 @@
-#' Normalized functional instability from compare_curves output
+#' Normalized functional instability from fitted functional disease curves
 #'
 #' Computes normalized functional instability (NFI) for each treatment
 #' based on genotype-by-environment predicted curves extracted from a
-#' `compare_curves()` object. Optionally, instability can be decomposed
+#' \code{\link{functional_curves}} object. Optionally, instability can be decomposed
 #' into spatial and temporal components if the environment identifier can
 #' be split into location and year.
 #'
@@ -11,7 +11,7 @@
 #' mean curve across environments, normalized by the integrated squared mean
 #' curve.
 #'
-#' @param x An object returned by \code{\link{functional_curves}} or \code{\link{compare_curves}}.
+#' @param x An object returned by \code{\link{functional_curves}} or a \code{functional_dsp} object.
 #' @param n_time Number of points in the prediction grid over the time domain.
 #' @param env_sep Optional separator used to split `env` into spatial and
 #'   temporal components, for example `"_"` or `"-"`. If `NULL`, only the
@@ -68,17 +68,16 @@
 #' Numerical integration is performed with the trapezoidal rule on a regular
 #' prediction grid over the observed time domain.
 #'
-#' @seealso \code{\link{functional_curves}}, \code{\link{compare_curves}}
+#' @seealso \code{\link{functional_curves}}
 #'
 #' @examples
 #' \dontrun{
-#' m1 <- r4pde::compare_curves(
+#' m1 <- r4pde::functional_curves(
 #'   data = dat_ready,
 #'   time = "time",
 #'   response = "y",
 #'   treatment = "geno",
-#'   environment = "env",
-#'   cluster_k = 4
+#'   environment = "env"
 #' )
 #'
 #' # Overall instability
@@ -110,20 +109,19 @@ functional_instability.functional_curves <- function(x,
                 return_curves = FALSE,
                 ...) {
 
-  has_data <- "data" %in% names(x) || "observed_data" %in% names(x)
-  if (is.null(names(x)) || !("gam" %in% names(x)) || !has_data) {
-    stop("`x` must be a valid `functional_curves()` or `compare_curves()` object containing `gam` and `observed_data`/`data`.",
+  if (!inherits(x, "functional_curves") || is.null(names(x)) || !("gam" %in% names(x)) || !("observed_data" %in% names(x))) {
+    stop("`x` must be a valid `functional_curves()` object containing `gam` and `observed_data`.",
          call. = FALSE)
   }
 
-  dat <- if (!is.null(x$observed_data)) x$observed_data else x$data
+  dat <- x$observed_data
 
   trt_col <- if (!is.null(x$vars$treatment)) x$vars$treatment else "geno"
   env_col <- if (!is.null(x$vars$environment)) x$vars$environment else "env"
   time_col <- if (!is.null(x$vars$time)) x$vars$time else "time"
 
   if (!all(c(trt_col, env_col, time_col) %in% names(dat))) {
-    stop(sprintf("`x$data` must contain columns `%s`, `%s`, and `%s`.", trt_col, env_col, time_col), call. = FALSE)
+    stop(sprintf("`x$observed_data` must contain columns `%s`, `%s`, and `%s`.", trt_col, env_col, time_col), call. = FALSE)
   }
 
  trapz_vec <- function(x, y) {

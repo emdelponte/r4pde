@@ -1,8 +1,7 @@
 # Diagnostic tools for functional epidemic curve models
 
-Computes residuals, fitted values, and model diagnostics for GAM-based
-epidemic curve models fitted with
-[`compare_curves()`](https://emdelponte.github.io/r4pde/reference/compare_curves.md).
+Diagnostic tools for functional epidemic curve models fitted with
+[`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md).
 Produces diagnostic plots without invoking base graphics.
 
 ## Usage
@@ -15,7 +14,7 @@ diagnose_curves(x, grid_n = 200)
 
 - x:
 
-  An object of class `"functional_curves"` or `"r4pde_compare_curves"`.
+  An object of class `"functional_curves"`.
 
 - grid_n:
 

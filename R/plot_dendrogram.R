@@ -4,7 +4,7 @@
 #' Visualizes the hierarchical clustering of treatments based on
 #' functional distances among epidemic curves.
 #'
-#' @param x An object of class \code{"r4pde_compare_curves"} or \code{"functional_distances"}.
+#' @param x An object of class \code{"functional_distances"}.
 #' @param label_fun Optional function to modify treatment labels.
 #' @param palette Optional named vector of colors for clusters.
 #' @param show_cut Logical; whether to display the cluster cut height.
@@ -20,19 +20,16 @@ plot_dendrogram <- function(
     show_cut = TRUE,
     label_size = 2.8
 ){
-  stopifnot(inherits(x, "r4pde_compare_curves") || inherits(x, "functional_distances"))
+  if (!inherits(x, "functional_distances")) {
+    stop("`x` must be an object of class `functional_distances`.", call. = FALSE)
+  }
   if(!requireNamespace("ggplot2", quietly = TRUE)) stop("Need ggplot2.")
   if(!requireNamespace("dplyr", quietly = TRUE)) stop("Need dplyr.")
   if(!requireNamespace("ggdendro", quietly = TRUE)) stop("Need ggdendro.")
 
-  if (inherits(x, "functional_distances")) {
-    fc <- x$functional_curves
-    trt <- fc$vars$treatment
-    k <- length(unique(x$clusters$cluster))
-  } else {
-    trt <- x$vars$treatment
-    k <- x$settings$cluster_k
-  }
+  fc <- x$functional_curves
+  trt <- fc$vars$treatment
+  k <- length(unique(x$clusters$cluster))
 
   if(is.null(label_fun)) label_fun <- function(z) z
 
