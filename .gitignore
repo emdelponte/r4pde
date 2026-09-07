@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 .DS_Store
-
-.DS_Store
-.DS_Store
+Rplots.pdf
+tests/testthat/Rplots.pdf

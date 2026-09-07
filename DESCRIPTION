@@ -1,16 +1,16 @@
 Package: r4pde
 Type: Package
-Title: Companion to R for Plant Disease Epidemiology Book
-Version: 0.2.1
+Title: Tools for Quantitative Plant Disease Epidemiology
+Version: 0.2.2
 Authors@R: 
     person(given = "Emerson", family = "Del Ponte", email = "delponte@ufv.br", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4398-409X"))
-Description: Datasets and utility functions to support the book
-    "R for Plant Disease Epidemiology" (R4PDE). It includes functions for quantifying disease,
-    assessing spatial patterns, and modeling plant disease epidemics based on weather predictors.
-    These tools are intended for teaching and research in plant disease epidemiology. Several functions
-    are based on classical and contemporary methods, including those discussed in Laurence V. Madden,
-    Gareth Hughes, and Frank van den Bosch (2007) <doi:10.1094/9780890545058>.
+Description: Tools for quantitative plant disease epidemiology, including functional analysis
+    of disease progress curves, spatial epidemiology, disease quantification,
+    and weather-driven epidemic analysis. The package also serves as an educational
+    resource and companion to the book "R for Plant Disease Epidemiology" (R4PDE).
+    Several functions are based on classical and contemporary methods, including those
+    discussed in Laurence V. Madden, Gareth Hughes, and Frank van den Bosch (2007) <doi:10.1094/9780890545058>.
 License: MIT + file LICENSE
 Depends: 
     R (>= 4.1.0)
@@ -48,6 +48,7 @@ Suggests:
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 BugReports: https://github.com/emdelponte/r4pde/issues

@@ -80,4 +80,10 @@ test_that("functional_pca works properly on valid input", {
   
   p3 <- plot(res, type = "reconstruction")
   expect_s3_class(p3, "ggplot")
+
+  # Test scores plot with object retaining at least 2 components
+  res_2comp <- functional_pca(mock_fc, n_components = 2)
+  expect_true(all(c("curve_id", "FPC1", "FPC2") %in% names(res_2comp$scores)))
+  p4 <- plot(res_2comp, type = "scores", components = c(1, 2))
+  expect_s3_class(p4, "ggplot")
 })

@@ -4,8 +4,10 @@
 ^docs$
 ^pkgdown$
 ^LICENSE\.md$
-ˆMeta$
+^Meta$
 ^.*\.qmd$
 ^.*\.quarto$
 ^\.quarto$
+^.*Rplots\.pdf$
+^scratch$
 

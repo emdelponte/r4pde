@@ -42,7 +42,7 @@ windowpane <- function(data,
   variable <- enquo(variable)
 
   # Prepare data and convert date columns
-  data <- data %>%
+  data <- tibble::as_tibble(data) %>%
     mutate(
       {{ date_col }} := as.Date(as.character({{ date_col }}), format = date_format),
       {{ end_date_col }} := as.Date(as.character({{ end_date_col }}), format = date_format)
@@ -57,7 +57,7 @@ windowpane <- function(data,
 
   # Get unique combinations of grouping variables and end_date_col
   unique_combinations <- grouped_data %>%
-    distinct(across(c(group_by_cols, !!end_date_col))) %>%
+    distinct(across(c(dplyr::any_of(group_by_cols), !!end_date_col))) %>%
     ungroup()
 
   results_list <- list()

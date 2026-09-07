@@ -7,26 +7,81 @@ template:
 
 home:
   title: r4pde
-  description: Companion package to the book "R for Plant Disease Epidemiology"
+  description: Tools for quantitative plant disease epidemiology
   license: FALSE
 development:
   mode: unreleased
 
 reference:
-  - title: "Disease Quantification"
-    desc: "Functions for calculating disease indices and survival-based metrics."
+  - title: "Disease measurement and quantification"
+    desc: "Functions for calculating disease severity indices and survival-based censored metrics."
     contents:
       - CompMuCens
       - DSI
       - DSI2
 
-  - title: "Spatial analysis"
-    desc: "Functions to detect and quantify spatial structure in disease data."
+  - title: "Epidemic dynamics and functional analysis"
+    desc: "Functions for fitting, differentiating, comparing, and classifying functional disease progress curves."
+    contents:
+      - functional_curves
+      - functional_rate
+      - functional_distances
+      - functional_pca
+      - functional_pca_clusters
+      - functional_resistance
+      - functional_instability
+      - reconstruct_curves
+      - suggest_k
+      - plot_curves
+      - plot_dendrogram
+      - plot_functional_instability
+      - diagnose_curves
+      - plot_diagnostics
+      - augment
+      - augment.functional_rate
+      - augment_functional_rate
+      - augment_functional_pca
+      - get_fpca_eigenfunctions
+      - get_fpca_scores
+      - get_fpca_variance
+      - plot.functional_curves
+      - plot.functional_rate
+      - plot.r4pde_functional_pca
+      - print.functional_curves
+      - print.functional_distances
+      - print.functional_rate
+      - print.functional_resistance
+      - print.r4pde_curve_diagnostics
+      - print.suggest_k
+      - summary.functional_rate
+
+  - title: "Disease management and suppression"
+    desc: "Tools for evaluating Disease Suppression Profiles (DSP) and treatment efficacy trajectories."
+    contents:
+      - functional_contrast
+      - functional_summary
+      - functional_suppression_profiles
+      - rank_dsp
+      - plot_dsp
+      - plot_dsp_rank_heatmap
+      - simulate_dsp_data
+      - plot.functional_suppression_profiles
+      - plot.functional_suppression_profiles_list
+      - print.functional_suppression_profiles
+      - print.functional_suppression_profiles_list
+      - print.summary.functional_suppression_profiles
+      - print.summary.functional_suppression_profiles_list
+      - summary.functional_suppression_profiles
+      - summary.functional_suppression_profiles_list
+
+  - title: "Spatial epidemiology"
+    desc: "Methods for spatial pattern analysis, foci dynamics, runs tests, and join-count statistics."
     contents:
       - AFSD
       - BPL
       - count_subareas
       - count_subareas_random
+      - fit_gradients
       - join_count
       - oruns_test
       - oruns_test_boustrophedon
@@ -35,17 +90,17 @@ reference:
       - windowpane
       - windowpane_tests
 
-  - title: "Disease modeling"
-    desc: "Functions for fitting gradient models and retrieving climate data."
+  - title: "Weather and environmental data"
+    desc: "Tools for downloading and extracting gridded and station weather data."
     contents:
-      - fit_gradients
       - get_brdwgd
       - get_era5
       - get_nasapower
 
-  - title: "Datasets"
-    desc: "Datasets used in the examples and analyses."
+  - title: "Utilities and datasets"
+    desc: "Package plotting theme and epidemiological research datasets."
     contents:
+      - theme_r4pde
       - BlastWheat
       - BudBlightSoybean
       - DidymellaWatermelon
@@ -56,61 +111,3 @@ reference:
       - SpatialAggregated
       - SpatialRandom
       - WhiteMoldSoybean
-
-  - title: "Miscellaneous"
-    desc: "Utility functions for plotting and customization."
-    contents:
-      - theme_r4pde
-
-  - title: "Functional Analysis"
-    desc: "Functions for functional modeling and comparison of epidemic curves."
-    contents:
-      - functional_curves
-      - functional_rate
-      - functional_distances
-      - functional_pca
-      - functional_pca_clusters
-      - functional_resistance
-      - functional_instability
-      - functional_contrast
-      - functional_summary
-      - functional_suppression_profiles
-      - get_fpca_eigenfunctions
-      - get_fpca_scores
-      - get_fpca_variance
-      - plot_curves
-      - plot_dendrogram
-      - plot_dsp
-      - plot_dsp_rank_heatmap
-      - plot_functional_instability
-      - rank_dsp
-      - reconstruct_curves
-      - simulate_dsp_data
-      - suggest_k
-      - augment
-      - augment_functional_pca
-      - augment.functional_rate
-      - augment_functional_rate
-      - plot.functional_curves
-      - plot.functional_rate
-      - plot.functional_suppression_profiles
-      - plot.functional_suppression_profiles_list
-      - plot.r4pde_functional_pca
-      - print.functional_curves
-      - print.functional_distances
-      - print.functional_rate
-      - print.functional_resistance
-      - print.functional_suppression_profiles
-      - print.functional_suppression_profiles_list
-      - print.suggest_k
-      - print.summary.functional_suppression_profiles
-      - print.summary.functional_suppression_profiles_list
-      - summary.functional_rate
-      - summary.functional_suppression_profiles
-      - summary.functional_suppression_profiles_list
-
-  - title: "Diagnostics"
-    contents:
-      - diagnose_curves
-      - plot_diagnostics
-      - print.r4pde_curve_diagnostics

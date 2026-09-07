@@ -142,7 +142,9 @@ functional_pca.functional_curves <- function(
     dplyr::slice(1:k)
   
   # Create scores tibble
-  scores_tbl <- tibble::as_tibble(pca_res$x[, 1:k, drop = FALSE])
+  scores_mat <- pca_res$x[, 1:k, drop = FALSE]
+  colnames(scores_mat) <- gsub("^PC", "FPC", colnames(scores_mat))
+  scores_tbl <- tibble::as_tibble(scores_mat)
   scores_tbl <- dplyr::bind_cols(tibble::tibble(curve_id = curve_ids), scores_tbl)
   
   # Create eigenfunctions tibble
@@ -587,7 +589,9 @@ functional_pca.functional_dsp <- function(
     dplyr::slice(1:k)
   
   # Create scores tibble
-  scores_tbl <- tibble::as_tibble(pca_res$x[, 1:k, drop = FALSE])
+  scores_mat <- pca_res$x[, 1:k, drop = FALSE]
+  colnames(scores_mat) <- gsub("^PC", "FPC", colnames(scores_mat))
+  scores_tbl <- tibble::as_tibble(scores_mat)
   scores_tbl <- dplyr::bind_cols(tibble::tibble(curve_id = curve_ids), scores_tbl)
   
   # Create eigenfunctions tibble
