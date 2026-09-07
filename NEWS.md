@@ -1,7 +1,7 @@
 # r4pde 0.2.2
 
 ## New functions
-- Added `functional_rate()`: Estimates instantaneous rates of plant disease progress (\eqn{S'(t) = dS(t)/dt}) and associated uncertainty from epidemic trajectories fitted by `functional_curves()`. Supports response and link scale derivatives via GAM linear predictor matrix differences, handles boundary conditions without extrapolation, accounts for zero-epidemic curves and negative rates, and computes key rate phenotypes (\eqn{r_{max}}, \eqn{t_{r_{max}}}, growth duration, cumulative positive growth, and growth windows). Includes S3 methods: `print()`, `summary()`, `plot()`, and `augment()`.
+- Added `functional_rate()`: Estimates instantaneous rates of plant disease progress (first derivative of trajectory over time) and associated uncertainty from epidemic trajectories fitted by `functional_curves()`. Supports response and link scale derivatives via GAM linear predictor matrix differences, handles boundary conditions without extrapolation, accounts for zero-epidemic curves and negative rates, and computes key rate phenotypes (`r_max`, `t_r_max`, growth duration, cumulative positive growth, and growth windows). Includes S3 methods: `print()`, `summary()`, `plot()`, and `augment()`.
 
 ## Bug fixes and improvements
 - `functional_curves()`: Fixed smooth term label inspection during prediction so that `.unit` experimental unit and block random effects are correctly identified and supplied to `predict.gam()`.
