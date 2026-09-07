@@ -271,11 +271,7 @@ functional_suppression_profiles <- function(
   cluster_table$cluster <- factor(cluster_labels, levels = paste("Profile", utils::as.roman(sort(unique(cluster_table$cluster)))))
   
   # Generate palette
-  if (requireNamespace("scales", quietly = TRUE)) {
-    cluster_palette <- scales::hue_pal()(k_unique)
-  } else {
-    cluster_palette <- grDevices::rainbow(k_unique)
-  }
+  cluster_palette <- grDevices::hcl(h = seq(15, 375, length.out = k_unique + 1)[1:k_unique], l = 65, c = 100)
   names(cluster_palette) <- levels(cluster_table$cluster)
   
   # Update distances object to use roman numerals
@@ -325,7 +321,7 @@ functional_suppression_profiles <- function(
       dplyr::select(dplyr::all_of(c(treatment, rank_cols)))
     
     if ("average_rank" %in% names(ranking)) {
-      ranking <- ranking |> dplyr::rename(mean_rank = average_rank)
+      ranking <- ranking |> dplyr::rename(mean_rank = "average_rank")
     }
   } else {
     ranking <- tibble::tibble(!!treatment := summary_df[[treatment]])

@@ -65,6 +65,8 @@ reference:
     desc: "Functions for functional modeling and comparison of epidemic curves."
     contents:
       - augment_functional_pca
+      - augment.functional_rate
+      - augment_functional_rate
       - compare_curves
       - functional_contrast
       - functional_curves
@@ -72,6 +74,7 @@ reference:
       - functional_instability
       - functional_pca
       - functional_pca_clusters
+      - functional_rate
       - functional_resistance
       - functional_summary
       - functional_suppression_profiles
@@ -79,6 +82,7 @@ reference:
       - get_fpca_scores
       - get_fpca_variance
       - plot.functional_curves
+      - plot.functional_rate
       - plot.functional_suppression_profiles
       - plot.r4pde_compare_curves
       - plot.r4pde_functional_pca
@@ -89,6 +93,7 @@ reference:
       - plot_functional_instability
       - print.functional_curves
       - print.functional_distances
+      - print.functional_rate
       - print.functional_resistance
       - print.functional_suppression_profiles
       - print.suggest_k
@@ -96,6 +101,7 @@ reference:
       - reconstruct_curves
       - simulate_dsp_data
       - suggest_k
+      - summary.functional_rate
       - summary.functional_suppression_profiles
 
   - title: "Diagnostics"

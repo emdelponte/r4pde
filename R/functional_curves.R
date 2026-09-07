@@ -314,7 +314,12 @@ functional_curves <- function(
     excl <- character()
     if(!is.null(.env)) excl <- c(excl, sprintf("s(%s)", .env))
 
-    if(any(grepl(sprintf("s\\(%s\\)", .unit), names(m_gam$smooth), fixed = TRUE))) {
+    smooth_labels <- if (!is.null(m_gam$smooth)) {
+      vapply(m_gam$smooth, function(s) s$label, character(1))
+    } else {
+      character(0)
+    }
+    if(any(grepl(sprintf("s(%s)", .unit), smooth_labels, fixed = TRUE))) {
       newd[[.unit]] <- factor(unit_levels0[1], levels = unit_levels0)
       excl <- c(excl, sprintf("s(%s)", .unit))
     }

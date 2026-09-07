@@ -104,7 +104,7 @@ functional_distances <- function(
 
   hc <- stats::hclust(stats::as.dist(D), method = hc_method)
   
-  cl_raw <- stats::cutree(hc, k = cluster_k)
+  cl_raw <- stats::cutree(hc, k = min(cluster_k, length(hc$order)))
 
   cluster_tbl <- tibble::tibble(
     !!.trt := names(cl_raw),

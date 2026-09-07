@@ -57,6 +57,11 @@ functional_pca <- function(object, ...) {
 }
 
 #' @export
+functional_pca.default <- function(object, ...) {
+  stop("`object` must be of class 'functional_curves'.", call. = FALSE)
+}
+
+#' @export
 #' @rdname functional_pca
 functional_pca.functional_curves <- function(
     object,

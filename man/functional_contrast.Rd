@@ -38,6 +38,8 @@ functional_contrast(
 \item{contrast}{Character specifying the contrast type. Currently \code{"difference"} is implemented.}
 
 \item{keep_reference}{Logical; if \code{TRUE}, includes the reference treatment in the output (with DSP = 0). Default is \code{FALSE}.}
+
+\item{...}{Additional arguments.}
 }
 \value{
 An object of class \code{"functional_dsp"} (inheriting from \code{"tbl_df"}), containing:

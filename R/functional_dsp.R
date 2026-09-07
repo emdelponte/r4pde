@@ -17,6 +17,7 @@
 #' @param grid Optional numeric vector of common time points for interpolation. If provided, curves are interpolated.
 #' @param contrast Character specifying the contrast type. Currently \code{"difference"} is implemented.
 #' @param keep_reference Logical; if \code{TRUE}, includes the reference treatment in the output (with DSP = 0). Default is \code{FALSE}.
+#' @param ... Additional arguments.
 #'
 #' @return An object of class \code{"functional_dsp"} (inheriting from \code{"tbl_df"}), containing:
 #' \itemize{
