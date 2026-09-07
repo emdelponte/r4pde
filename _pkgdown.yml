@@ -3,6 +3,7 @@ url: https://emdelponte.github.io/r4pde/
 template:
   bootstrap: 5
   light-switch: true
+  math-rendering: mathjax
 
 home:
   title: r4pde
