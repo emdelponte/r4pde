@@ -59,7 +59,6 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
     given_date <- as.Date(data_row[[date_col]])
 
     # Calculate start and end dates
-    # Calculate start and end dates
     if (direction == "back") {
       start_date <- given_date - lubridate::days(days_around)
       end_date <- given_date
