@@ -1,38 +1,58 @@
 # r4pde <img src="man/figures/logo.png" width="200px" align="right"/>
 
-[![CRAN](https://www.r-pkg.org/badges/version/r4pde)](https://CRAN.R-project.org/package=r4pde) [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/r4pde)](https://CRAN.R-project.org/package=r4pde)\
-An R package developed as a companion to the book [R for Plant Disease Epidemiology](https://r4pde.netlify.app/). It provides access to a suite of specialized R functions and datasets tailored for teaching and analyzing plant disease epidemiology. This package supports researchers, students, and practitioners by offering tools for disease quantification, spatial analysis and predictive modeling.
+[![CRAN](https://www.r-pkg.org/badges/version/r4pde)](https://CRAN.R-project.org/package=r4pde) [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/r4pde)](https://CRAN.R-project.org/package=r4pde)
+
+**r4pde** provides tools for quantitative plant disease epidemiology. It started as the companion package to the book [R for Plant Disease Epidemiology](https://r4pde.netlify.app/) and now also implements methods from recent research on the functional analysis of disease progress curves. It is aimed at researchers, students and practitioners who analyse field and greenhouse disease data.
+
+## What the package does
+
+| Area | What you can do | Main functions |
+|---|---|---|
+| **Disease progress curves (functional analysis)** | Fit smooth, design-adjusted disease progress curves with GAMs; estimate instantaneous rates; compare and cluster whole trajectories; rank resistance and quantify stability across environments | `functional_curves()`, `functional_rate()`, `functional_distances()`, `functional_pca()`, `functional_resistance()`, `functional_instability()`, `diagnose_curves()` |
+| **Disease management** | Build Disease Suppression Profiles (DSP) for fungicides or other control measures relative to an untreated check, summarise and rank them | `functional_contrast()`, `functional_summary()`, `functional_suppression_profiles()`, `rank_dsp()`, `plot_dsp()` |
+| **Spatial epidemiology** | Test for aggregation (ordinary runs, join counts, binary power law), analyse foci (AFSD), count subareas, fit dispersal gradients | `oruns_test()`, `join_count()`, `BPL()`, `AFSD()`, `count_subareas()`, `fit_gradients()` |
+| **Disease quantification** | Compute disease severity indices from ordinal scales and compare treatments on censored ordinal data | `DSI()`, `DSI2()`, `CompMuCens()` |
+| **Weather and environment** | Download daily weather (NASA POWER, ERA5, BR-DWGD) and build window-pane variables for weather–disease models | `get_nasapower()`, `get_era5()`, `get_brdwgd()`, `windowpane()`, `windowpane_tests()` |
+| **Datasets** | Real epidemiological datasets used in the book and in the examples | `BudBlightSoybean`, `RustSoybean`, `FHBWheat`, `WhiteMoldSoybean`, `SpatialAggregated`, … |
+
+The [reference page](https://emdelponte.github.io/r4pde/reference/) lists every function by family.
 
 ## Installation
 
-Install the stable release from CRAN.
+Install the stable release from CRAN:
 
 ``` r
 install.packages("r4pde")
 ```
 
-The development version of {r4pde} is available from GitHub. To install it along with its dependencies (including Bioconductor packages), use the [`pak`](https://pak.r-lib.org/) package:
+The development version is on GitHub. To install it with its dependencies (including Bioconductor packages), use [`pak`](https://pak.r-lib.org/):
 
 ``` r
 if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pkg_install("emdelponte/r4pde")
 ```
 
-Alternatively, using remotes:
+Or with remotes:
 
 ``` r
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("emdelponte/r4pde")
 ```
 
-## Reporting Issues
+## Learning more
 
-Please [report any bugs or issues](https://github.com/emdelponte/r4pde/issues) via the GitHub issue tracker.
+- **Book:** [R for Plant Disease Epidemiology](https://r4pde.netlify.app/) explains the epidemiological concepts and uses this package throughout.
+- **Vignette:** [Functional analysis of disease progress curves](https://emdelponte.github.io/r4pde/articles/functional-analysis.html) walks through the full workflow, from fitting curves to resistance and stability across environments.
+- **Website:** [emdelponte.github.io/r4pde](https://emdelponte.github.io/r4pde/) has the function reference and the changelog.
+- **Methods:** many functions follow Madden, Hughes and van den Bosch (2007), *The Study of Plant Disease Epidemics* ([doi:10.1094/9780890545058](https://doi.org/10.1094/9780890545058)).
 
-## License and Citation
+## Reporting issues
 
--   This package is released under the MIT license.
--   To cite the package, please use:
+Please report bugs or suggest features on the [GitHub issue tracker](https://github.com/emdelponte/r4pde/issues). A small reproducible example helps a lot.
+
+## License and citation
+
+r4pde is released under the MIT license. To cite it, run:
 
 ``` r
 citation("r4pde")

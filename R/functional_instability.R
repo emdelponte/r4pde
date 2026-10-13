@@ -68,6 +68,16 @@
 #' Numerical integration is performed with the trapezoidal rule on a regular
 #' prediction grid over the observed time domain.
 #'
+#' \strong{Model requirements.} The genotype-by-environment curves \eqn{f_{ge}(t)} are
+#' predicted from the fitted GAM with the environment and genotype-by-environment terms
+#' included. If the model has no genotype-by-environment term (the default
+#' \code{functional_curves(ge_term = "none")} with only an environment random intercept), every
+#' genotype receives the same environment shift on the link scale; nFI then mostly reflects
+#' each genotype's disease level (low-disease genotypes appear unstable) and a warning is given.
+#' Fit \code{functional_curves(..., env_smooth = TRUE, ge_term = "smooth")} for instability
+#' analyses. Experimental-unit random intercepts are averaged out, unless the units are the
+#' genotype x environment curves themselves, in which case they are kept as the G x E term.
+#'
 #' @seealso \code{\link{functional_curves}}
 #'
 #' @examples
@@ -77,7 +87,9 @@
 #'   time = "time",
 #'   response = "y",
 #'   treatment = "geno",
-#'   environment = "env"
+#'   environment = "env",
+#'   env_smooth = TRUE,
+#'   ge_term = "smooth"
 #' )
 #'
 #' # Overall instability
@@ -139,8 +151,16 @@ functional_instability.functional_curves <- function(x,
 }
 
   predict_geno_env_curves <- function(dat, mod, trt_c, env_c, time_c, n_time = 200) {
+    # Curve-level terms: G x E terms are kept; unit random effects are kept only
+    # when units are the treatment x environment curves, otherwise averaged out.
+    unit_c <- x$vars$unit
+    ge_c <- x$vars$ge
+    keep_unit <- !is.null(unit_c) && .fc_unit_matches_ge(x)
+    pair_cols <- unique(c(trt_c, env_c,
+                          if (!is.null(ge_c) && ge_c %in% names(dat)) ge_c,
+                          if (keep_unit) unit_c))
     pairs <- dat %>%
-      dplyr::distinct(.data[[trt_c]], .data[[env_c]])
+      dplyr::distinct(dplyr::across(dplyr::all_of(pair_cols)))
 
     time_seq <- seq(
       min(dat[[time_c]], na.rm = TRUE),
@@ -152,11 +172,14 @@ functional_instability.functional_curves <- function(x,
     names(time_df) <- time_c
 
     newdata <- tidyr::expand_grid(pairs, time_df)
+    newdata <- .fc_fill_newdata(newdata, x)
+    excl <- if (keep_unit) character(0) else .fc_random_terms(x)$unit
 
-    mu  <- stats::predict(mod, newdata = newdata, type = "response")
-    eta <- stats::predict(mod, newdata = newdata, type = "link")
+    eta <- as.numeric(mgcv::predict.gam(mod, newdata = newdata, type = "link", exclude = excl))
+    mu  <- mod$family$linkinv(eta)
 
     newdata <- newdata %>%
+      dplyr::select(dplyr::all_of(c(trt_c, env_c, time_c))) %>%
       dplyr::mutate(mu = as.numeric(mu), eta = as.numeric(eta))
 
     names(newdata)[names(newdata) == trt_c] <- "geno"
@@ -276,6 +299,17 @@ functional_instability.functional_curves <- function(x,
       dplyr::left_join(mean_energy, by = "geno") %>%
       dplyr::mutate(nFI_time = FI_time / pmax(mean_energy_time, 1e-8)) %>%
       dplyr::mutate(nFI_time = pmax(nFI_time, 0))
+  }
+
+  if (is.null(x$vars$environment)) {
+    stop("`functional_instability()` needs a `functional_curves()` fit with an `environment`.",
+         call. = FALSE)
+  }
+  if (!.fc_has_ge(x)) {
+    warning("The fitted model has no genotype-by-environment term, so all treatments share ",
+            "the same environment effects and nFI mainly reflects each treatment's disease level. ",
+            "Refit `functional_curves()` with `ge_term = \"smooth\"` (and usually `env_smooth = TRUE`).",
+            call. = FALSE)
   }
 
   curves <- predict_geno_env_curves(dat, x$gam, trt_col, env_col, time_col, n_time = n_time)

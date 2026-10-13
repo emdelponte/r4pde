@@ -368,23 +368,12 @@ functional_rate <- function(
   df_1[[.time]] <- t1_v
   df_2[[.time]] <- t2_v
 
-  # Exclude random effect terms from prediction
-  excl <- character()
-  if (!is.null(.env)) excl <- c(excl, sprintf("s(%s)", .env))
-
-  smooth_labels <- if (!is.null(m_gam$smooth)) {
-    vapply(m_gam$smooth, function(s) s$label, character(1))
-  } else {
-    character(0)
-  }
-  if (!is.null(.unit) && any(grepl(sprintf("s(%s)", .unit), smooth_labels, fixed = TRUE))) {
-    excl <- c(excl, sprintf("s(%s)", .unit))
-  }
-
-  # Predict lpmatrix
-  X_0 <- mgcv::predict.gam(m_gam, newdata = df_0, type = "lpmatrix", exclude = excl)
-  X_1 <- mgcv::predict.gam(m_gam, newdata = df_1, type = "lpmatrix", exclude = excl)
-  X_2 <- mgcv::predict.gam(m_gam, newdata = df_2, type = "lpmatrix", exclude = excl)
+  # Linear predictor matrices of the treatment mean curves, built exactly as in
+  # functional_curves(): unit terms excluded, environment and G x E terms
+  # centred or averaged.
+  X_0 <- .fc_mean_lpmatrix(object, df_0)
+  X_1 <- .fc_mean_lpmatrix(object, df_1)
+  X_2 <- .fc_mean_lpmatrix(object, df_2)
 
   beta <- stats::coef(m_gam)
   Vp   <- m_gam$Vp

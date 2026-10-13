@@ -22,7 +22,11 @@ functional_pca_clusters(
 
 \item{method}{Clustering method: "kmeans" or "hclust".}
 
-\item{choose_k}{Method for suggesting k: "none", "silhouette", or "elbow".}
+\item{choose_k}{Method used to choose \code{k} when \code{k = NULL}:
+\code{"silhouette"} (largest mean silhouette width over k = 2 to 10) or
+\code{"elbow"} (largest drop below the line joining the within-cluster sums
+of squares of k = 1 and k = 10). \code{"none"} requires \code{k}. The
+criterion table is attached to the result as attribute \code{"k_selection"}.}
 
 \item{...}{Additional arguments passed to clustering functions.}
 }

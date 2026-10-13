@@ -1,19 +1,109 @@
 # Changelog
 
+## r4pde 0.2.3
+
+### New features
+
+- [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
+  gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE`
+  replaces the environment random intercept with a random environment
+  factor-smooth, `s(time, env, bs = "fs")`, which adjusts for
+  environments that differ in epidemic timing or shape and for
+  treatments that are unbalanced across environments.
+  `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment
+  random intercept or factor-smooth per treatment x environment curve.
+  Defaults keep the previous model. `k_env` now sets the basis dimension
+  of the environment factor-smooth.
+- Treatment mean curves average environment factor-smooth and G x E
+  deviations over environments instead of dropping them, because
+  factor-smooths are not centred. The same construction is shared by
+  [`functional_rate()`](https://emdelponte.github.io/r4pde/reference/functional_rate.md)
+  and
+  [`diagnose_curves()`](https://emdelponte.github.io/r4pde/reference/diagnose_curves.md),
+  so fitted rates match the curves.
+
+### Bug fixes
+
+- [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md)
+  now predicts genotype-by-environment curves with the G x E term,
+  averages out plot-level unit effects, and no longer fails when
+  [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
+  was fitted with `block` or `unit`. It warns when the model has no G x
+  E term, because nFI then mainly reflects each genotype’s disease
+  level.
+- [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md)
+  (curve level) and `functional_resistance(group_method = "bootstrap")`
+  supply all model variables when predicting curve-level trajectories;
+  the bootstrap in
+  [`functional_resistance()`](https://emdelponte.github.io/r4pde/reference/functional_resistance.md)
+  previously failed when an environment was modelled.
+- [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md):
+  `perm_unit` is now honoured. Labels are permuted between permutation
+  units (for example genotypes) and mapped back to their curves, instead
+  of being shuffled between curves; this matters when `test_factor` is a
+  genotype-level property such as a resistance class. `perm_strata` is
+  applied at the unit level when strata are constant within units;
+  otherwise whole units are permuted without strata, with a warning.
+- [`functional_distances()`](https://emdelponte.github.io/r4pde/reference/functional_distances.md)
+  gains `seed` (default 1) and, like `simulate_dsp_data(seed = 123)`, no
+  longer resets the user’s random stream: the previous `.Random.seed` is
+  restored afterwards. The bootstrap seed (`boot_seed`) is handled the
+  same way.
+- `functional_resistance(instability = )` accepts the list returned by
+  `functional_instability(return_curves = TRUE)` (it read a non-existent
+  `nfi_table` element) and joins on the treatment column instead of
+  guessing it.
+- `functional_pca_clusters(choose_k = "silhouette" | "elbow")` is
+  implemented; it previously used k = 2 silently. The criterion table is
+  attached as attribute `"k_selection"`.
+- [`reconstruct_curves()`](https://emdelponte.github.io/r4pde/reference/reconstruct_curves.md)
+  multiplies back by the column scaling when
+  `functional_pca(scale = TRUE)` was used, and returns numeric times.
+- [`AFSD()`](https://emdelponte.github.io/r4pde/reference/AFSD.md): the
+  summary mean shape index now averages the per-focus
+  `SIF = rows / cols` (it averaged `cols / rows`).
+- [`functional_contrast()`](https://emdelponte.github.io/r4pde/reference/functional_contrast.md)
+  averages replicated observations explicitly, with a message, instead
+  of letting [`approx()`](https://rdrr.io/r/stats/approxfun.html)
+  average ties silently, and reports when constant extrapolation is
+  used.
+- [`functional_summary()`](https://emdelponte.github.io/r4pde/reference/functional_summary.md):
+  `persistence` is the total time above `threshold`, summed over
+  sampling intervals with the profile above the threshold at both ends;
+  gaps below the threshold are no longer counted. Results for profiles
+  without gaps are unchanged.
+- [`fit_gradients()`](https://emdelponte.github.io/r4pde/reference/fit_gradients.md):
+  `results_table` is a data frame with numeric columns; parameters are
+  no longer rounded before back-transformation or before drawing the
+  fitted curves. The documentation no longer claims the models are
+  ranked.
+- [`theme_r4pde()`](https://emdelponte.github.io/r4pde/reference/theme_r4pde.md)
+  works without cowplot (in Suggests), falling back to a
+  [`theme_classic()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)-based
+  equivalent.
+- Documentation: `FHBWheat$i` and `$n` are the diseased and assessed
+  plant counts used by
+  [`BPL()`](https://emdelponte.github.io/r4pde/reference/BPL.md);
+  `BlastWheat$index_mean` is the wheat blast index.
+- Tests: the
+  [`CompMuCens()`](https://emdelponte.github.io/r4pde/reference/CompMuCens.md)
+  test checked a non-existent element.
+
 ## r4pde 0.2.2
 
 ### New functions
 
 - Added
   [`functional_rate()`](https://emdelponte.github.io/r4pde/reference/functional_rate.md):
-  Estimates instantaneous rates of plant disease progress () and
-  associated uncertainty from epidemic trajectories fitted by
+  Estimates instantaneous rates of plant disease progress (first
+  derivative of trajectory over time) and associated uncertainty from
+  epidemic trajectories fitted by
   [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md).
   Supports response and link scale derivatives via GAM linear predictor
   matrix differences, handles boundary conditions without extrapolation,
   accounts for zero-epidemic curves and negative rates, and computes key
-  rate phenotypes (, , growth duration, cumulative positive growth, and
-  growth windows). Includes S3 methods:
+  rate phenotypes (`r_max`, `t_r_max`, growth duration, cumulative
+  positive growth, and growth windows). Includes S3 methods:
   [`print()`](https://rdrr.io/r/base/print.html),
   [`summary()`](https://rdrr.io/r/base/summary.html),
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html), and
@@ -133,8 +223,6 @@
 - Added plotting and diagnostic helpers for curve models.
 
 ## r4pde 0.1.0 (2025-06-21)
-
-CRAN release: 2025-07-02
 
 ### First release
 

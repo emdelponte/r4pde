@@ -97,8 +97,8 @@ AFSD <- function(df) {
   cluster_df$CIF <- cluster_df$size / (cluster_df$rows * cluster_df$cols)
 
   # Add mean indices for shape and compactness
-  cluster_summary$mean_SIF <- mean(cluster_df$cols / cluster_df$rows)
-  cluster_summary$mean_CIF <- mean(cluster_df$size / (cluster_df$rows * cluster_df$cols))
+  cluster_summary$mean_SIF <- mean(cluster_df$SIF)
+  cluster_summary$mean_CIF <- mean(cluster_df$CIF)
 
   # Pivot the summary table
   cluster_summary2 <- tidyr::pivot_longer(cluster_summary, cols = 1:7, names_to = "stats", values_to = "value")

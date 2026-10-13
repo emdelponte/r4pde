@@ -9,7 +9,7 @@ A data frame with the following columns:
 \describe{
 \item{heading}{Date of heading}
 \item{inc_mean}{Mean incidence}
-\item{index_mean}{FHB index mean}
+\item{index_mean}{Mean wheat blast index}
 \item{latitude}{Latitude coordinate}
 \item{location}{Experimental site name}
 \item{longitude}{Longitude coordinate}

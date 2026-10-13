@@ -100,6 +100,16 @@ nFI_g = \frac{FI_g}{\int_T \bar f_g(t)^2 dt}
 
 Numerical integration is performed with the trapezoidal rule on a regular
 prediction grid over the observed time domain.
+
+\strong{Model requirements.} The genotype-by-environment curves \eqn{f_{ge}(t)} are
+predicted from the fitted GAM with the environment and genotype-by-environment terms
+included. If the model has no genotype-by-environment term (the default
+\code{functional_curves(ge_term = "none")} with only an environment random intercept), every
+genotype receives the same environment shift on the link scale; nFI then mostly reflects
+each genotype's disease level (low-disease genotypes appear unstable) and a warning is given.
+Fit \code{functional_curves(..., env_smooth = TRUE, ge_term = "smooth")} for instability
+analyses. Experimental-unit random intercepts are averaged out, unless the units are the
+genotype x environment curves themselves, in which case they are kept as the G x E term.
 }
 \examples{
 \dontrun{
@@ -108,7 +118,9 @@ m1 <- r4pde::functional_curves(
   time = "time",
   response = "y",
   treatment = "geno",
-  environment = "env"
+  environment = "env",
+  env_smooth = TRUE,
+  ge_term = "smooth"
 )
 
 # Overall instability

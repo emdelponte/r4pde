@@ -15,5 +15,7 @@ A ggplot2 theme object.
 \description{
 This function creates a new ggplot2 theme by modifying the cowplot::theme_half_open theme.
 It sets a custom font size and changes the panel background color to gray96.
+If cowplot is not installed, a close equivalent built on
+\code{ggplot2::theme_classic()} is used.
 }
 \concept{Miscellaneous}

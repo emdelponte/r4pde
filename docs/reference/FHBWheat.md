@@ -18,11 +18,13 @@ A data frame with:
 
 - i:
 
-  Row position
+  Number of diseased plants in the quadrat (used as `i` by
+  [`BPL()`](https://emdelponte.github.io/r4pde/reference/BPL.md))
 
 - n:
 
-  Column position
+  Number of plants assessed in the quadrat (used as `n` by
+  [`BPL()`](https://emdelponte.github.io/r4pde/reference/BPL.md))
 
 - quadrat:
 

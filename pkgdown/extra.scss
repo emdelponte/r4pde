@@ -1,0 +1,68 @@
+// r4pde site theme: teal from the hex sticker, dark by default.
+// Light mode uses the bslib values in _pkgdown.yml; dark mode is set here.
+
+$r4pde-teal: #007f80;
+$r4pde-teal-bright: #2ec4bd;   // teal lifted for contrast on dark backgrounds
+
+// ---- shared ---------------------------------------------------------------
+.navbar {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+.navbar-brand { font-family: "Space Grotesk", sans-serif; font-weight: 700; letter-spacing: 0.02em; }
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+.page-header h1 { font-size: 2.2rem; }
+img.logo { filter: drop-shadow(0 6px 18px rgba(0, 127, 128, 0.35)); }
+
+// home page: the package-family table in the README reads as cards
+.template-home table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+.template-home table th { background: rgba(0, 127, 128, 0.12); }
+.template-home table td, .template-home table th { padding: 0.6rem 0.8rem; vertical-align: top; }
+
+pre, div.sourceCode { border-radius: 0.6rem; border: 1px solid var(--bs-border-color); }
+code { font-size: 0.9em; color: var(--r4pde-code); }
+a > code, a code { color: inherit; }
+.navbar .navbar-brand, .navbar .nav-link { color: var(--bs-emphasis-color); }
+
+.ref-index h3, .ref-index .section-desc { margin-top: 1.5rem; }
+a { text-underline-offset: 0.18em; }
+
+// ---- light ----------------------------------------------------------------
+[data-bs-theme="light"] {
+  --r4pde-code: #005b5c;
+  --bs-body-bg: #ffffff;
+  --bs-tertiary-bg: #f3f8f8;
+  .navbar { background-color: rgba(255, 255, 255, 0.85) !important; }
+  pre, div.sourceCode { background-color: #f3f8f8; }
+}
+
+// ---- dark (default) -------------------------------------------------------
+[data-bs-theme="dark"] {
+  --r4pde-code: #f2b880;          // warm accent so code stands out from teal links
+  --bs-body-bg: #0e1719;
+  --bs-body-color: #dbe7e7;
+  --bs-secondary-color: #9fb3b3;
+  --bs-tertiary-bg: #142124;
+  --bs-border-color: #22363a;
+  --bs-border-color-translucent: rgba(46, 196, 189, 0.15);
+  --bs-link-color: #{$r4pde-teal-bright};
+  --bs-link-color-rgb: 46, 196, 189;
+  --bs-link-hover-color: #7fe0da;
+  --bs-primary: #{$r4pde-teal-bright};
+  --bs-primary-rgb: 46, 196, 189;
+  --bs-emphasis-color: #f2f8f8;
+  --bs-heading-color: #f2f8f8;
+
+  .navbar { background-color: rgba(14, 23, 25, 0.85) !important; }
+  .navbar .nav-link.active, .navbar .nav-link:hover { color: $r4pde-teal-bright !important; }
+  pre, div.sourceCode { background-color: #121e21; }
+  .template-home table th { background: rgba(46, 196, 189, 0.12); }
+  .btn-primary { --bs-btn-bg: #{$r4pde-teal}; --bs-btn-border-color: #{$r4pde-teal}; }
+  .sidebar, aside { color: var(--bs-secondary-color); }
+}

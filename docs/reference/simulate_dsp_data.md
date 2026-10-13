@@ -1,4 +1,4 @@
-# \#' Simulate Disease Suppression Profile Data
+# Simulate Disease Suppression Profile Data
 
 Simulates a dataset for demonstrating functional analysis with Disease
 Suppression Profiles. Returns a data frame with varying treatments and
@@ -7,8 +7,15 @@ replicates over multiple time points.
 ## Usage
 
 ``` r
-simulate_dsp_data()
+simulate_dsp_data(seed = 123)
 ```
+
+## Arguments
+
+- seed:
+
+  Integer seed, or `NULL` to use the current random stream. The caller's
+  random stream is restored afterwards.
 
 ## Value
 

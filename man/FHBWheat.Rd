@@ -8,8 +8,8 @@
 A data frame with:
 \describe{
 \item{field}{Field identifier}
-\item{i}{Row position}
-\item{n}{Column position}
+\item{i}{Number of diseased plants in the quadrat (used as \code{i} by \code{BPL()})}
+\item{n}{Number of plants assessed in the quadrat (used as \code{n} by \code{BPL()})}
 \item{quadrat}{Quadrat ID}
 \item{season}{Crop season}
 }

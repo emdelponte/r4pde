@@ -31,6 +31,9 @@ functional_curves(
   include_covariates = FALSE,
   covariate_smooths = FALSE,
   global_smooth = FALSE,
+  env_smooth = FALSE,
+  ge_term = c("none", "intercept", "smooth"),
+  k_ge = 4,
   ...
 )
 ```
@@ -93,7 +96,8 @@ functional_curves(
 
 - k_env:
 
-  Basis dimension for the environment-specific smooth.
+  Basis dimension (over time) for the environment factor-smooth used
+  when `env_smooth = TRUE`. Ignored otherwise.
 
 - k_trt:
 
@@ -136,6 +140,31 @@ functional_curves(
   deviations. If `FALSE` (default), fits independent smooths per
   treatment.
 
+- env_smooth:
+
+  Logical; if `TRUE` and `environment` is given, the environment effect
+  is a factor-smooth interaction `s(time, env, bs = "fs", m = 1)`, i.e.
+  a random environment-specific deviation curve, instead of the default
+  random intercept `s(env, bs = "re")`. Use it when environments differ
+  in epidemic timing or shape, or when treatments are unbalanced across
+  environments.
+
+- ge_term:
+
+  Genotype-by-environment term: `"none"` (default), `"intercept"`
+  (random intercept per treatment x environment curve,
+  `s(.ge, bs = "re")`) or `"smooth"` (random deviation curve per
+  treatment x environment, `s(time, .ge, bs = "fs", m = 1)`). A G x E
+  term is needed for
+  [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md)
+  to measure genotype-specific instability; without it, all treatments
+  share the same environment effects. Requires `environment`.
+
+- k_ge:
+
+  Basis dimension (over time) for the G x E factor-smooth used when
+  `ge_term = "smooth"`.
+
 - ...:
 
   Additional arguments.
@@ -165,6 +194,19 @@ An object of class `"functional_curves"` containing:
 - `plot_mean`: ggplot object of the mean curves.
 
 ## Details
+
+**Model terms.** The linear predictor always contains the treatment
+effect and treatment-specific smooths of time (plus a global smooth when
+`global_smooth = TRUE`). Environment enters as a random intercept, or as
+a random factor-smooth when `env_smooth = TRUE`. A
+genotype-by-environment term is added with `ge_term`. When `block` or
+`unit` is given, a random intercept per experimental unit is added; if
+those units are exactly the treatment x environment curves and a
+`ge_term` is requested, the unit intercept is dropped because the G x E
+term already contains it. Treatment mean curves are always predicted
+with the environment, G x E and unit terms excluded. For instability
+analyses across environments, a typical specification is
+`env_smooth = TRUE, ge_term = "smooth"`.
 
 Genotype-level covariates are descriptors that do not vary within a
 genotype, such as phenological groups. For example, in wheat blast

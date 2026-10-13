@@ -1,3 +1,25 @@
+# r4pde 0.2.3
+
+## New features
+- `functional_curves()` gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE` replaces the environment random intercept with a random environment factor-smooth, `s(time, env, bs = "fs")`, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. `k_env` now sets the basis dimension of the environment factor-smooth.
+- Treatment mean curves average environment factor-smooth and G x E deviations over environments instead of dropping them, because factor-smooths are not centred. The same construction is shared by `functional_rate()` and `diagnose_curves()`, so fitted rates match the curves.
+
+## Bug fixes
+- `functional_instability()` now predicts genotype-by-environment curves with the G x E term, averages out plot-level unit effects, and no longer fails when `functional_curves()` was fitted with `block` or `unit`. It warns when the model has no G x E term, because nFI then mainly reflects each genotype's disease level.
+- `functional_distances()` (curve level) and `functional_resistance(group_method = "bootstrap")` supply all model variables when predicting curve-level trajectories; the bootstrap in `functional_resistance()` previously failed when an environment was modelled.
+- `functional_distances()`: `perm_unit` is now honoured. Labels are permuted between permutation units (for example genotypes) and mapped back to their curves, instead of being shuffled between curves; this matters when `test_factor` is a genotype-level property such as a resistance class. `perm_strata` is applied at the unit level when strata are constant within units; otherwise whole units are permuted without strata, with a warning.
+- `functional_distances()` gains `seed` (default 1) and, like `simulate_dsp_data(seed = 123)`, no longer resets the user's random stream: the previous `.Random.seed` is restored afterwards. The bootstrap seed (`boot_seed`) is handled the same way.
+- `functional_resistance(instability = )` accepts the list returned by `functional_instability(return_curves = TRUE)` (it read a non-existent `nfi_table` element) and joins on the treatment column instead of guessing it.
+- `functional_pca_clusters(choose_k = "silhouette" | "elbow")` is implemented; it previously used k = 2 silently. The criterion table is attached as attribute `"k_selection"`.
+- `reconstruct_curves()` multiplies back by the column scaling when `functional_pca(scale = TRUE)` was used, and returns numeric times.
+- `AFSD()`: the summary mean shape index now averages the per-focus `SIF = rows / cols` (it averaged `cols / rows`).
+- `functional_contrast()` averages replicated observations explicitly, with a message, instead of letting `approx()` average ties silently, and reports when constant extrapolation is used.
+- `functional_summary()`: `persistence` is the total time above `threshold`, summed over sampling intervals with the profile above the threshold at both ends; gaps below the threshold are no longer counted. Results for profiles without gaps are unchanged.
+- `fit_gradients()`: `results_table` is a data frame with numeric columns; parameters are no longer rounded before back-transformation or before drawing the fitted curves. The documentation no longer claims the models are ranked.
+- `theme_r4pde()` works without cowplot (in Suggests), falling back to a `theme_classic()`-based equivalent.
+- Documentation: `FHBWheat$i` and `$n` are the diseased and assessed plant counts used by `BPL()`; `BlastWheat$index_mean` is the wheat blast index.
+- Tests: the `CompMuCens()` test checked a non-existent element.
+
 # r4pde 0.2.2
 
 ## New functions

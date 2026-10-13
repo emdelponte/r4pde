@@ -5,7 +5,7 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Changelog"><meta property="og:image" content="https://emdelponte.github.io/r4pde/logo.png"></head><body>
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet"><link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet"><link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Changelog"><meta property="og:image" content="https://emdelponte.github.io/r4pde/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.2</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,44 @@
       <small>Source: <a href="https://github.com/emdelponte/r4pde/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.3" id="r4pde-023">r4pde 0.2.3<a class="anchor" aria-label="anchor" href="#r4pde-023"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-2-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-3"></a></h3>
+<ul><li>
+<code><a href="../reference/functional_curves.html">functional_curves()</a></code> gains <code>env_smooth</code> and <code>ge_term</code> (with <code>k_ge</code>). <code>env_smooth = TRUE</code> replaces the environment random intercept with a random environment factor-smooth, <code>s(time, env, bs = "fs")</code>, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. <code>ge_term = "intercept"</code> or <code>"smooth"</code> adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. <code>k_env</code> now sets the basis dimension of the environment factor-smooth.</li>
+<li>Treatment mean curves average environment factor-smooth and G x E deviations over environments instead of dropping them, because factor-smooths are not centred. The same construction is shared by <code><a href="../reference/functional_rate.html">functional_rate()</a></code> and <code><a href="../reference/diagnose_curves.html">diagnose_curves()</a></code>, so fitted rates match the curves.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-3"></a></h3>
+<ul><li>
+<code><a href="../reference/functional_instability.html">functional_instability()</a></code> now predicts genotype-by-environment curves with the G x E term, averages out plot-level unit effects, and no longer fails when <code><a href="../reference/functional_curves.html">functional_curves()</a></code> was fitted with <code>block</code> or <code>unit</code>. It warns when the model has no G x E term, because nFI then mainly reflects each genotype’s disease level.</li>
+<li>
+<code><a href="../reference/functional_distances.html">functional_distances()</a></code> (curve level) and <code>functional_resistance(group_method = "bootstrap")</code> supply all model variables when predicting curve-level trajectories; the bootstrap in <code><a href="../reference/functional_resistance.html">functional_resistance()</a></code> previously failed when an environment was modelled.</li>
+<li>
+<code><a href="../reference/functional_distances.html">functional_distances()</a></code>: <code>perm_unit</code> is now honoured. Labels are permuted between permutation units (for example genotypes) and mapped back to their curves, instead of being shuffled between curves; this matters when <code>test_factor</code> is a genotype-level property such as a resistance class. <code>perm_strata</code> is applied at the unit level when strata are constant within units; otherwise whole units are permuted without strata, with a warning.</li>
+<li>
+<code><a href="../reference/functional_distances.html">functional_distances()</a></code> gains <code>seed</code> (default 1) and, like <code>simulate_dsp_data(seed = 123)</code>, no longer resets the user’s random stream: the previous <code>.Random.seed</code> is restored afterwards. The bootstrap seed (<code>boot_seed</code>) is handled the same way.</li>
+<li>
+<code>functional_resistance(instability = )</code> accepts the list returned by <code>functional_instability(return_curves = TRUE)</code> (it read a non-existent <code>nfi_table</code> element) and joins on the treatment column instead of guessing it.</li>
+<li>
+<code>functional_pca_clusters(choose_k = "silhouette" | "elbow")</code> is implemented; it previously used k = 2 silently. The criterion table is attached as attribute <code>"k_selection"</code>.</li>
+<li>
+<code><a href="../reference/reconstruct_curves.html">reconstruct_curves()</a></code> multiplies back by the column scaling when <code>functional_pca(scale = TRUE)</code> was used, and returns numeric times.</li>
+<li>
+<code><a href="../reference/AFSD.html">AFSD()</a></code>: the summary mean shape index now averages the per-focus <code>SIF = rows / cols</code> (it averaged <code>cols / rows</code>).</li>
+<li>
+<code><a href="../reference/functional_contrast.html">functional_contrast()</a></code> averages replicated observations explicitly, with a message, instead of letting <code><a href="https://rdrr.io/r/stats/approxfun.html" class="external-link">approx()</a></code> average ties silently, and reports when constant extrapolation is used.</li>
+<li>
+<code><a href="../reference/functional_summary.html">functional_summary()</a></code>: <code>persistence</code> is the total time above <code>threshold</code>, summed over sampling intervals with the profile above the threshold at both ends; gaps below the threshold are no longer counted. Results for profiles without gaps are unchanged.</li>
+<li>
+<code><a href="../reference/fit_gradients.html">fit_gradients()</a></code>: <code>results_table</code> is a data frame with numeric columns; parameters are no longer rounded before back-transformation or before drawing the fitted curves. The documentation no longer claims the models are ranked.</li>
+<li>
+<code><a href="../reference/theme_r4pde.html">theme_r4pde()</a></code> works without cowplot (in Suggests), falling back to a <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic()</a></code>-based equivalent.</li>
+<li>Documentation: <code>FHBWheat$i</code> and <code>$n</code> are the diseased and assessed plant counts used by <code><a href="../reference/BPL.html">BPL()</a></code>; <code>BlastWheat$index_mean</code> is the wheat blast index.</li>
+<li>Tests: the <code><a href="../reference/CompMuCens.html">CompMuCens()</a></code> test checked a non-existent element.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="r4pde-022">r4pde 0.2.2<a class="anchor" aria-label="anchor" href="#r4pde-022"></a></h2>
 <div class="section level3">
@@ -118,7 +156,7 @@
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="r4pde-010-2025-06-21">r4pde 0.1.0 (2025-06-21)<a class="anchor" aria-label="anchor" href="#r4pde-010-2025-06-21"></a></h2><p class="text-muted">CRAN release: 2025-07-02</p>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="r4pde-010-2025-06-21">r4pde 0.1.0 (2025-06-21)<a class="anchor" aria-label="anchor" href="#r4pde-010-2025-06-21"></a></h2>
 <div class="section level3">
 <h3 id="first-release-0-1-0">First release<a class="anchor" aria-label="anchor" href="#first-release-0-1-0"></a></h3>
 <ul><li>Initial release of the <code>r4pde</code> package.</li>

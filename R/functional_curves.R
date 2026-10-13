@@ -17,7 +17,8 @@
 #' @param grid_n Number of time points for evaluating predicted curves.
 #' @param env_ref Reference environment level used for adjusted predictions.
 #' @param k_smooth Basis dimension for the global smooth of time.
-#' @param k_env Basis dimension for the environment-specific smooth.
+#' @param k_env Basis dimension (over time) for the environment factor-smooth used when
+#'   \code{env_smooth = TRUE}. Ignored otherwise.
 #' @param k_trt Basis dimension for the treatment-specific smooth.
 #' @param gamma Penalization parameter passed to \code{mgcv::bam()}.
 #' @param discrete Logical; whether to use discrete (approximate) fitting.
@@ -27,9 +28,33 @@
 #' @param include_covariates Logical; whether to include covariates as fixed effects in the model.
 #' @param covariate_smooths Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.
 #' @param global_smooth Logical; if \code{TRUE}, fits a shared global curve plus treatment deviations. If \code{FALSE} (default), fits independent smooths per treatment.
+#' @param env_smooth Logical; if \code{TRUE} and \code{environment} is given, the environment
+#'   effect is a factor-smooth interaction \code{s(time, env, bs = "fs", m = 1)}, i.e. a random
+#'   environment-specific deviation curve, instead of the default random intercept
+#'   \code{s(env, bs = "re")}. Use it when environments differ in epidemic timing or shape, or
+#'   when treatments are unbalanced across environments.
+#' @param ge_term Genotype-by-environment term: \code{"none"} (default), \code{"intercept"}
+#'   (random intercept per treatment x environment curve, \code{s(.ge, bs = "re")}) or
+#'   \code{"smooth"} (random deviation curve per treatment x environment,
+#'   \code{s(time, .ge, bs = "fs", m = 1)}). A G x E term is needed for
+#'   \code{\link{functional_instability}()} to measure genotype-specific instability; without it,
+#'   all treatments share the same environment effects. Requires \code{environment}.
+#' @param k_ge Basis dimension (over time) for the G x E factor-smooth used when
+#'   \code{ge_term = "smooth"}.
 #' @param ... Additional arguments.
 #'
 #' @details
+#' \strong{Model terms.} The linear predictor always contains the treatment effect and
+#' treatment-specific smooths of time (plus a global smooth when \code{global_smooth = TRUE}).
+#' Environment enters as a random intercept, or as a random factor-smooth when
+#' \code{env_smooth = TRUE}. A genotype-by-environment term is added with \code{ge_term}.
+#' When \code{block} or \code{unit} is given, a random intercept per experimental unit is added;
+#' if those units are exactly the treatment x environment curves and a \code{ge_term} is
+#' requested, the unit intercept is dropped because the G x E term already contains it.
+#' Treatment mean curves are always predicted with the environment, G x E and unit terms
+#' excluded. For instability analyses across environments, a typical specification is
+#' \code{env_smooth = TRUE, ge_term = "smooth"}.
+#'
 #' Genotype-level covariates are descriptors that do not vary within a genotype, such as phenological groups.
 #' For example, in wheat blast studies, a cultivar's \code{heading_group} (early, intermediate, late)
 #' can be supplied. This helps distinguish between true genetic resistance and phenological escape, as
@@ -89,10 +114,20 @@ functional_curves <- function(
     include_covariates = FALSE,
     covariate_smooths = FALSE,
     global_smooth = FALSE,
+    env_smooth = FALSE,
+    ge_term = c("none", "intercept", "smooth"),
+    k_ge = 4,
     ...
 ) {
   response_scale <- match.arg(response_scale)
   family_try <- match.arg(family_try)
+  ge_term <- match.arg(ge_term)
+
+  if (is.null(environment) && (isTRUE(env_smooth) || ge_term != "none")) {
+    warning("`env_smooth` and `ge_term` require `environment`; they are ignored.", call. = FALSE)
+    env_smooth <- FALSE
+    ge_term <- "none"
+  }
 
   # Validate columns
   dat <- data
@@ -205,8 +240,19 @@ functional_curves <- function(
 
   k_smooth_eff <- min(k_smooth, max(3, length(unique(df[[.time]])) - 1))
   k_trt_eff    <- min(k_trt,    max(2, length(unique(df[[.trt]]))  - 1))
+  n_time_unique <- length(unique(df[[.time]]))
   k_env_eff <- NULL
-  if(!is.null(.env)) k_env_eff <- min(k_env, max(2, length(unique(df[[.env]])) - 1))
+  if(!is.null(.env) && isTRUE(env_smooth)) k_env_eff <- min(k_env, max(3, n_time_unique - 1))
+  k_ge_eff <- NULL
+  if(ge_term == "smooth") k_ge_eff <- min(k_ge, max(3, n_time_unique - 1))
+
+  # Treatment x environment identifier (one level per curve in unreplicated designs)
+  ge_col <- NULL
+  if(!is.null(.env)) {
+    df$.ge <- .fc_ge_id(df[[.trt]], df[[.env]])
+    ge_col <- ".ge"
+  }
+  unit_is_ge <- .fc_unit_is_ge(df, .unit, ge_col)
 
   if (global_smooth) {
     f_terms <- c(
@@ -231,11 +277,28 @@ functional_curves <- function(
   }
 
   if(!is.null(.env)){
-    f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .env))
+    if (isTRUE(env_smooth)) {
+      f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s)", .time, .env, k_env_eff))
+    } else {
+      f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .env))
+    }
   }
 
+  if (ge_term == "intercept") {
+    f_terms <- c(f_terms, sprintf("s(%s, bs='re')", ge_col))
+  } else if (ge_term == "smooth") {
+    f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s)", .time, ge_col, k_ge_eff))
+  }
+
+  unit_term_used <- FALSE
   if(!is.null(.blk) || !is.null(unit)){
-    f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .unit))
+    if (ge_term != "none" && unit_is_ge) {
+      message("Experimental units coincide with treatment x environment curves; ",
+              "the unit random intercept is dropped because `ge_term` already includes it.")
+    } else {
+      f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .unit))
+      unit_term_used <- TRUE
+    }
   }
 
   f_gam_beta <- stats::as.formula(paste0(".y ~ ", paste(f_terms, collapse = " + ")))
@@ -297,6 +360,18 @@ functional_curves <- function(
     if(!(env_ref %in% env_levels0)) stop("`env_ref` not found in environment levels.")
   }
 
+  # Treatment mean curves: unit terms excluded, environment and G x E terms
+  # centred or averaged (see .fc_mean_lpmatrix())
+  fit_info <- list(
+    gam = m_gam,
+    observed_data = df,
+    vars = list(environment = .env, block = .blk, unit = .unit, ge = ge_col,
+                treatment = .trt, time = .time),
+    settings = list(env_smooth = isTRUE(env_smooth))
+  )
+  beta_hat <- stats::coef(m_gam)
+  linkinv <- m_gam$family$linkinv
+
   pred_trt <- purrr::map_dfr(trt_levels0, function(trt_i){
     newd <- tibble::tibble(tmp_time = t_grid)
     names(newd)[1] <- .time
@@ -309,22 +384,8 @@ functional_curves <- function(
       }
     }
 
-    if(!is.null(.env)) newd[[.env]] <- factor(env_levels0[1], levels = env_levels0)
-
-    excl <- character()
-    if(!is.null(.env)) excl <- c(excl, sprintf("s(%s)", .env))
-
-    smooth_labels <- if (!is.null(m_gam$smooth)) {
-      vapply(m_gam$smooth, function(s) s$label, character(1))
-    } else {
-      character(0)
-    }
-    if(any(grepl(sprintf("s(%s)", .unit), smooth_labels, fixed = TRUE))) {
-      newd[[.unit]] <- factor(unit_levels0[1], levels = unit_levels0)
-      excl <- c(excl, sprintf("s(%s)", .unit))
-    }
-
-    mu <- mgcv::predict.gam(m_gam, newdata = newd, type = "response", exclude = excl)
+    X_mean <- .fc_mean_lpmatrix(fit_info, newd)
+    mu <- linkinv(as.numeric(X_mean %*% beta_hat))
 
     tibble::tibble(
       !!.trt := trt_i,
@@ -354,7 +415,7 @@ functional_curves <- function(
     genotype_info = genotype_info,
     vars = list(time = .time, response = .y, treatment = .trt,
                 environment = .env, block = .blk, unit = unit_used,
-                covariates = covariates),
+                covariates = covariates, ge = ge_col),
     settings = list(
       response_scale = response_scale, eps = eps, min_points = min_points,
       grid_n = grid_n, env_ref = env_ref,
@@ -363,7 +424,15 @@ functional_curves <- function(
       k_env_eff = k_env_eff,
       k_trt_eff = k_trt_eff,
       gamma = gamma, discrete = discrete,
-      family_try = family_try
+      family_try = family_try,
+      global_smooth = global_smooth,
+      env_smooth = isTRUE(env_smooth),
+      ge_term = ge_term,
+      k_ge = k_ge,
+      k_ge_eff = k_ge_eff,
+      unit_term = unit_term_used,
+      unit_is_ge = unit_is_ge,
+      formula = paste(deparse(f_gam_beta, width.cutoff = 500L), collapse = " ")
     ),
     warnings_betar = w,
     family_used = fam_used,
@@ -383,6 +452,7 @@ print.functional_curves <- function(x, ...) {
   cat("Time variable:", x$vars$time, "\n")
   cat("Treatment variable:", x$vars$treatment, "\n")
   cat("Grid size:", length(x$grid), "points\n")
+  if (!is.null(x$settings$formula)) cat("Model:", x$settings$formula, "\n")
   invisible(x)
 }
 

@@ -19,9 +19,12 @@
   };
 </script><script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="r4pde">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><script src="extra.js"></script><meta property="og:title" content="r4pde">
 <meta name="description" content="Tools for quantitative plant disease epidemiology">
 <meta property="og:description" content="Tools for quantitative plant disease epidemiology">
 <meta property="og:image" content="https://emdelponte.github.io/r4pde/logo.png">
@@ -34,7 +37,7 @@
 
     <a class="navbar-brand me-2" href="index.html">r4pde</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.2</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,35 +80,106 @@
 <img src="logo.png" class="logo" alt=""><h1 id="r4pde-">r4pde <a class="anchor" aria-label="anchor" href="#r4pde-"></a>
 </h1>
 </div>
-<p><a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://www.r-pkg.org/badges/version/r4pde" alt="CRAN"></a> <a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/r4pde" alt="Downloads"></a><br>
-An R package developed as a companion to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a>. It provides access to a suite of specialized R functions and datasets tailored for teaching and analyzing plant disease epidemiology. This package supports researchers, students, and practitioners by offering tools for disease quantification, spatial analysis and predictive modeling.</p>
+<p><a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://www.r-pkg.org/badges/version/r4pde" alt="CRAN"></a> <a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/r4pde" alt="Downloads"></a></p>
+<p><strong>r4pde</strong> provides tools for quantitative plant disease epidemiology. It started as the companion package to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a> and now also implements methods from recent research on the functional analysis of disease progress curves. It is aimed at researchers, students and practitioners who analyse field and greenhouse disease data.</p>
+<div class="section level2">
+<h2 id="what-the-package-does">What the package does<a class="anchor" aria-label="anchor" href="#what-the-package-does"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th>Area</th>
+<th>What you can do</th>
+<th>Main functions</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Disease progress curves (functional analysis)</strong></td>
+<td>Fit smooth, design-adjusted disease progress curves with GAMs; estimate instantaneous rates; compare and cluster whole trajectories; rank resistance and quantify stability across environments</td>
+<td>
+<code><a href="reference/functional_curves.html">functional_curves()</a></code>, <code><a href="reference/functional_rate.html">functional_rate()</a></code>, <code><a href="reference/functional_distances.html">functional_distances()</a></code>, <code><a href="reference/functional_pca.html">functional_pca()</a></code>, <code><a href="reference/functional_resistance.html">functional_resistance()</a></code>, <code><a href="reference/functional_instability.html">functional_instability()</a></code>, <code><a href="reference/diagnose_curves.html">diagnose_curves()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Disease management</strong></td>
+<td>Build Disease Suppression Profiles (DSP) for fungicides or other control measures relative to an untreated check, summarise and rank them</td>
+<td>
+<code><a href="reference/functional_contrast.html">functional_contrast()</a></code>, <code><a href="reference/functional_summary.html">functional_summary()</a></code>, <code><a href="reference/functional_suppression_profiles.html">functional_suppression_profiles()</a></code>, <code><a href="reference/rank_dsp.html">rank_dsp()</a></code>, <code><a href="reference/plot_dsp.html">plot_dsp()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Spatial epidemiology</strong></td>
+<td>Test for aggregation (ordinary runs, join counts, binary power law), analyse foci (AFSD), count subareas, fit dispersal gradients</td>
+<td>
+<code><a href="reference/oruns_test.html">oruns_test()</a></code>, <code><a href="reference/join_count.html">join_count()</a></code>, <code><a href="reference/BPL.html">BPL()</a></code>, <code><a href="reference/AFSD.html">AFSD()</a></code>, <code><a href="reference/count_subareas.html">count_subareas()</a></code>, <code><a href="reference/fit_gradients.html">fit_gradients()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Disease quantification</strong></td>
+<td>Compute disease severity indices from ordinal scales and compare treatments on censored ordinal data</td>
+<td>
+<code><a href="reference/DSI.html">DSI()</a></code>, <code><a href="reference/DSI2.html">DSI2()</a></code>, <code><a href="reference/CompMuCens.html">CompMuCens()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Weather and environment</strong></td>
+<td>Download daily weather (NASA POWER, ERA5, BR-DWGD) and build window-pane variables for weather–disease models</td>
+<td>
+<code><a href="reference/get_nasapower.html">get_nasapower()</a></code>, <code><a href="reference/get_era5.html">get_era5()</a></code>, <code><a href="reference/get_brdwgd.html">get_brdwgd()</a></code>, <code><a href="reference/windowpane.html">windowpane()</a></code>, <code><a href="reference/windowpane_tests.html">windowpane_tests()</a></code>
+</td>
+</tr>
+<tr>
+<td><strong>Datasets</strong></td>
+<td>Real epidemiological datasets used in the book and in the examples</td>
+<td>
+<code>BudBlightSoybean</code>, <code>RustSoybean</code>, <code>FHBWheat</code>, <code>WhiteMoldSoybean</code>, <code>SpatialAggregated</code>, …</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="https://emdelponte.github.io/r4pde/reference/">reference page</a> lists every function by family.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the stable release from CRAN.</p>
+<p>Install the stable release from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"r4pde"</span><span class="op">)</span></span></code></pre></div>
-<p>The development version of {r4pde} is available from GitHub. To install it along with its dependencies (including Bioconductor packages), use the <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a> package:</p>
+<p>The development version is on GitHub. To install it with its dependencies (including Bioconductor packages), use <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"pak"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"emdelponte/r4pde"</span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, using remotes:</p>
+<p>Or with remotes:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"emdelponte/r4pde"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="reporting-issues">Reporting Issues<a class="anchor" aria-label="anchor" href="#reporting-issues"></a>
-</h2>
-<p>Please <a href="https://github.com/emdelponte/r4pde/issues" class="external-link">report any bugs or issues</a> via the GitHub issue tracker.</p>
-</div>
-<div class="section level2">
-<h2 id="license-and-citation">License and Citation<a class="anchor" aria-label="anchor" href="#license-and-citation"></a>
+<h2 id="learning-more">Learning more<a class="anchor" aria-label="anchor" href="#learning-more"></a>
 </h2>
 <ul>
-<li>This package is released under the MIT license.</li>
-<li>To cite the package, please use:</li>
+<li>
+<strong>Book:</strong> <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a> explains the epidemiological concepts and uses this package throughout.</li>
+<li>
+<strong>Vignette:</strong> <a href="https://emdelponte.github.io/r4pde/articles/functional-analysis.html">Functional analysis of disease progress curves</a> walks through the full workflow, from fitting curves to resistance and stability across environments.</li>
+<li>
+<strong>Website:</strong> <a href="https://emdelponte.github.io/r4pde/">emdelponte.github.io/r4pde</a> has the function reference and the changelog.</li>
+<li>
+<strong>Methods:</strong> many functions follow Madden, Hughes and van den Bosch (2007), <em>The Study of Plant Disease Epidemics</em> (<a href="https://doi.org/10.1094/9780890545058" class="external-link">doi:10.1094/9780890545058</a>).</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="reporting-issues">Reporting issues<a class="anchor" aria-label="anchor" href="#reporting-issues"></a>
+</h2>
+<p>Please report bugs or suggest features on the <a href="https://github.com/emdelponte/r4pde/issues" class="external-link">GitHub issue tracker</a>. A small reproducible example helps a lot.</p>
+</div>
+<div class="section level2">
+<h2 id="license-and-citation">License and citation<a class="anchor" aria-label="anchor" href="#license-and-citation"></a>
+</h2>
+<p>r4pde is released under the MIT license. To cite it, run:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"r4pde"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -113,9 +187,10 @@ An R package developed as a companion to the book <a href="https://r4pde.netlify
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://cloud.r-project.org/package=r4pde" class="external-link">View on CRAN</a></li>
+<li><a href="https://CRAN.R-project.org/package=r4pde" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology (book)</a></li>
 </ul>
 </div>
 

@@ -27,7 +27,9 @@ functional_resistance(
 \arguments{
 \item{object}{An object of class \code{functional_curves}.}
 
-\item{instability}{Optional output from \code{functional_instability()}.}
+\item{instability}{Optional output from \code{functional_instability()}: the
+metrics tibble, or the list returned with \code{return_curves = TRUE}. It is
+joined by the treatment column.}
 
 \item{reference}{Character string naming the reference genotype, or a named vector if \code{reference_within_group = TRUE}.}
 

@@ -7,7 +7,9 @@
 #' genotypes into classes based on quantiles, clustering, or bootstrap-supported differences.
 #'
 #' @param object An object of class \code{functional_curves}.
-#' @param instability Optional output from \code{functional_instability()}.
+#' @param instability Optional output from \code{functional_instability()}: the
+#'   metrics tibble, or the list returned with \code{return_curves = TRUE}. It is
+#'   joined by the treatment column.
 #' @param reference Character string naming the reference genotype, or a named vector if \code{reference_within_group = TRUE}.
 #' @param lambda Numeric penalty weight for instability. Default is 1.
 #' @param method Character string for distance method.
@@ -128,12 +130,22 @@ functional_resistance <- function(
   res_df <- tibble::tibble(!!.trt := names(fri_res), FRI = fri_res)
 
   if (!is.null(instability)) {
-    inst_df <- if(is.data.frame(instability)) instability else instability$nfi_table
-    trt_col_inst <- names(inst_df)[apply(inst_df, 2, function(col) all(res_df[[.trt]] %in% col))][1]
-    if (is.na(trt_col_inst)) stop("Could not match genotype names in `instability`.")
+    inst_df <- if (is.data.frame(instability)) instability else instability$metrics
+    if (!is.data.frame(inst_df)) {
+      stop("`instability` must be the output of functional_instability() (a tibble, or a list with `metrics`).")
+    }
+    if (!(.trt %in% names(inst_df))) {
+      stop(sprintf("`instability` has no column named '%s' (the treatment variable).", .trt))
+    }
+    if (!("nFI" %in% names(inst_df))) stop("`instability` has no `nFI` column.")
+    miss <- setdiff(res_df[[.trt]], as.character(inst_df[[.trt]]))
+    if (length(miss) > 0) {
+      warning(sprintf("No instability value for %d treatment(s): %s. Their SAFRI is NA.",
+                      length(miss), paste(utils::head(miss, 5), collapse = ", ")))
+    }
 
-    inst_sub <- inst_df |> dplyr::select(!!trt_col_inst, nFI = dplyr::any_of("nFI"))
-    res_df <- res_df |> dplyr::left_join(inst_sub, by = stats::setNames(trt_col_inst, .trt))
+    inst_sub <- tibble::tibble(!!.trt := as.character(inst_df[[.trt]]), nFI = inst_df[["nFI"]])
+    res_df <- res_df |> dplyr::left_join(inst_sub, by = .trt)
     
     if(scale_nfi && max(res_df$nFI, na.rm=TRUE) > 0) res_df$nFI <- res_df$nFI / max(res_df$nFI, na.rm=TRUE)
     res_df$SAFRI <- res_df$FRI / (1 + lambda * res_df$nFI)
@@ -199,7 +211,9 @@ functional_resistance <- function(
     ids0 <- if(!is.null(.blk)) levels(df_boot[[.blk]]) else levels(df_boot[[unit_used]])
     id_col <- if(!is.null(.blk)) .blk else unit_used
     
-    curve_meta <- df_boot |> dplyr::distinct(.data[[unit_used]], .data[[.trt]], .data[[id_col]]) |>
+    curve_cols <- unique(c(unit_used, .trt, id_col, object$vars$environment, object$vars$ge))
+    curve_cols <- curve_cols[curve_cols %in% names(df_boot)]
+    curve_meta <- df_boot |> dplyr::distinct(dplyr::across(dplyr::all_of(curve_cols))) |>
       dplyr::mutate(curve_id_chr = as.character(.data[[unit_used]]), trt_chr = as.character(.data[[.trt]]))
       
     new_curve_grid <- tidyr::crossing(curve_id_chr = curve_meta$curve_id_chr, !!.time := t_grid) |>
@@ -213,10 +227,13 @@ functional_resistance <- function(
       }
     }
       
-    excl_c <- character()
-    if(any(grepl(sprintf("s\\(%s\\)", unit_used), names(m_gam$smooth), fixed = TRUE))) excl_c <- sprintf("s(%s)", unit_used)
-    
-    new_curve_grid$y_hat <- as.numeric(mgcv::predict.gam(m_gam, newdata = new_curve_grid, type = "response", exclude = excl_c))
+    for (cc in intersect(c(object$vars$environment, object$vars$ge), names(new_curve_grid))) {
+      new_curve_grid[[cc]] <- factor(new_curve_grid[[cc]], levels = levels(factor(df_boot[[cc]])))
+    }
+    new_curve_grid <- .fc_fill_newdata(new_curve_grid, object)
+
+    # Curve-level trajectories keep every term (environment, G x E and unit)
+    new_curve_grid$y_hat <- as.numeric(mgcv::predict.gam(m_gam, newdata = new_curve_grid, type = "response"))
     boot_safri_list <- vector("list", n_boot)
     
     for (b in seq_len(n_boot)) {

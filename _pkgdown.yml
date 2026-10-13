@@ -4,13 +4,31 @@ template:
   bootstrap: 5
   light-switch: true
   math-rendering: mathjax
+  theme: a11y-light
+  theme-dark: a11y-dark
+  bslib:
+    # brand teal taken from the hex sticker (#007f80)
+    primary: "#007f80"
+    link-color: "#007f80"
+    base_font: {google: "Inter"}
+    heading_font: {google: "Space Grotesk"}
+    code_font: {google: "JetBrains Mono"}
+    font-size-base: "1rem"
+    border-radius: "0.6rem"
+    navbar-padding-y: "0.8rem"
 
 home:
   title: r4pde
   description: Tools for quantitative plant disease epidemiology
+  links:
+    - text: R for Plant Disease Epidemiology (book)
+      href: https://r4pde.netlify.app/
   license: FALSE
 development:
   mode: unreleased
+
+news:
+  cran_dates: false
 
 reference:
   - title: "Disease measurement and quantification"

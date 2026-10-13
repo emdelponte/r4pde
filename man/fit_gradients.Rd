@@ -15,7 +15,10 @@ fit_gradients(data, C = 1)
 \value{
 A list containing:
 \item{data}{The input data, which will include an additional column 'mod_x'.}
-\item{results_table}{A table of the model parameters and R-squared values.}
+\item{results_table}{A data frame with one row per model: intercept \code{a}, slope \code{b},
+their standard errors and significance symbols (\code{"*"} p < 0.05, \code{"**"} p < 0.01),
+the back-transformed intercept \code{a_back = exp(a)} and \code{R2}. Values are rounded to
+three decimals; the fitted curves in the plots use unrounded estimates.}
 \item{plot_exponential}{Diagnostic plot for the exponential model.}
 \item{plot_power}{Diagnostic plot for the power model.}
 \item{plot_modified_power}{Diagnostic plot for the modified power model.}
@@ -24,8 +27,10 @@ A list containing:
 \item{plot_modified_power_original}{Plot of the original data with the modified power model fit.}
 }
 \description{
-This function fits three gradient models (exponential, power, and modified power) to given data.
-It then ranks the models based on their R-squared values and returns diagnostic plots for each model.
+This function fits three gradient models (exponential, power, and modified power) to given data
+by linear regression of \code{log(Y)} and returns the parameters, R-squared values (on the log
+scale) and diagnostic plots for each model. The models are not ranked; compare them using the
+R-squared values and the residual patterns in the plots.
 }
 \examples{
 x <- c(0.8, 1.6, 2.4, 3.2, 4, 7.2, 12, 15.2, 21.6, 28.8)

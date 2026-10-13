@@ -39,7 +39,9 @@ functional_resistance(
 - instability:
 
   Optional output from
-  [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md).
+  [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md):
+  the metrics tibble, or the list returned with `return_curves = TRUE`.
+  It is joined by the treatment column.
 
 - reference:
 

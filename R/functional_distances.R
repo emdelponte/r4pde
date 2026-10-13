@@ -10,13 +10,23 @@
 #' @param hc_method Clustering linkage method passed to \code{stats::hclust()}.
 #' @param test_factor Optional a priori grouping used for a distance-based permutation test.
 #' @param n_perm Number of permutations for the distance-based test.
+#' @param seed Integer seed for the permutation test, or \code{NULL} to use the
+#'   current random stream. The caller's random stream is restored afterwards.
 #' @param test_mode Character; permutation test mode.
 #' @param min_strata_for_pairwise Minimum number of strata levels required for pairwise tests.
-#' @param perm_unit Optional character naming the unit at which group labels are permuted.
-#' @param perm_strata Optional character naming a factor defining restricted permutation strata.
+#' @param perm_unit Optional character naming the unit at which group labels are
+#'   permuted (default: the curve unit). Use it when \code{test_factor} is a
+#'   property of a coarser unit, such as a genotype-level resistance class: all
+#'   curves of a unit keep the same label in every permutation, so curves of the
+#'   same genotype are not treated as exchangeable.
+#' @param perm_strata Optional character naming a factor defining restricted
+#'   permutation strata. When \code{perm_unit} is coarser than the curve, strata
+#'   are honoured only if they are constant within each permutation unit;
+#'   otherwise whole units are permuted without strata, with a warning.
 #' @param bootstrap Logical; if \code{TRUE}, compute bootstrap envelopes and distance summaries.
 #' @param boot_B Integer number of bootstrap replicates.
-#' @param boot_seed Integer seed for bootstrap resampling.
+#' @param boot_seed Integer seed for bootstrap resampling. The caller's random
+#'   stream is restored afterwards.
 #' @param boot_ci Length-2 numeric vector of quantiles for bootstrap intervals.
 #' @param show_progress Logical; whether to show progress.
 #' @param curve_level Logical; whether to compute curve-level distance matrix.
@@ -47,6 +57,7 @@ functional_distances <- function(
     hc_method = "ward.D2",
     test_factor = NULL,
     n_perm = 999,
+    seed = 1,
     test_mode = c("auto","none","global","global_pairwise"),
     min_strata_for_pairwise = 6,
     perm_unit = NULL,
@@ -144,7 +155,7 @@ functional_distances <- function(
 
     env_col <- col_name1(.env)
     blk_col <- col_name1(.blk)
-    ab_cols <- c(env_col, blk_col)
+    ab_cols <- c(env_col, blk_col, object$vars$ge)
     ab_cols <- ab_cols[!is.na(ab_cols) & nzchar(ab_cols)]
 
     curve_meta <- df |>
@@ -179,17 +190,19 @@ functional_distances <- function(
       new_curve_grid[[.blk]] <- factor(new_curve_grid[[.blk]], levels = blk_levels0)
     }
 
-    excl_c <- character()
-    if(any(grepl(sprintf("s\\(%s\\)", unit_used), names(m_gam$smooth), fixed = TRUE))) {
-       excl_c <- c(excl_c, sprintf("s(%s)", unit_used))
+    if (!is.null(object$vars$ge) && object$vars$ge %in% names(new_curve_grid)) {
+      new_curve_grid[[object$vars$ge]] <- factor(new_curve_grid[[object$vars$ge]],
+                                                 levels = levels(factor(df[[object$vars$ge]])))
     }
+    new_curve_grid <- .fc_fill_newdata(new_curve_grid, object)
 
+    # Curve-level trajectories keep every term (environment, G x E and unit),
+    # so each experimental unit gets its own fitted curve.
     new_curve_grid$y_hat <- as.numeric(
       mgcv::predict.gam(
         m_gam,
         newdata = new_curve_grid,
-        type = "response",
-        exclude = excl_c
+        type = "response"
       )
     )
 
@@ -310,63 +323,90 @@ functional_distances <- function(
     if (test_mode == "global") pairwise_allowed <- FALSE
     if (test_mode == "global_pairwise") pairwise_allowed <- TRUE
 
-    obs <- permanova_F(D_curve, g_curve)
-    set.seed(1)
-    
-    if (show_progress) {
-      pb_glob <- progress::progress_bar$new(
-        format = "  Global permutation test [:bar] :percent eta: :eta",
-        total = n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
+    # Labels are exchangeable between permutation units, not between curves:
+    # each permutation shuffles the unit labels (within strata when the strata
+    # are constant within units) and maps them back to the curves.
+    strata_u <- NULL
+    if (!is.null(strata_curve)) {
+      su <- tapply(as.character(strata_curve), u_curve, function(z) unique(z))
+      if (all(lengths(su) == 1L)) {
+        strata_u <- unlist(su)
+      } else if (!identical(perm_unit_eff, unit_used)) {
+        warning("`perm_strata` varies within `perm_unit`, so labels cannot be permuted ",
+                "within strata at the unit level. Whole units are permuted without strata.")
+      }
     }
-    
-    F_perm <- numeric(n_perm)
-    for (i in seq_len(n_perm)) {
-      if (show_progress) pb_glob$tick()
-      gperm <- if (is.null(strata_curve)) {
-        sample(g_curve, replace = FALSE)
+    unit_level <- !identical(perm_unit_eff, unit_used) || any(duplicated(u_curve))
+
+    perm_labels <- function(g, u, keep = rep(TRUE, length(g))) {
+      if (!unit_level) {
+        s <- if (is.null(strata_curve)) NULL else droplevels(strata_curve[keep])
+        return(if (is.null(s)) sample(g, replace = FALSE) else permute_within_strata(g, s))
+      }
+      u_lev <- unique(u)
+      g_lev <- g[match(u_lev, u)]
+      g_new <- if (is.null(strata_u)) {
+        sample(g_lev, replace = FALSE)
       } else {
-        permute_within_strata(g_curve, strata_curve)
+        permute_within_strata(g_lev, factor(strata_u[u_lev]))
       }
-      F_perm[i] <- permanova_F(D_curve, gperm)$F
+      g_new[match(u, u_lev)]
     }
-    
-    p_global <- (1 + sum(F_perm >= obs$F, na.rm = TRUE)) / (n_perm + 1)
 
-    pairwise <- NULL
-    lev <- levels(g_curve)
-    if (pairwise_allowed && length(lev) > 2) {
-      pairs <- utils::combn(lev, 2, simplify = FALSE)
-      
+    obs <- permanova_F(D_curve, g_curve)
+    perm_out <- .with_seed(seed, {
+
       if (show_progress) {
-        pb_pair <- progress::progress_bar$new(
-          format = "  Pairwise permutation tests [:bar] :percent eta: :eta",
-          total = length(pairs) * n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
+        pb_glob <- progress::progress_bar$new(
+          format = "  Global permutation test [:bar] :percent eta: :eta",
+          total = n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
       }
 
-      pairwise <- purrr::map_dfr(pairs, function(pp) {
-        keep2 <- g_curve %in% pp
-        D2 <- D_curve[keep2, keep2, drop = FALSE]
-        g2 <- droplevels(g_curve[keep2])
-        s2 <- if (is.null(strata_curve)) NULL else droplevels(strata_curve[keep2])
+      F_perm <- numeric(n_perm)
+      for (i in seq_len(n_perm)) {
+        if (show_progress) pb_glob$tick()
+        gperm <- perm_labels(g_curve, u_curve)
+        F_perm[i] <- permanova_F(D_curve, gperm)$F
+      }
 
-        ob2 <- permanova_F(D2, g2)
-        
-        Fp2 <- numeric(n_perm)
-        for (j in seq_len(n_perm)) {
-          if (show_progress) pb_pair$tick()
-          gp <- if (is.null(s2)) {
-            sample(g2, replace = FALSE)
-          } else {
-            permute_within_strata(g2, s2)
-          }
-          Fp2[j] <- permanova_F(D2, gp)$F
+      p_global <- (1 + sum(F_perm >= obs$F, na.rm = TRUE)) / (n_perm + 1)
+
+      pairwise <- NULL
+      lev <- levels(g_curve)
+      if (pairwise_allowed && length(lev) > 2) {
+        pairs <- utils::combn(lev, 2, simplify = FALSE)
+
+        if (show_progress) {
+          pb_pair <- progress::progress_bar$new(
+            format = "  Pairwise permutation tests [:bar] :percent eta: :eta",
+            total = length(pairs) * n_perm, clear = FALSE, width = 60, force = TRUE, show_after = 0)
         }
-        
-        p2 <- (1 + sum(Fp2 >= ob2$F, na.rm = TRUE)) / (n_perm + 1)
-        tibble::tibble(group1 = pp[1], group2 = pp[2], F = ob2$F, p = p2)
-      }) |>
-        dplyr::mutate(p_adj = stats::p.adjust(p, method = "holm"))
-    }
+
+        pairwise <- purrr::map_dfr(pairs, function(pp) {
+          keep2 <- g_curve %in% pp
+          D2 <- D_curve[keep2, keep2, drop = FALSE]
+          g2 <- droplevels(g_curve[keep2])
+          u2 <- u_curve[keep2]
+
+          ob2 <- permanova_F(D2, g2)
+
+          Fp2 <- numeric(n_perm)
+          for (j in seq_len(n_perm)) {
+            if (show_progress) pb_pair$tick()
+            gp <- droplevels(perm_labels(g2, u2, keep2))
+            Fp2[j] <- permanova_F(D2, gp)$F
+          }
+
+          p2 <- (1 + sum(Fp2 >= ob2$F, na.rm = TRUE)) / (n_perm + 1)
+          tibble::tibble(group1 = pp[1], group2 = pp[2], F = ob2$F, p = p2)
+        }) |>
+          dplyr::mutate(p_adj = stats::p.adjust(p, method = "holm"))
+      }
+      list(p_global = p_global, pairwise = pairwise, F_perm = F_perm)
+    })
+    p_global <- perm_out$p_global
+    pairwise <- perm_out$pairwise
+    F_perm <- perm_out$F_perm
 
     test_res <- list(
       type = "permutation_distance_test",
@@ -385,6 +425,10 @@ functional_distances <- function(
   # ---- Bootstrap ----
   boot_res <- NULL
   if (isTRUE(bootstrap)) {
+    if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
+      old_seed <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
+      on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
+    }
     set.seed(boot_seed)
     if(!is.null(.blk)) {
       ids0 <- blk_levels0

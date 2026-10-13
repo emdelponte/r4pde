@@ -1,7 +1,7 @@
 Package: r4pde
 Type: Package
 Title: Tools for Quantitative Plant Disease Epidemiology
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
     person(given = "Emerson", family = "Del Ponte", email = "delponte@ufv.br", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4398-409X"))
@@ -29,6 +29,7 @@ Imports:
     purrr,
     rlang,
     stats,
+    utils,
     survival,
     tidyr,
     tibble,

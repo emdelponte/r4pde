@@ -78,13 +78,36 @@ functional_contrast <- function(
     stop(sprintf("Reference level '%s' not found in treatment column.", reference))
   }
   
+  # Replicated observations (several values per treatment and time) are
+  # averaged explicitly; approx() would otherwise average ties silently.
+  keys <- c(group_cols, trt_col, time_col)
+  n_dup <- sum(duplicated(df[, keys]))
+  if (n_dup > 0) {
+    message(sprintf(
+      "Averaging replicated observations (%d rows share a treatment and time). For replicated data, consider fitting functional_curves() first.",
+      n_dup))
+    df <- df |>
+      dplyr::group_by(dplyr::across(dplyr::all_of(keys))) |>
+      dplyr::summarise(!!resp_col := mean(.data[[resp_col]], na.rm = TRUE), .groups = "drop")
+  }
+
+  # Interpolation is linear; outside a treatment's observed range the nearest
+  # observed value is carried (constant extrapolation), which is reported.
+  rng <- df |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(c(group_cols, trt_col)))) |>
+    dplyr::summarise(tmin = min(.data[[time_col]]), tmax = max(.data[[time_col]]), .groups = "drop")
+  target_range <- if (!is.null(grid)) range(grid) else range(df[[time_col]])
+  if (any(rng$tmin > target_range[1] | rng$tmax < target_range[2])) {
+    message("Some treatments do not cover the full time range; their first/last observed values are carried to the ends.")
+  }
+
   # Interpolation if grid is provided
   if (!is.null(grid)) {
     grid <- sort(unique(grid))
     df <- df |>
       dplyr::group_by(dplyr::across(dplyr::all_of(c(group_cols, trt_col)))) |>
       dplyr::reframe(
-        !!resp_col := suppressWarnings(stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = grid, rule = 2)$y),
+        !!resp_col := stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = grid, rule = 2)$y,
         !!time_col := grid
       )
   } else {
@@ -100,7 +123,7 @@ functional_contrast <- function(
         .x |>
           dplyr::group_by(.data[[trt_col]]) |>
           dplyr::reframe(
-            !!resp_col := suppressWarnings(stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = common_times, rule = 2)$y),
+            !!resp_col := stats::approx(x = .data[[time_col]], y = .data[[resp_col]], xout = common_times, rule = 2)$y,
             !!time_col := common_times
           )
       }) |>
@@ -183,7 +206,9 @@ trapz_vec_internal <- function(x, y) {
 #'   \item \code{mean_suppression}: Temporal mean of DSP(t).
 #'   \item \code{max_suppression}: Maximum value of DSP(t).
 #'   \item \code{time_max_suppression}: Time at which maximum suppression occurs.
-#'   \item \code{persistence}: Total duration where DSP(t) > threshold.
+#'   \item \code{persistence}: Total duration where DSP(t) > threshold: the
+#'     summed length of the sampling intervals with DSP above the threshold at
+#'     both ends, so gaps below the threshold are not counted.
 #'   \item \code{centroid}: Temporal centroid defined as \eqn{\int t \cdot DSP(t) dt / \int DSP(t) dt}.
 #'   \item \code{energy}: Integral of \eqn{DSP(t)^2}.
 #'   \item \code{early_area, mid_area, late_area}: Protected area in the first, second, and third tertiles of the time period.
@@ -256,17 +281,7 @@ functional_summary <- function(
         idx <- which.max(y)
         if (length(idx) > 0) t[idx[1]] else NA_real_
       },
-      persistence = {
-        t <- .data[[time]]
-        y <- .data[[response]]
-        above <- y > threshold
-        if (sum(above) < 2) {
-          0
-        } else {
-          t_above <- t[above]
-          max(t_above) - min(t_above)
-        }
-      },
+      persistence = time_above_internal(.data[[time]], .data[[response]], threshold),
       centroid = {
         t <- .data[[time]]
         y <- .data[[response]]
@@ -509,16 +524,21 @@ plot_dsp_rank_heatmap <- function(
   p
 }
 
-#' #' Simulate Disease Suppression Profile Data
+#' Simulate Disease Suppression Profile Data
 #'
 #' @description
 #' Simulates a dataset for demonstrating functional analysis with Disease Suppression Profiles.
 #' Returns a data frame with varying treatments and replicates over multiple time points.
 #'
+#' @param seed Integer seed, or \code{NULL} to use the current random stream.
+#'   The caller's random stream is restored afterwards.
 #' @return A \code{tibble} with columns \code{treatment}, \code{rep}, \code{time}, \code{y_control}, \code{dsp_true}, \code{severity_true}, and \code{severity}.
 #' @export
-simulate_dsp_data <- function() {
-  set.seed(123)
+simulate_dsp_data <- function(seed = 123) {
+  .with_seed(seed, simulate_dsp_data_internal())
+}
+
+simulate_dsp_data_internal <- function() {
   
   time_seq <- seq(0, 60, by = 5)
   
@@ -576,4 +596,21 @@ simulate_dsp_data <- function() {
     dplyr::select(-.data$profile)
     
   return(dat_concept)
+}
+
+#' Total time above a threshold, summed over sampling intervals
+#'
+#' Adds the lengths of the intervals between consecutive time points at which
+#' the profile is above the threshold at both ends. For a profile with no gaps
+#' this equals the span from the first to the last time point above the
+#' threshold; intervals inside a gap are not counted.
+#' @noRd
+time_above_internal <- function(t, y, threshold) {
+  ok <- !is.na(t) & !is.na(y)
+  t <- t[ok]; y <- y[ok]
+  o <- order(t); t <- t[o]; y <- y[o]
+  if (length(t) < 2) return(0)
+  above <- y > threshold
+  both <- above[-1] & above[-length(above)]
+  sum(diff(t)[both])
 }

@@ -2,9 +2,13 @@
 % Please edit documentation in R/functional_dsp.R
 \name{simulate_dsp_data}
 \alias{simulate_dsp_data}
-\title{#' Simulate Disease Suppression Profile Data}
+\title{Simulate Disease Suppression Profile Data}
 \usage{
-simulate_dsp_data()
+simulate_dsp_data(seed = 123)
+}
+\arguments{
+\item{seed}{Integer seed, or \code{NULL} to use the current random stream.
+The caller's random stream is restored afterwards.}
 }
 \value{
 A \code{tibble} with columns \code{treatment}, \code{rep}, \code{time}, \code{y_control}, \code{dsp_true}, \code{severity_true}, and \code{severity}.

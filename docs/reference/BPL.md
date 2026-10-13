@@ -104,7 +104,7 @@ print(result$model_summary)
 #> (Intercept)   0.3158     0.1860   1.698   0.0916 .  
 #> log_Vbin      1.0205     0.0420  24.295   <2e-16 ***
 #> ---
-#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #> 
 #> Residual standard error: 0.3935 on 151 degrees of freedom
 #> Multiple R-squared:  0.7963, Adjusted R-squared:  0.7949 

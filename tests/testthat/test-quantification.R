@@ -43,5 +43,5 @@ test_that("CompMuCens executes when interval package is available", {
     ckData = TRUE
   )
   expect_type(res, "list")
-  expect_true(!is.null(res$Test_result))
+  expect_true(all(c("inputData", "U.Score", "Hypothesis.test", "adj.Signif", "Conclusion") %in% names(res)))
 })

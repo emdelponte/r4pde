@@ -34,8 +34,10 @@ functional_curves()
 ```
 
 ``` r
+
 library(r4pde)
 library(ggplot2)
+#> Warning: package 'ggplot2' was built under R version 4.5.3
 ```
 
 ## Example Data: Soybean Bud Blight
@@ -46,6 +48,7 @@ dates (`PD1` to `PD4`) evaluated at four assessment dates (30, 40, 50,
 and 60 days after planting) across 4 randomized blocks:
 
 ``` r
+
 data("BudBlightSoybean", package = "r4pde")
 head(BudBlightSoybean)
 #> # A tibble: 6 × 4
@@ -74,6 +77,7 @@ the data into restrictive parametric shapes (e.g., strictly logistic or
 Gompertz):
 
 ``` r
+
 fc <- functional_curves(
   data = BudBlightSoybean,
   time = "time",
@@ -111,6 +115,7 @@ covariance to compute pointwise confidence intervals and extracting key
 rate phenotypes:
 
 ``` r
+
 fr <- functional_rate(fc, scale = "response", n_grid = 100)
 
 # Summary of rate phenotypes (r_max, t_r_max, growth duration)
@@ -155,6 +160,7 @@ differences between fitted curves across the shared time domain:
 It performs hierarchical clustering and profile identification:
 
 ``` r
+
 fd <- functional_distances(fc, cluster_k = 2, show_progress = FALSE)
 
 # Plot environment-adjusted curves colored by functional cluster
@@ -165,6 +171,7 @@ plot_curves(fd)
 cluster](functional-analysis_files/figure-html/distances-1.png)
 
 ``` r
+
 
 # Plot hierarchical clustering dendrogram
 plot_dendrogram(fd)
@@ -186,6 +193,7 @@ among epidemic trajectories into orthogonal temporal components
 epidemic magnitude and timing/shape shifts:
 
 ``` r
+
 # Retain 2 components for score biplot
 fpca <- functional_pca(fc, n_components = 2)
 
@@ -224,6 +232,7 @@ FRI (SAFRI) by benchmarking each curve’s integral against a designated
 susceptible check:
 
 ``` r
+
 # Using 'PD1' as the reference susceptible treatment
 fres <- functional_resistance(
   fc,

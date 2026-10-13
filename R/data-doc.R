@@ -6,7 +6,7 @@
 #' \describe{
 #'   \item{heading}{Date of heading}
 #'   \item{inc_mean}{Mean incidence}
-#'   \item{index_mean}{FHB index mean}
+#'   \item{index_mean}{Mean wheat blast index}
 #'   \item{latitude}{Latitude coordinate}
 #'   \item{location}{Experimental site name}
 #'   \item{longitude}{Longitude coordinate}
@@ -50,8 +50,8 @@
 #' @format A data frame with:
 #' \describe{
 #'   \item{field}{Field identifier}
-#'   \item{i}{Row position}
-#'   \item{n}{Column position}
+#'   \item{i}{Number of diseased plants in the quadrat (used as \code{i} by \code{BPL()})}
+#'   \item{n}{Number of plants assessed in the quadrat (used as \code{n} by \code{BPL()})}
 #'   \item{quadrat}{Quadrat ID}
 #'   \item{season}{Crop season}
 #' }

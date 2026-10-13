@@ -62,7 +62,9 @@ A `tibble` with one row per group/treatment containing:
 
 - `time_max_suppression`: Time at which maximum suppression occurs.
 
-- `persistence`: Total duration where DSP(t) \> threshold.
+- `persistence`: Total duration where DSP(t) \> threshold: the summed
+  length of the sampling intervals with DSP above the threshold at both
+  ends, so gaps below the threshold are not counted.
 
 - `centroid`: Temporal centroid defined as \\\int t \cdot DSP(t) dt /
   \int DSP(t) dt\\.

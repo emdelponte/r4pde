@@ -101,7 +101,7 @@ efficacy trajectories.
 - [`plot_dsp_rank_heatmap()`](https://emdelponte.github.io/r4pde/reference/plot_dsp_rank_heatmap.md)
   : Plot DSP Rankings Heatmap
 - [`simulate_dsp_data()`](https://emdelponte.github.io/r4pde/reference/simulate_dsp_data.md)
-  : \#' Simulate Disease Suppression Profile Data
+  : Simulate Disease Suppression Profile Data
 - [`plot(`*`<functional_suppression_profiles>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_suppression_profiles.md)
   : Plot functional suppression profiles
 - [`plot(`*`<functional_suppression_profiles_list>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.functional_suppression_profiles_list.md)

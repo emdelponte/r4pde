@@ -108,21 +108,15 @@ diagnose_curves <- function(x, grid_n = 200){
 
   newd[[trt]] <- factor(trt0, levels = levels(df[[trt]]))
 
-  if(!is.null(x$vars$environment)){
-    env <- x$vars$environment
-    env_ref <- x$settings$env_ref %||% levels(df[[env]])[1]
-    newd[[env]] <- factor(env_ref, levels = levels(df[[env]]))
+  if (!is.null(x$vars$covariates)) {
+    for (cov in x$vars$covariates) {
+      newd[[cov]] <- x$genotype_info[[cov]][match(trt0, as.character(x$genotype_info[[trt]]))]
+    }
   }
 
-  newd[[x$vars$unit]] <- df[[x$vars$unit]][1]
-
-  excl <- c(sprintf("s(%s)", x$vars$unit))
-  if(!is.null(x$vars$environment)){
-    excl <- c(excl, sprintf("s(%s,%s)", tim, x$vars$environment))
-  }
-
-  mu_grid <- mgcv::predict.gam(
-    x$gam, newdata = newd, type = "response", exclude = excl
+  # Same construction as the treatment mean curves in functional_curves()
+  mu_grid <- x$gam$family$linkinv(
+    as.numeric(.fc_mean_lpmatrix(x, newd) %*% stats::coef(x$gam))
   )
 
   p_curve <- ggplot2::ggplot(

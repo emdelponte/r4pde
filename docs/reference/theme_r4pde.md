@@ -2,7 +2,10 @@
 
 This function creates a new ggplot2 theme by modifying the
 cowplot::theme_half_open theme. It sets a custom font size and changes
-the panel background color to gray96.
+the panel background color to gray96. If cowplot is not installed, a
+close equivalent built on
+[`ggplot2::theme_classic()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+is used.
 
 ## Usage
 

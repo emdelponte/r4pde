@@ -22,7 +22,7 @@ A data frame with the following columns:
 
 - index_mean:
 
-  FHB index mean
+  Mean wheat blast index
 
 - latitude:
 

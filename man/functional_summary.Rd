@@ -36,7 +36,9 @@ A \code{tibble} with one row per group/treatment containing:
 \item \code{mean_suppression}: Temporal mean of DSP(t).
 \item \code{max_suppression}: Maximum value of DSP(t).
 \item \code{time_max_suppression}: Time at which maximum suppression occurs.
-\item \code{persistence}: Total duration where DSP(t) > threshold.
+\item \code{persistence}: Total duration where DSP(t) > threshold: the
+summed length of the sampling intervals with DSP above the threshold at
+both ends, so gaps below the threshold are not counted.
 \item \code{centroid}: Temporal centroid defined as \eqn{\int t \cdot DSP(t) dt / \int DSP(t) dt}.
 \item \code{energy}: Integral of \eqn{DSP(t)^2}.
 \item \code{early_area, mid_area, late_area}: Protected area in the first, second, and third tertiles of the time period.

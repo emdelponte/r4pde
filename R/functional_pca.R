@@ -439,7 +439,13 @@ reconstruct_curves <- function(x, components = NULL) {
   for (i in components) {
     recon_mat <- recon_mat + outer(scores[, i], rot[, i])
   }
-  recon_mat <- t(t(recon_mat) + pca$center)
+  if (!isFALSE(pca$scale) && !is.null(pca$scale)) {
+    recon_mat <- t(t(recon_mat) * pca$scale)
+  }
+  if (!isFALSE(pca$center) && !is.null(pca$center)) {
+    recon_mat <- t(t(recon_mat) + pca$center)
+  }
+  colnames(recon_mat) <- rownames(rot)
   
   recon_tbl <- tibble::as_tibble(recon_mat) |>
     dplyr::mutate(curve_id = rownames(scores)) |>
@@ -458,7 +464,11 @@ reconstruct_curves <- function(x, components = NULL) {
 #' @param k Number of clusters.
 #' @param components Integer vector of components to use.
 #' @param method Clustering method: "kmeans" or "hclust".
-#' @param choose_k Method for suggesting k: "none", "silhouette", or "elbow".
+#' @param choose_k Method used to choose \code{k} when \code{k = NULL}:
+#'   \code{"silhouette"} (largest mean silhouette width over k = 2 to 10) or
+#'   \code{"elbow"} (largest drop below the line joining the within-cluster sums
+#'   of squares of k = 1 and k = 10). \code{"none"} requires \code{k}. The
+#'   criterion table is attached to the result as attribute \code{"k_selection"}.
 #' @param ... Additional arguments passed to clustering functions.
 #' @export
 functional_pca_clusters <- function(
@@ -481,13 +491,16 @@ functional_pca_clusters <- function(
   # Standardize scores before clustering
   score_mat <- scale(score_mat)
   
-  # Logic for choosing k if requested, though simplified for now
   if (is.null(k) && choose_k == "none") {
     stop("Must specify `k` or a method for `choose_k`.")
   }
-  
+
+  k_criterion <- NULL
   if (is.null(k)) {
-    k <- 2 # fallback
+    sel <- .fpca_choose_k(score_mat, method = method, choose_k = choose_k, ...)
+    k <- sel$k
+    k_criterion <- sel$table
+    message(sprintf("Selected k = %d by %s.", k, choose_k))
   }
   
   if (method == "kmeans") {
@@ -499,10 +512,56 @@ functional_pca_clusters <- function(
     clusters <- stats::cutree(hc, k = k)
   }
   
-  tibble::tibble(
+  out <- tibble::tibble(
     curve_id = curve_ids,
     cluster = factor(clusters)
   )
+  if (!is.null(k_criterion)) attr(out, "k_selection") <- k_criterion
+  out
+}
+
+#' Choose the number of clusters for FPCA scores
+#'
+#' Silhouette: k with the largest mean silhouette width. Elbow: k whose
+#' within-cluster sum of squares lies farthest below the straight line joining
+#' the first and last candidate.
+#' @noRd
+.fpca_choose_k <- function(score_mat, method, choose_k, k_max = 10, ...) {
+  n <- nrow(score_mat)
+  k_max <- min(k_max, n - 1)
+  if (k_max < 2) stop("Too few curves to choose the number of clusters.")
+  ks <- 2:k_max
+  d <- stats::dist(score_mat)
+  if (method == "hclust") hc <- stats::hclust(d, ...)
+  cl_k <- function(kk) {
+    if (method == "kmeans") {
+      stats::kmeans(score_mat, centers = kk, nstart = 10)$cluster
+    } else {
+      stats::cutree(hc, k = kk)
+    }
+  }
+  cls <- lapply(ks, cl_k)
+  if (choose_k == "silhouette") {
+    crit <- vapply(cls, function(cl) {
+      mean(cluster::silhouette(cl, d)[, "sil_width"])
+    }, numeric(1))
+    k <- ks[which.max(crit)]
+  } else {
+    wss <- vapply(cls, function(cl) {
+      sum(vapply(split(seq_len(n), cl), function(ii) {
+        sum(scale(score_mat[ii, , drop = FALSE], scale = FALSE)^2)
+      }, numeric(1)))
+    }, numeric(1))
+    ks_all <- c(1L, ks)
+    wss_all <- c(sum(scale(score_mat, scale = FALSE)^2), wss)
+    x <- (ks_all - min(ks_all)) / diff(range(ks_all))
+    y <- (wss_all - min(wss_all)) / max(diff(range(wss_all)), .Machine$double.eps)
+    gap <- (1 - x) - y
+    k <- ks_all[which.max(gap)]
+    if (k < 2) k <- 2L
+    crit <- wss
+  }
+  list(k = k, table = tibble::tibble(k = ks, criterion = crit))
 }
 
 #' @export

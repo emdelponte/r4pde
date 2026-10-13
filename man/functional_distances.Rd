@@ -10,6 +10,7 @@ functional_distances(
   hc_method = "ward.D2",
   test_factor = NULL,
   n_perm = 999,
+  seed = 1,
   test_mode = c("auto", "none", "global", "global_pairwise"),
   min_strata_for_pairwise = 6,
   perm_unit = NULL,
@@ -34,19 +35,30 @@ functional_distances(
 
 \item{n_perm}{Number of permutations for the distance-based test.}
 
+\item{seed}{Integer seed for the permutation test, or \code{NULL} to use the
+current random stream. The caller's random stream is restored afterwards.}
+
 \item{test_mode}{Character; permutation test mode.}
 
 \item{min_strata_for_pairwise}{Minimum number of strata levels required for pairwise tests.}
 
-\item{perm_unit}{Optional character naming the unit at which group labels are permuted.}
+\item{perm_unit}{Optional character naming the unit at which group labels are
+permuted (default: the curve unit). Use it when \code{test_factor} is a
+property of a coarser unit, such as a genotype-level resistance class: all
+curves of a unit keep the same label in every permutation, so curves of the
+same genotype are not treated as exchangeable.}
 
-\item{perm_strata}{Optional character naming a factor defining restricted permutation strata.}
+\item{perm_strata}{Optional character naming a factor defining restricted
+permutation strata. When \code{perm_unit} is coarser than the curve, strata
+are honoured only if they are constant within each permutation unit;
+otherwise whole units are permuted without strata, with a warning.}
 
 \item{bootstrap}{Logical; if \code{TRUE}, compute bootstrap envelopes and distance summaries.}
 
 \item{boot_B}{Integer number of bootstrap replicates.}
 
-\item{boot_seed}{Integer seed for bootstrap resampling.}
+\item{boot_seed}{Integer seed for bootstrap resampling. The caller's random
+stream is restored afterwards.}
 
 \item{boot_ci}{Length-2 numeric vector of quantiles for bootstrap intervals.}
 

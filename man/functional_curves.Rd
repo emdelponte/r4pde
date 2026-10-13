@@ -28,6 +28,9 @@ functional_curves(
   include_covariates = FALSE,
   covariate_smooths = FALSE,
   global_smooth = FALSE,
+  env_smooth = FALSE,
+  ge_term = c("none", "intercept", "smooth"),
+  k_ge = 4,
   ...
 )
 }
@@ -58,7 +61,8 @@ functional_curves(
 
 \item{k_smooth}{Basis dimension for the global smooth of time.}
 
-\item{k_env}{Basis dimension for the environment-specific smooth.}
+\item{k_env}{Basis dimension (over time) for the environment factor-smooth used when
+\code{env_smooth = TRUE}. Ignored otherwise.}
 
 \item{k_trt}{Basis dimension for the treatment-specific smooth.}
 
@@ -77,6 +81,22 @@ functional_curves(
 \item{covariate_smooths}{Logical; if TRUE and \code{include_covariates = TRUE}, adds smooth interactions \code{s(time, by=covariate)} for factor covariates.}
 
 \item{global_smooth}{Logical; if \code{TRUE}, fits a shared global curve plus treatment deviations. If \code{FALSE} (default), fits independent smooths per treatment.}
+
+\item{env_smooth}{Logical; if \code{TRUE} and \code{environment} is given, the environment
+effect is a factor-smooth interaction \code{s(time, env, bs = "fs", m = 1)}, i.e. a random
+environment-specific deviation curve, instead of the default random intercept
+\code{s(env, bs = "re")}. Use it when environments differ in epidemic timing or shape, or
+when treatments are unbalanced across environments.}
+
+\item{ge_term}{Genotype-by-environment term: \code{"none"} (default), \code{"intercept"}
+(random intercept per treatment x environment curve, \code{s(.ge, bs = "re")}) or
+\code{"smooth"} (random deviation curve per treatment x environment,
+\code{s(time, .ge, bs = "fs", m = 1)}). A G x E term is needed for
+\code{\link{functional_instability}()} to measure genotype-specific instability; without it,
+all treatments share the same environment effects. Requires \code{environment}.}
+
+\item{k_ge}{Basis dimension (over time) for the G x E factor-smooth used when
+\code{ge_term = "smooth"}.}
 
 \item{...}{Additional arguments.}
 }
@@ -99,6 +119,17 @@ Fits a generalized additive model (GAM) to replicated disease progress curves,
 returning adjusted treatment mean curves evaluated on a common time grid.
 }
 \details{
+\strong{Model terms.} The linear predictor always contains the treatment effect and
+treatment-specific smooths of time (plus a global smooth when \code{global_smooth = TRUE}).
+Environment enters as a random intercept, or as a random factor-smooth when
+\code{env_smooth = TRUE}. A genotype-by-environment term is added with \code{ge_term}.
+When \code{block} or \code{unit} is given, a random intercept per experimental unit is added;
+if those units are exactly the treatment x environment curves and a \code{ge_term} is
+requested, the unit intercept is dropped because the G x E term already contains it.
+Treatment mean curves are always predicted with the environment, G x E and unit terms
+excluded. For instability analyses across environments, a typical specification is
+\code{env_smooth = TRUE, ge_term = "smooth"}.
+
 Genotype-level covariates are descriptors that do not vary within a genotype, such as phenological groups.
 For example, in wheat blast studies, a cultivar's \code{heading_group} (early, intermediate, late)
 can be supplied. This helps distinguish between true genetic resistance and phenological escape, as

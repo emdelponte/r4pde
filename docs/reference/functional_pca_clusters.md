@@ -35,7 +35,11 @@ functional_pca_clusters(
 
 - choose_k:
 
-  Method for suggesting k: "none", "silhouette", or "elbow".
+  Method used to choose `k` when `k = NULL`: `"silhouette"` (largest
+  mean silhouette width over k = 2 to 10) or `"elbow"` (largest drop
+  below the line joining the within-cluster sums of squares of k = 1 and
+  k = 10). `"none"` requires `k`. The criterion table is attached to the
+  result as attribute `"k_selection"`.
 
 - ...:
 

@@ -1,8 +1,10 @@
 
 #' Fit Gradient Models to Data
 #'
-#' This function fits three gradient models (exponential, power, and modified power) to given data.
-#' It then ranks the models based on their R-squared values and returns diagnostic plots for each model.
+#' This function fits three gradient models (exponential, power, and modified power) to given data
+#' by linear regression of \code{log(Y)} and returns the parameters, R-squared values (on the log
+#' scale) and diagnostic plots for each model. The models are not ranked; compare them using the
+#' R-squared values and the residual patterns in the plots.
 #'
 #' @param data A dataframe containing the data, with columns "x" representing distances and
 #' "Y" representing the corresponding measurements or counts.
@@ -10,7 +12,10 @@
 #'
 #' @return A list containing:
 #' \item{data}{The input data, which will include an additional column 'mod_x'.}
-#' \item{results_table}{A table of the model parameters and R-squared values.}
+#' \item{results_table}{A data frame with one row per model: intercept \code{a}, slope \code{b},
+#'   their standard errors and significance symbols (\code{"*"} p < 0.05, \code{"**"} p < 0.01),
+#'   the back-transformed intercept \code{a_back = exp(a)} and \code{R2}. Values are rounded to
+#'   three decimals; the fitted curves in the plots use unrounded estimates.}
 #' \item{plot_exponential}{Diagnostic plot for the exponential model.}
 #' \item{plot_power}{Diagnostic plot for the power model.}
 #' \item{plot_modified_power}{Diagnostic plot for the modified power model.}
@@ -46,44 +51,42 @@ fit_gradients <- function(data, C = 1) {
   power <- lm(log(Y) ~ log(x), data = data)
   modified_power <- lm(log(Y) ~ log(x + C), data = data)
 
-  # Extract parameters and R-squared
+  # Extract parameters and R-squared (unrounded; rounding only in the table)
   get_params <- function(model) {
     s <- summary(model)
-    a <- round(coef(model)[1], 3)
-    b <- round(coef(model)[2], 3)
-    R2 <- round(s$r.squared, 3)
-    a_back_transformed <- round(exp(a), 3)
-
-    se_a <- round(s$coefficients["(Intercept)", "Std. Error"], 3)
+    cf <- s$coefficients
     predictor_name <- names(coef(model))[2]
-    se_b <- round(s$coefficients[predictor_name, "Std. Error"], 3)
 
     sig_symbol <- function(p_val) {
-      if (p_val < 0.01) return("**")
-      else if (p_val < 0.05) return("*")
-      else return("")
+      if (p_val < 0.01) "**" else if (p_val < 0.05) "*" else ""
     }
 
-    sig_a <- sig_symbol(s$coefficients["(Intercept)", "Pr(>|t|)"])
-    sig_b <- sig_symbol(s$coefficients[predictor_name, "Pr(>|t|)"])
-
-    return(list(
-      a = a, se_a = se_a, sig_a = sig_a,
-      b = b, se_b = se_b, sig_b = sig_b,
-      a_back = a_back_transformed, R2 = R2
-    ))
+    list(
+      a = unname(cf["(Intercept)", "Estimate"]),
+      se_a = unname(cf["(Intercept)", "Std. Error"]),
+      sig_a = sig_symbol(cf["(Intercept)", "Pr(>|t|)"]),
+      b = unname(cf[predictor_name, "Estimate"]),
+      se_b = unname(cf[predictor_name, "Std. Error"]),
+      sig_b = sig_symbol(cf[predictor_name, "Pr(>|t|)"]),
+      a_back = unname(exp(cf["(Intercept)", "Estimate"])),
+      R2 = s$r.squared
+    )
   }
 
   exp_params <- get_params(exponential)
   power_params <- get_params(power)
   mod_power_params <- get_params(modified_power)
 
-  # Combine results into a table
-  results <- rbind(
-    Exponential = unlist(exp_params),
-    Power = unlist(power_params),
-    Modified_Power = unlist(mod_power_params)
-  )
+  # Combine results into a table with numeric columns
+  results <- do.call(rbind, lapply(
+    list(Exponential = exp_params, Power = power_params, Modified_Power = mod_power_params),
+    function(p) data.frame(
+      a = round(p$a, 3), se_a = round(p$se_a, 3), sig_a = p$sig_a,
+      b = round(p$b, 3), se_b = round(p$se_b, 3), sig_b = p$sig_b,
+      a_back = round(p$a_back, 3), R2 = round(p$R2, 3),
+      stringsAsFactors = FALSE
+    )
+  ))
 
   # Plotting
   plot_exponential <- ggplot2::ggplot(data, ggplot2::aes(x = x, y = log(Y))) +

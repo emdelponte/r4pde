@@ -1,8 +1,10 @@
 # Fit Gradient Models to Data
 
 This function fits three gradient models (exponential, power, and
-modified power) to given data. It then ranks the models based on their
-R-squared values and returns diagnostic plots for each model.
+modified power) to given data by linear regression of `log(Y)` and
+returns the parameters, R-squared values (on the log scale) and
+diagnostic plots for each model. The models are not ranked; compare them
+using the R-squared values and the residual patterns in the plots.
 
 ## Usage
 
@@ -32,7 +34,11 @@ A list containing:
 
 - results_table:
 
-  A table of the model parameters and R-squared values.
+  A data frame with one row per model: intercept `a`, slope `b`, their
+  standard errors and significance symbols (`"*"` p \< 0.05, `"**"` p \<
+  0.01), the back-transformed intercept `a_back = exp(a)` and `R2`.
+  Values are rounded to three decimals; the fitted curves in the plots
+  use unrounded estimates.
 
 - plot_exponential:
 
@@ -78,6 +84,7 @@ x <- c(0.8, 1.6, 2.4, 3.2, 4, 7.2, 12, 15.2, 21.6, 28.8)
 Y <- c(184.9, 113.3, 113.3, 64.1, 25, 8, 4.3, 2.5, 1, 0.8)
 grad1 <- data.frame(x = x, Y = Y)
 library(ggplot2)
+#> Warning: package ‘ggplot2’ was built under R version 4.5.3
 mg <- fit_gradients(grad1, C = 0.4)
 mg$plot_power_original +
   labs(title = "", x = "Distance from focus (m)", y = "Count of lesions")
