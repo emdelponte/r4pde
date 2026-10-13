@@ -278,7 +278,7 @@ functional_curves <- function(
 
   if(!is.null(.env)){
     if (isTRUE(env_smooth)) {
-      f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s)", .time, .env, k_env_eff))
+      f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s, m=1)", .time, .env, k_env_eff))
     } else {
       f_terms <- c(f_terms, sprintf("s(%s, bs='re')", .env))
     }
@@ -287,7 +287,7 @@ functional_curves <- function(
   if (ge_term == "intercept") {
     f_terms <- c(f_terms, sprintf("s(%s, bs='re')", ge_col))
   } else if (ge_term == "smooth") {
-    f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s)", .time, ge_col, k_ge_eff))
+    f_terms <- c(f_terms, sprintf("s(%s, %s, bs='fs', k=%s, m=1)", .time, ge_col, k_ge_eff))
   }
 
   unit_term_used <- FALSE

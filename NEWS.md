@@ -1,7 +1,7 @@
 # r4pde 0.2.3
 
 ## New features
-- `functional_curves()` gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE` replaces the environment random intercept with a random environment factor-smooth, `s(time, env, bs = "fs")`, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. `k_env` now sets the basis dimension of the environment factor-smooth.
+- `functional_curves()` gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE` replaces the environment random intercept with a random environment factor-smooth, `s(time, env, bs = "fs")`, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. `k_env` now sets the basis dimension of the environment factor-smooth. Both factor-smooths use a first-order penalty (`m = 1`), so an environment or G x E deviation flattens out where a curve has no assessments instead of bending back up at the start of the time domain.
 - Treatment mean curves average environment factor-smooth and G x E deviations over environments instead of dropping them, because factor-smooths are not centred. The same construction is shared by `functional_rate()` and `diagnose_curves()`, so fitted rates match the curves.
 
 ## Bug fixes
