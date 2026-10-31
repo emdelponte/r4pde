@@ -1,6 +1,12 @@
 # r4pde 0.2.3
 
 ## New features
+- New `sad_*` family for the validation of standard area diagrams (SADs), for studies with a single SAD (without and with the SAD) and for comparisons of two or more SADs or conditions:
+  - `sad_data()` organises estimates in long or wide format and checks them.
+  - Conventional two-stage workflow: `sad_ccc()` (Lin's concordance and its components per rater), `sad_compare()` (means by condition with Tukey letters, mixed model with rater random when raters are paired), `sad_reliability()` (ICC(A,1) with confidence interval and OCC) and `sad_plots()` (exploratory figures).
+  - One-stage hierarchical model: `sad_fit()` (glmmTMB mixed model with rater intercepts and slopes per method, image difficulty and severity-dependent dispersion; gaussian or ordered beta), `sad_curve()` (bias, variance components and expected absolute error along the severity range, and differences between conditions with simultaneous bands; `type = "smooth"` fits a functional GAMM of the error curves), `sad_regions()`, `sad_raters()`, `plot_sad_raters()`, `sad_images()` and `sad_simulate()` (power for planning a study).
+- New dataset `SADRustSoybean` (Franceschi et al. 2020) and vignette "Validation of standard area diagrams".
+- glmmTMB, emmeans, lmerTest, multcompView, MASS and ggridges are suggested packages, needed only by the `sad_*` functions.
 - `functional_curves()` gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE` replaces the environment random intercept with a random environment factor-smooth, `s(time, env, bs = "fs")`, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. `k_env` now sets the basis dimension of the environment factor-smooth. Both factor-smooths use a first-order penalty (`m = 1`), so an environment or G x E deviation flattens out where a curve has no assessments instead of bending back up at the start of the time domain.
 - Treatment mean curves average environment factor-smooth and G x E deviations over environments instead of dropping them, because factor-smooths are not centred. The same construction is shared by `functional_rate()` and `diagnose_curves()`, so fitted rates match the curves.
 

@@ -38,6 +38,26 @@ reference:
       - DSI
       - DSI2
 
+  - title: "Validation of standard area diagrams (SADs)"
+    desc: >
+      Conventional two-stage validation (Lin's concordance per rater, comparison
+      between conditions, inter-rater reliability) and the one-stage hierarchical
+      model with functional comparison of error curves along the severity range.
+    contents:
+      - sad_data
+      - sad_ccc
+      - sad_compare
+      - sad_reliability
+      - sad_plots
+      - sad_fit
+      - sad_curve
+      - sad_regions
+      - plot.sad_curve
+      - sad_raters
+      - plot_sad_raters
+      - sad_images
+      - sad_simulate
+
   - title: "Epidemic dynamics and functional analysis"
     desc: "Functions for fitting, differentiating, comparing, and classifying functional disease progress curves."
     contents:
@@ -126,6 +146,7 @@ reference:
       - FHBWheatBrazil
       - FusariumBanana
       - RustSoybean
+      - SADRustSoybean
       - SpatialAggregated
       - SpatialRandom
       - WhiteMoldSoybean

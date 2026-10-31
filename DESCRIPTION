@@ -6,7 +6,7 @@ Authors@R:
     person(given = "Emerson", family = "Del Ponte", email = "delponte@ufv.br", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4398-409X"))
 Description: Tools for quantitative plant disease epidemiology, including functional analysis
-    of disease progress curves, spatial epidemiology, disease quantification,
+    of disease progress curves, spatial epidemiology, disease quantification (including the validation of standard area diagrams),
     and weather-driven epidemic analysis. The package also serves as an educational
     resource and companion to the book "R for Plant Disease Epidemiology" (R4PDE).
     Several functions are based on classical and contemporary methods, including those
@@ -28,6 +28,7 @@ Imports:
     progress,
     purrr,
     rlang,
+    parallel,
     stats,
     utils,
     survival,
@@ -45,7 +46,13 @@ Suggests:
     patchwork,
     cowplot,
     ncdf4,
-    ggrepel
+    ggrepel,
+    glmmTMB,
+    emmeans,
+    lmerTest,
+    multcompView,
+    MASS,
+    ggridges
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

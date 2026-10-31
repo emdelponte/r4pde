@@ -1,0 +1,217 @@
+---
+title: "Validation of standard area diagrams"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Validation of standard area diagrams}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 3.5,
+  fig.align = "center"
+)
+has_models <- requireNamespace("glmmTMB", quietly = TRUE) &&
+  requireNamespace("MASS", quietly = TRUE)
+has_compare <- requireNamespace("emmeans", quietly = TRUE) &&
+  requireNamespace("lmerTest", quietly = TRUE) &&
+  requireNamespace("multcompView", quietly = TRUE)
+```
+
+## Introduction
+
+Standard area diagrams (SADs) are sets of images of diseased organs with known
+severity that raters consult while estimating severity by eye. A new SAD is
+usually validated by asking a group of raters to assess the same images
+without and then with the SAD, and comparing the accuracy of the two sets of
+estimates.
+
+The `sad_*` functions of {r4pde} cover two ways of analysing such a study:
+
+```text
+sad_data()                         organise and check the estimates
+   │
+   ├── conventional, two stages
+   │     sad_ccc()                 Lin's statistics per rater and condition
+   │     sad_compare()             means and Tukey letters by condition
+   │     sad_reliability()         ICC and OCC among raters
+   │     sad_plots()               exploratory figures
+   │
+   └── one stage, hierarchical model
+         sad_fit()                 mixed model of all estimates
+         sad_curve()               bias, variance and expected error along severity;
+                                   functional comparison of conditions
+         sad_regions()             severity ranges where conditions differ
+         sad_raters(), sad_images()  rater calibration and image difficulty
+         sad_simulate()            power for planning a new study
+```
+
+The example uses `SADRustSoybean`, from the study of Franceschi et al. (2020).
+Forty raters estimated the severity of soybean rust on 50 leaves without a SAD
+and then with a SAD. Raters 1 to 20 used an old SAD and raters 21 to 40 a new
+one. The design therefore compares two SADs, each against its own unaided
+baseline.
+
+```{r}
+library(r4pde)
+head(SADRustSoybean)
+```
+
+## Preparing the data
+
+The estimates are in wide format, one column per method. `wide` names the
+estimate columns, and its names become the method labels. `group` says which
+SAD each rater used, so there are four conditions.
+
+```{r}
+x <- sad_data(SADRustSoybean, rater = "rater", image = "leaf", actual = "actual",
+              wide = c(UN = "unaided", SAD = "aided"), group = "sad")
+x
+```
+
+For a study with a single SAD, leave out `group`:
+
+```{r}
+x_new <- sad_data(subset(SADRustSoybean, sad == "New"),
+                  wide = c(UN = "unaided", SAD = "aided"))
+levels(x_new$condition)
+```
+
+## Conventional analysis
+
+### Lin's concordance per rater
+
+The first stage summarises each rater under each condition by Lin's
+concordance correlation coefficient ($\rho_c$) and its components: precision
+($r$), the bias correction factor ($C_b$), the scale shift ($v$) and the
+location shift ($u$, negative when the rater underestimates).
+
+```{r}
+cc <- sad_ccc(x)
+head(cc)
+```
+
+### Comparing conditions
+
+The second stage compares the means of these statistics between conditions.
+Because the same raters assessed the images without and with the SAD, a mixed
+model with rater as random effect is used, followed by Tukey's test. The table
+matches Table 2 of Franceschi et al. (2020).
+
+```{r, eval = has_compare}
+cmp <- sad_compare(x, cc)
+cmp
+```
+
+### Inter-rater reliability
+
+```{r}
+sad_reliability(x)
+```
+
+### Exploratory plots
+
+```{r, fig.height = 3}
+p <- sad_plots(x, cc, baseline = "UN")
+p$scatter
+```
+
+```{r, fig.height = 3.2}
+p$box_ccc
+```
+
+```{r, fig.width = 6, fig.height = 3.5}
+p$gain_vs_baseline
+```
+
+The new SAD improved agreement for every rater, while the old SAD helped some
+raters and made others worse.
+
+## One-stage hierarchical model
+
+The two-stage analysis reduces 50 estimates per rater to a single number, and
+cannot say at which severity a SAD helps. `sad_fit()` models all estimates at
+once: each condition has its own bias and calibration slope, raters have their
+own intercepts and slopes in each method, images have an intrinsic difficulty
+and the residual variance changes with severity and condition.
+
+```{r, eval = has_models}
+fit <- sad_fit(x)
+fit
+```
+
+`structure = "auto"` tries richer random-effects structures first and keeps the
+first that converges.
+
+### Bias and expected error along the severity range
+
+`sad_curve()` turns the model into curves. With `reference = "UN"`, each SAD is
+compared with the unaided estimates of the same raters, using simultaneous
+confidence bands over the whole severity range.
+
+```{r, eval = has_models}
+cv <- sad_curve(fit, reference = "UN")
+sad_regions(cv)
+```
+
+```{r, eval = has_models}
+plot(cv, "bias")
+plot(cv, "difference")
+```
+
+The old SAD shifted estimates downwards, and the shift grows with severity.
+The new SAD did not change the bias significantly anywhere in the range. Its
+benefit is precision, which shows in the expected absolute error, which
+combines bias and the variation among raters, among images and within raters:
+
+```{r, eval = has_models}
+plot(cv, "expected_abs_error")
+```
+
+### A functional model for the error curves
+
+`type = "smooth"` replaces the straight lines by smooth error curves, with a
+random smooth curve per rater, fitted by `mgcv::bam()`. It shows where along
+the severity range the two conditions differ, without assuming a linear bias.
+
+```{r, eval = has_models}
+cs <- sad_curve(fit, type = "smooth", reference = "UN")
+sad_regions(cs)
+plot(cs, "difference")
+```
+
+### Raters and images
+
+```{r, eval = has_models, fig.width = 6, fig.height = 4}
+rt <- sad_raters(fit)
+plot_sad_raters(rt)
+```
+
+```{r, eval = has_models}
+head(sad_images(fit))
+```
+
+Images with large absolute difficulty were consistently over- or
+underestimated by all raters and deserve a second look.
+
+## Planning a new study
+
+`sad_simulate()` estimates the power of the paired t test on $\rho_c$ and of
+the likelihood ratio test of the one-stage model for a given number of raters
+and images. Each scenario fits many models, so the call below is not run.
+
+```{r, eval = FALSE}
+sad_simulate(n_rater = c(10, 20), n_image = c(20, 40), nsim = 200,
+             shift = -3, precision = 0.8, cores = 4)
+```
+
+## Reference
+
+Franceschi, V. T., Alves, K. S., Mazaro, S. M., Godoy, C. V., Duarte, H. S. S.,
+and Del Ponte, E. M. (2020). A new standard area diagram set for assessment of
+severity of soybean rust improves accuracy of estimates and optimizes resource
+use. Plant Pathology 69:495-505.

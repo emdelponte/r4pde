@@ -25,6 +25,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/functional-analysis.html">Functional analysis of plant disease progress curves</a></li>
+    <li><a class="dropdown-item" href="../articles/sad-validation.html">Validation of standard area diagrams</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -76,6 +77,99 @@
 
         </dt>
         <dd>Calculate the Disease severity Index (DSI) (frequency of each class)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="validation-of-standard-area-diagrams-sads-">Validation of standard area diagrams (SADs)<a class="anchor" aria-label="anchor" href="#validation-of-standard-area-diagrams-sads-"></a></h2>
+
+      <div class="section-desc"><p>Conventional two-stage validation (Lin’s concordance per rater, comparison between conditions, inter-rater reliability) and the one-stage hierarchical model with functional comparison of error curves along the severity range.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="sad_data.html">sad_data()</a></code>
+
+        </dt>
+        <dd>Prepare severity estimates for SAD validation</dd>
+
+        <dt>
+
+          <code><a href="sad_ccc.html">sad_ccc()</a></code>
+
+        </dt>
+        <dd>Lin's concordance statistics per rater and condition</dd>
+
+        <dt>
+
+          <code><a href="sad_compare.html">sad_compare()</a></code>
+
+        </dt>
+        <dd>Compare concordance statistics between conditions</dd>
+
+        <dt>
+
+          <code><a href="sad_reliability.html">sad_reliability()</a></code>
+
+        </dt>
+        <dd>Inter-rater reliability by condition</dd>
+
+        <dt>
+
+          <code><a href="sad_plots.html">sad_plots()</a></code>
+
+        </dt>
+        <dd>Exploratory plots for SAD validation</dd>
+
+        <dt>
+
+          <code><a href="sad_fit.html">sad_fit()</a></code>
+
+        </dt>
+        <dd>Fit the one-stage hierarchical model for SAD validation</dd>
+
+        <dt>
+
+          <code><a href="sad_curve.html">sad_curve()</a></code>
+
+        </dt>
+        <dd>Bias, variance components and expected error along the severity range</dd>
+
+        <dt>
+
+          <code><a href="sad_regions.html">sad_regions()</a></code>
+
+        </dt>
+        <dd>Severity ranges where conditions differ</dd>
+
+        <dt>
+
+          <code><a href="plot.sad_curve.html">plot(<i>&lt;sad_curve&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot curves from sad_curve()</dd>
+
+        <dt>
+
+          <code><a href="sad_raters.html">sad_raters()</a></code> <code><a href="sad_raters.html">plot_sad_raters()</a></code>
+
+        </dt>
+        <dd>Bias and calibration of each rater</dd>
+
+        <dt>
+
+          <code><a href="sad_images.html">sad_images()</a></code>
+
+        </dt>
+        <dd>Intrinsic difficulty of each image</dd>
+
+        <dt>
+
+          <code><a href="sad_simulate.html">sad_simulate()</a></code>
+
+        </dt>
+        <dd>Simulate power for planning a SAD validation study</dd>
       </dl></div><div class="section level2">
       <h2 id="epidemic-dynamics-and-functional-analysis">Epidemic dynamics and functional analysis<a class="anchor" aria-label="anchor" href="#epidemic-dynamics-and-functional-analysis"></a></h2>
 
@@ -604,6 +698,13 @@
 
         </dt>
         <dd>RustSoybean dataset</dd>
+
+        <dt>
+
+          <code><a href="SADRustSoybean.html">SADRustSoybean</a></code>
+
+        </dt>
+        <dd>SADRustSoybean dataset</dd>
 
         <dt>
 
