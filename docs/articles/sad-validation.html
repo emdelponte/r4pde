@@ -95,28 +95,36 @@ with known severity that raters consult while estimating severity by
 eye. A new SAD is usually validated by asking a group of raters to
 assess the same images without and then with the SAD, and comparing the
 accuracy of the two sets of estimates.</p>
-<p>The <code>sad_*</code> functions of {r4pde} cover two ways of
-analysing such a study:</p>
-<pre class="text"><code>sad_data()                         organise and check the estimates
+<p>This vignette walks through the workflow of the paper that proposed
+the one-stage framework (Del Ponte et al., in preparation), step by step
+and with the same functions, using one of the five studies reanalysed
+there. Each section explains what a function does, what its output means
+and how it was used in the paper. The workflow has two parts:</p>
+<pre class="text"><code>sad_data()                            1. organise and check the estimates
    │
    ├── conventional, two stages
-   │     sad_ccc()                 Lin's statistics per rater and condition
-   │     sad_compare()             means and Tukey letters by condition
-   │     sad_reliability()         ICC and OCC among raters
-   │     sad_plots()               exploratory figures
+   │     sad_ccc()                    2. Lin's statistics per rater and condition
+   │     sad_compare()                3. means and Tukey letters by condition
+   │     sad_reliability()            4. ICC and OCC among raters
+   │     sad_plots()                  5. exploratory figures
    │
    └── one stage, hierarchical model
-         sad_fit()                 mixed model of all estimates
-         sad_curve()               bias, variance and expected error along severity;
-                                   functional comparison of conditions
-         sad_regions()             severity ranges where conditions differ
-         sad_raters(), sad_images()  rater calibration and image difficulty
-         sad_simulate()            power for planning a new study</code></pre>
-<p>The example uses <code>SADRustSoybean</code>, from the study of
-Franceschi et al. (2020). Forty raters estimated the severity of soybean
-rust on 50 leaves without a SAD and then with a SAD. Raters 1 to 20 used
-an old SAD and raters 21 to 40 a new one. The design therefore compares
-two SADs, each against its own unaided baseline.</p>
+         sad_fit()                    6. mixed model of all estimates
+         sad_curve(), sad_regions()   7. bias, variation and expected error along severity
+         sad_curve(type = "smooth")   8. functional comparison (GAMM)
+         sad_raters(), sad_images()   9. rater calibration and image difficulty
+         sad_fit(dispersion, family) 10. sensitivity analyses
+         sad_simulate()              11. planning a new study</code></pre>
+</div>
+<div class="section level2">
+<h2 id="the-example-soybean-rust">The example: soybean rust<a class="anchor" aria-label="anchor" href="#the-example-soybean-rust"></a>
+</h2>
+<p><code>SADRustSoybean</code> comes from Franceschi et al. (2020).
+Forty raters estimated the severity of soybean rust on 50 leaves, first
+without and then with a SAD. Raters 1 to 20 used an old SAD and raters
+21 to 40 a new one. The design therefore compares two SADs between
+groups of raters, each against its own unaided baseline. In the paper
+this is one of the two studies with two SADs.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://emdelponte.github.io/r4pde/">r4pde</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">SADRustSoybean</span><span class="op">)</span></span>
@@ -129,12 +137,16 @@ two SADs, each against its own unaided baseline.</p>
 <span><span class="co">#&gt; 6 Old     1    6  11.60      15   7.0</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="preparing-the-data">Preparing the data<a class="anchor" aria-label="anchor" href="#preparing-the-data"></a>
+<h2 id="preparing-the-data-sad_data">1. Preparing the data: <code>sad_data()</code><a class="anchor" aria-label="anchor" href="#preparing-the-data-sad_data"></a>
 </h2>
-<p>The estimates are in wide format, one column per method.
-<code>wide</code> names the estimate columns, and its names become the
-method labels. <code>group</code> says which SAD each rater used, so
-there are four conditions.</p>
+<p><code><a href="../reference/sad_data.html">sad_data()</a></code> puts the estimates in long format, one row
+per rater, image and condition, and checks them (missing values,
+estimates outside 0-100%, raters who did not assess every image). The
+estimates here are in wide format, one column per method, so
+<code>wide</code> names those columns and its names become the method
+labels. <code>group</code> says which SAD each rater used, so there are
+four conditions: <code>UN_Old</code>, <code>UN_New</code>,
+<code>SAD_Old</code> and <code>SAD_New</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_data.html">sad_data</a></span><span class="op">(</span><span class="va">SADRustSoybean</span>, rater <span class="op">=</span> <span class="st">"rater"</span>, image <span class="op">=</span> <span class="st">"leaf"</span>, actual <span class="op">=</span> <span class="st">"actual"</span>,</span>
 <span>              wide <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>UN <span class="op">=</span> <span class="st">"unaided"</span>, SAD <span class="op">=</span> <span class="st">"aided"</span><span class="op">)</span>, group <span class="op">=</span> <span class="st">"sad"</span><span class="op">)</span></span>
@@ -155,25 +167,51 @@ there are four conditions.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1     5       9.07     15   UN     Old   UN_Old     5.93 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1     5       9.07     18   SAD    Old   SAD_Old    8.93 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3,990 more rows</span></span></span></code></pre></div>
-<p>For a study with a single SAD, leave out <code>group</code>:</p>
+<p>Data already in long format are passed with <code>estimate</code> and
+<code>method</code> instead of <code>wide</code>. This is how the five
+studies of the paper were read:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sad_data.html">sad_data</a></span><span class="op">(</span><span class="va">d</span>, rater <span class="op">=</span> <span class="st">"rater"</span>, image <span class="op">=</span> <span class="st">"image"</span>, actual <span class="op">=</span> <span class="st">"actual"</span>,</span>
+<span>         estimate <span class="op">=</span> <span class="st">"estimate"</span>, method <span class="op">=</span> <span class="st">"method"</span>, group <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></code></pre></div>
+<p>For a study with a single SAD, <code>group</code> is left out:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_data.html">sad_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">SADRustSoybean</span>, <span class="va">sad</span> <span class="op">==</span> <span class="st">"New"</span><span class="op">)</span>,</span>
 <span>                  wide <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>UN <span class="op">=</span> <span class="st">"unaided"</span>, SAD <span class="op">=</span> <span class="st">"aided"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">x_new</span><span class="op">$</span><span class="va">condition</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "UN"  "SAD"</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="conventional-analysis">Conventional analysis<a class="anchor" aria-label="anchor" href="#conventional-analysis"></a>
+<h2 id="part-1--the-conventional-two-stage-analysis">Part 1. The conventional two-stage analysis<a class="anchor" aria-label="anchor" href="#part-1--the-conventional-two-stage-analysis"></a>
 </h2>
+<p>The conventional analysis first summarises each rater under each
+condition by one number per statistic (stage 1), then compares the means
+of these numbers between conditions (stage 2). The paper keeps this
+analysis because it is how SADs have been validated so far, and the
+one-stage results are read against it.</p>
 <div class="section level3">
-<h3 id="lins-concordance-per-rater">Lin’s concordance per rater<a class="anchor" aria-label="anchor" href="#lins-concordance-per-rater"></a>
+<h3 id="lins-concordance-per-rater-sad_ccc">2. Lin’s concordance per rater: <code>sad_ccc()</code><a class="anchor" aria-label="anchor" href="#lins-concordance-per-rater-sad_ccc"></a>
 </h3>
-<p>The first stage summarises each rater under each condition by Lin’s
-concordance correlation coefficient (<span class="math inline">\(\rho_c\)</span>) and its components: precision
-(<span class="math inline">\(r\)</span>), the bias correction factor
-(<span class="math inline">\(C_b\)</span>), the scale shift (<span class="math inline">\(v\)</span>) and the location shift (<span class="math inline">\(u\)</span>, negative when the rater
-underestimates).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>For each rater and condition, <code><a href="../reference/sad_ccc.html">sad_ccc()</a></code> computes Lin’s
+concordance correlation coefficient, <span class="math inline">\(\rho_c
+= r \cdot C_b\)</span>, and its components:</p>
+<ul>
+<li>
+<span class="math inline">\(r\)</span>, Pearson’s correlation,
+measures <strong>precision</strong>;</li>
+<li>
+<span class="math inline">\(C_b = 2 / (v + 1/v + u^2)\)</span>, the
+bias correction factor, measures <strong>accuracy</strong> and combines
+two shifts;</li>
+<li>
+<span class="math inline">\(v = \sigma_Y / \sigma_T\)</span>, the
+<strong>scale shift</strong> (1 when the spread of the estimates matches
+the spread of the actual values);</li>
+<li>
+<span class="math inline">\(u = (\mu_Y - \mu_T) / \sqrt{\sigma_Y
+\sigma_T}\)</span>, the <strong>location shift</strong>, negative when
+the rater underestimates.</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_ccc.html">sad_ccc</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 12</span></span></span>
@@ -188,13 +226,16 @@ underestimates).</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: slope &lt;dbl&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="comparing-conditions">Comparing conditions<a class="anchor" aria-label="anchor" href="#comparing-conditions"></a>
+<h3 id="comparing-conditions-sad_compare">3. Comparing conditions: <code>sad_compare()</code><a class="anchor" aria-label="anchor" href="#comparing-conditions-sad_compare"></a>
 </h3>
-<p>The second stage compares the means of these statistics between
+<p>The second stage compares the means of each statistic between
 conditions. Because the same raters assessed the images without and with
-the SAD, a mixed model with rater as random effect is used, followed by
-Tukey’s test. The table matches Table 2 of Franceschi et al. (2020).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+the SAD, the means are compared with a mixed model with rater as random
+intercept (<code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer()</a></code>), followed by Tukey’s test
+(<code>emmeans</code>). Means followed by the same letter do not differ,
+and “a” marks the highest mean. These are the soybean rows of Table 1 of
+the paper, and they match Table 2 of Franceschi et al. (2020).</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_compare.html">sad_compare</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">cc</span><span class="op">)</span></span>
 <span><span class="va">cmp</span></span>
 <span><span class="co">#&gt; Lin's statistics by condition - linear mixed model, rater random </span></span>
@@ -205,11 +246,21 @@ Tukey’s test. The table matches Table 2 of Franceschi et al. (2020).</p>
 <span><span class="co">#&gt;     UN_New 20  0.10 a 1.19 a 0.91 b 0.88 b 0.80 b</span></span>
 <span><span class="co">#&gt;    SAD_Old 20 -0.29 b 0.97 b 0.92 b 0.90 b 0.83 b</span></span>
 <span><span class="co">#&gt;    SAD_New 20  0.00 a 1.00 b 1.00 a 0.97 a 0.96 a</span></span></code></pre></div>
+<p>Only the new SAD improved <span class="math inline">\(\rho_c\)</span>
+significantly (0.96, against 0.83 with the old SAD and 0.80 without
+aid). The old SAD did change <span class="math inline">\(u\)</span>,
+which became negative, a sign of underestimation. The conventional
+analysis stops here: it cannot say whether that underestimation is
+constant or grows with severity.</p>
 </div>
 <div class="section level3">
-<h3 id="inter-rater-reliability">Inter-rater reliability<a class="anchor" aria-label="anchor" href="#inter-rater-reliability"></a>
+<h3 id="inter-rater-reliability-sad_reliability">4. Inter-rater reliability: <code>sad_reliability()</code><a class="anchor" aria-label="anchor" href="#inter-rater-reliability-sad_reliability"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/sad_reliability.html">sad_reliability()</a></code> gives, for each condition, the two-way
+random-effects, absolute-agreement, single-rater intraclass correlation
+coefficient (ICC(A,1), McGraw and Wong 1996) and the overall concordance
+correlation coefficient (OCC, Barnhart et al. 2002).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sad_reliability.html">sad_reliability</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 7</span></span></span>
 <span><span class="co">#&gt;   condition   ICC ICC_lower ICC_upper   OCC n_raters n_images</span></span>
@@ -220,32 +271,80 @@ Tukey’s test. The table matches Table 2 of Franceschi et al. (2020).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> SAD_New   0.942     0.918     0.962 0.941       20       50</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="exploratory-plots">Exploratory plots<a class="anchor" aria-label="anchor" href="#exploratory-plots"></a>
+<h3 id="exploratory-plots-sad_plots">5. Exploratory plots: <code>sad_plots()</code><a class="anchor" aria-label="anchor" href="#exploratory-plots-sad_plots"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/sad_plots.html">sad_plots()</a></code> returns a list of ggplot objects: estimates
+against actual severity, boxplots of each Lin statistic, and the gain in
+<span class="math inline">\(\rho_c\)</span> of each rater against the
+rater’s unaided <span class="math inline">\(\rho_c\)</span>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_plots.html">sad_plots</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">cc</span>, baseline <span class="op">=</span> <span class="st">"UN"</span><span class="op">)</span></span>
 <span><span class="va">p</span><span class="op">$</span><span class="va">scatter</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">box_ccc</span></span></code></pre></div>
 <p><img src="sad-validation_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">box_ccc</span></span></code></pre></div>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span><span class="op">$</span><span class="va">gain_vs_baseline</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
 <p>The new SAD improved agreement for every rater, while the old SAD
 helped some raters and made others worse.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="one-stage-hierarchical-model">One-stage hierarchical model<a class="anchor" aria-label="anchor" href="#one-stage-hierarchical-model"></a>
+<h2 id="part-2--the-one-stage-hierarchical-model">Part 2. The one-stage hierarchical model<a class="anchor" aria-label="anchor" href="#part-2--the-one-stage-hierarchical-model"></a>
 </h2>
-<p>The two-stage analysis reduces 50 estimates per rater to a single
-number, and cannot say at which severity a SAD helps.
-<code><a href="../reference/sad_fit.html">sad_fit()</a></code> models all estimates at once: each condition has
-its own bias and calibration slope, raters have their own intercepts and
-slopes in each method, images have an intrinsic difficulty and the
-residual variance changes with severity and condition.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>The two-stage analysis reduces 50 estimates per rater to one number
+per statistic. It cannot say at which severity a SAD helps or hurts, it
+mixes bias, calibration and precision in <span class="math inline">\(\rho_c\)</span>, and it ignores that some images
+are hard for every rater. Looking at the components <span class="math inline">\(r\)</span>, <span class="math inline">\(v\)</span>
+and <span class="math inline">\(u\)</span> does not solve this, because
+they are also one number per rater, averaged over the severity range.
+The one-stage model uses every estimate.</p>
+<div class="section level3">
+<h3 id="fitting-the-model-sad_fit">6. Fitting the model: <code>sad_fit()</code><a class="anchor" aria-label="anchor" href="#fitting-the-model-sad_fit"></a>
+</h3>
+<p>Let <span class="math inline">\(y_{ijc}\)</span> be the estimate of
+rater <span class="math inline">\(j\)</span> for image <span class="math inline">\(i\)</span> under condition <span class="math inline">\(c\)</span>, and <span class="math inline">\(z_i =
+(a_i - 10)/10\)</span> the actual severity <span class="math inline">\(a_i\)</span>, centred at 10% and in units of 10
+percentage points (p.p.). The model is</p>
+<p><span class="math display">\[y_{ijc} = (\beta_{0c} + b_{0jm}) +
+(\beta_{1c} + b_{1jm})\, z_i + v_i + w_{ic} +
+\varepsilon_{ijc}\]</span></p>
+<ul>
+<li>
+<span class="math inline">\(\beta_{0c}\)</span> and <span class="math inline">\(\beta_{1c}\)</span> are the mean estimate at 10%
+severity and the <strong>calibration slope</strong> of condition <span class="math inline">\(c\)</span> (a slope of 1 is perfect
+calibration);</li>
+<li>
+<span class="math inline">\(b_{0jm}\)</span> and <span class="math inline">\(b_{1jm}\)</span> are the intercept and slope of
+rater <span class="math inline">\(j\)</span> under method <span class="math inline">\(m\)</span>, so each rater can respond differently
+to the SAD;</li>
+<li>
+<span class="math inline">\(v_i\)</span> is the
+<strong>difficulty</strong> of image <span class="math inline">\(i\)</span>, shared by all raters;</li>
+<li>
+<span class="math inline">\(w_{ic}\)</span> is an image by condition
+effect;</li>
+<li>
+<span class="math inline">\(\varepsilon_{ijc}\)</span> is the
+residual error, whose variance changes with severity and condition
+(<code>dispersion = "quad"</code>: log SD quadratic in <span class="math inline">\(z\)</span>).</li>
+</ul>
+<p>The rater effects matter most. The simulation in the paper showed
+that a simpler model, with the same rater effects with and without the
+SAD, attributes individual changes to the SAD and has a type I error
+near 35%.</p>
+<p>Rich random-effects structures do not always converge, so
+<code>structure = "auto"</code> (the default) tries four nested
+structures in order and keeps the first with a positive definite Hessian
+and finite standard errors: <code>"full"</code> (as above),
+<code>"noim"</code> (without <span class="math inline">\(w_{ic}\)</span>), <code>"sep"</code> (rater
+intercepts and slopes uncorrelated) and <code>"base"</code> (rater
+effects common to all methods). Under <code>"base"</code> the model
+cannot say whether the SAD changed the variation among raters, so report
+which structure was retained.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_fit.html">sad_fit</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Structure 'full' did not converge; trying the next one.</span></span>
 <span><span class="co">#&gt; Structure 'noim' did not converge; trying the next one.</span></span>
@@ -255,62 +354,200 @@ residual variance changes with severity and condition.</p>
 <span><span class="co">#&gt;   severity centred at 10%, in units of 10 percentage points</span></span>
 <span><span class="co">#&gt;   40 raters, 50 images, 4000 estimates; conditions: UN_Old, UN_New, SAD_Old, SAD_New</span></span>
 <span><span class="co">#&gt;   AIC = 28896.6</span></span></code></pre></div>
-<p><code>structure = "auto"</code> tries richer random-effects
-structures first and keeps the first that converges.</p>
-<div class="section level3">
-<h3 id="bias-and-expected-error-along-the-severity-range">Bias and expected error along the severity range<a class="anchor" aria-label="anchor" href="#bias-and-expected-error-along-the-severity-range"></a>
-</h3>
-<p><code><a href="../reference/sad_curve.html">sad_curve()</a></code> turns the model into curves. With
-<code>reference = "UN"</code>, each SAD is compared with the unaided
-estimates of the same raters, using simultaneous confidence bands over
-the whole severity range.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_curve.html">sad_curve</a></span><span class="op">(</span><span class="va">fit</span>, reference <span class="op">=</span> <span class="st">"UN"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sad_regions.html">sad_regions</a></span><span class="op">(</span><span class="va">cv</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   contrast          from    to direction</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> SAD_Old - UN_Old  1.10    84 a &lt; b</span></span></code></pre></div>
+<p>For soybean rust the <code>"sep"</code> structure was retained, as in
+the paper. <code>summary(fit)</code> shows the full <code>glmmTMB</code>
+output: fixed effects, variance components and dispersion
+coefficients.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"bias"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  Family: gaussian  ( identity )</span></span>
+<span><span class="co">#&gt; Formula:          </span></span>
+<span><span class="co">#&gt; y ~ z * condition + (0 + method | rater) + (0 + method:z | rater) +  </span></span>
+<span><span class="co">#&gt;     (1 | image)</span></span>
+<span><span class="co">#&gt; Dispersion:         ~condition * (z + I(z^2))</span></span>
+<span><span class="co">#&gt; Data: d</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik -2*log(L)  df.resid </span></span>
+<span><span class="co">#&gt;   28896.6   29066.5  -14421.3   28842.6      3973 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Conditional model:</span></span>
+<span><span class="co">#&gt;  Groups   Name        Variance Std.Dev. Corr </span></span>
+<span><span class="co">#&gt;  rater    methodUN    16.2055  4.0256        </span></span>
+<span><span class="co">#&gt;           methodSAD    7.4890  2.7366   0.60 </span></span>
+<span><span class="co">#&gt;  rater.1  methodUN:z   2.4365  1.5609        </span></span>
+<span><span class="co">#&gt;           methodSAD:z  0.4169  0.6456   0.22 </span></span>
+<span><span class="co">#&gt;  image    (Intercept) 10.2669  3.2042        </span></span>
+<span><span class="co">#&gt;  Residual                  NA      NA        </span></span>
+<span><span class="co">#&gt; Number of obs: 4000, groups:  rater, 40; image, 50</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Conditional model:</span></span>
+<span><span class="co">#&gt;                    Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)         12.6128     1.2171  10.363  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; z                   10.9410     0.4220  25.928  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; conditionUN_New     -0.7780     1.3560  -0.574  0.56616    </span></span>
+<span><span class="co">#&gt; conditionSAD_Old    -4.4435     0.8529  -5.210 1.89e-07 ***</span></span>
+<span><span class="co">#&gt; conditionSAD_New    -1.8475     1.1514  -1.605  0.10858    </span></span>
+<span><span class="co">#&gt; z:conditionUN_New   -0.6026     0.5220  -1.154  0.24834    </span></span>
+<span><span class="co">#&gt; z:conditionSAD_Old  -2.3320     0.3863  -6.037 1.57e-09 ***</span></span>
+<span><span class="co">#&gt; z:conditionSAD_New  -1.1920     0.4013  -2.970  0.00297 ** </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Dispersion model:</span></span>
+<span><span class="co">#&gt;                           Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)              1.8084626  0.0497086   36.38  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; conditionUN_New         -0.0291743  0.0672255   -0.43  0.66431    </span></span>
+<span><span class="co">#&gt; conditionSAD_Old        -0.1427601  0.0683081   -2.09  0.03662 *  </span></span>
+<span><span class="co">#&gt; conditionSAD_New        -0.7075937  0.0720510   -9.82  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; z                        0.4502563  0.0388648   11.59  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; I(z^2)                  -0.0542789  0.0059719   -9.09  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; conditionUN_New:z        0.0038983  0.0498339    0.08  0.93765    </span></span>
+<span><span class="co">#&gt; conditionSAD_Old:z      -0.1381281  0.0539381   -2.56  0.01044 *  </span></span>
+<span><span class="co">#&gt; conditionSAD_New:z      -0.0722692  0.0545600   -1.32  0.18531    </span></span>
+<span><span class="co">#&gt; conditionUN_New:I(z^2)  -0.0002297  0.0075024   -0.03  0.97558    </span></span>
+<span><span class="co">#&gt; conditionSAD_Old:I(z^2)  0.0235632  0.0083257    2.83  0.00465 ** </span></span>
+<span><span class="co">#&gt; conditionSAD_New:I(z^2)  0.0103908  0.0081300    1.28  0.20122    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="curves-along-the-severity-range-sad_curve-and-sad_regions">7. Curves along the severity range: <code>sad_curve()</code> and
+<code>sad_regions()</code><a class="anchor" aria-label="anchor" href="#curves-along-the-severity-range-sad_curve-and-sad_regions"></a>
+</h3>
+<p><code><a href="../reference/sad_curve.html">sad_curve()</a></code> turns the fitted model into curves over a
+grid of severities within the observed range of each condition:</p>
+<ul>
+<li>
+<strong><code>bias</code></strong>, <span class="math inline">\(\beta_{0c} + \beta_{1c} z - a\)</span>, with
+pointwise 95% confidence intervals;</li>
+<li>
+<strong><code>sd_rater</code></strong>, the standard deviation among
+raters, from the covariance of rater intercepts and slopes of the
+method;</li>
+<li>
+<strong><code>sd_image</code></strong> and
+<strong><code>sd_resid</code></strong>, the image and residual standard
+deviations;</li>
+<li>
+<strong><code>expected_abs_error</code></strong> (EAE), the expected
+absolute error of one estimate made by a new rater on a new image. It
+combines bias and all variance components (the mean of a folded normal
+distribution) and is in percentage points, so it can be compared
+directly with the accuracy a user needs.</li>
+</ul>
+<p>Differences between pairs of conditions are computed over the common
+severity range with 95% <strong>simultaneous</strong> confidence bands
+(from the maximum absolute <span class="math inline">\(t\)</span>
+statistic over the grid), so a difference can be read anywhere along the
+curve without inflating the error rate.</p>
+<p><code>reference = "UN"</code> compares each SAD with the unaided
+estimates of the same raters. In the paper, <code>pairs</code> was used
+instead, to add the comparison of the two SADs (New minus Old):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"difference"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-13-2.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
-<p>The old SAD shifted estimates downwards, and the shift grows with
-severity. The new SAD did not change the bias significantly anywhere in
-the range. Its benefit is precision, which shows in the expected
-absolute error, which combines bias and the variation among raters,
-among images and within raters:</p>
+<code class="sourceCode R"><span><span class="va">pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SAD_Old"</span>, <span class="st">"SAD_New"</span>, <span class="st">"SAD_New"</span><span class="op">)</span>,</span>
+<span>                    b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"UN_Old"</span>,  <span class="st">"UN_New"</span>,  <span class="st">"SAD_Old"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_curve.html">sad_curve</a></span><span class="op">(</span><span class="va">fit</span>, pairs <span class="op">=</span> <span class="va">pairs</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/sad_regions.html">sad_regions()</a></code> lists the severity ranges where each
+difference is significant, and its direction:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"expected_abs_error"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level3">
-<h3 id="a-functional-model-for-the-error-curves">A functional model for the error curves<a class="anchor" aria-label="anchor" href="#a-functional-model-for-the-error-curves"></a>
-</h3>
-<p><code>type = "smooth"</code> replaces the straight lines by smooth
-error curves, with a random smooth curve per rater, fitted by
-<code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>. It shows where along the severity range the
-two conditions differ, without assuming a linear bias.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sad_regions.html">sad_regions</a></span><span class="op">(</span><span class="va">cv</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
+<span><span class="co">#&gt;   contrast           from    to direction</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> SAD_Old - UN_Old   1.10    84 a &lt; b    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> SAD_New - SAD_Old  7.02    84 a &gt; b</span></span></code></pre></div>
+<p>The curves are stored in <code>cv$curves</code>. Table 2 of the paper
+reports them at selected severities, which takes a few lines:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_curve.html">sad_curve</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"smooth"</span>, reference <span class="op">=</span> <span class="st">"UN"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/sad_regions.html">sad_regions</a></span><span class="op">(</span><span class="va">cs</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   contrast          from    to direction</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> SAD_Old - UN_Old  18.0    84 a &lt; b</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cs</span>, <span class="st">"difference"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="va">at</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">50</span>, <span class="fl">75</span><span class="op">)</span></span>
+<span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">cv</span><span class="op">$</span><span class="va">curves</span>, <span class="va">cv</span><span class="op">$</span><span class="va">curves</span><span class="op">$</span><span class="va">condition</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">z</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>condition <span class="op">=</span> <span class="va">z</span><span class="op">$</span><span class="va">condition</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, severity <span class="op">=</span> <span class="va">at</span>,</span>
+<span>             bias <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/approxfun.html" class="external-link">approx</a></span><span class="op">(</span><span class="va">z</span><span class="op">$</span><span class="va">actual</span>, <span class="va">z</span><span class="op">$</span><span class="va">bias</span>, <span class="va">at</span><span class="op">)</span><span class="op">$</span><span class="va">y</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>             EAE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/approxfun.html" class="external-link">approx</a></span><span class="op">(</span><span class="va">z</span><span class="op">$</span><span class="va">actual</span>, <span class="va">z</span><span class="op">$</span><span class="va">expected_abs_error</span>, <span class="va">at</span><span class="op">)</span><span class="op">$</span><span class="va">y</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">tab</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">tab</span><span class="op">$</span><span class="va">bias</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="co">#&gt;           condition severity  bias  EAE</span></span>
+<span><span class="co">#&gt; UN_Old.1     UN_Old       10   2.6  5.0</span></span>
+<span><span class="co">#&gt; UN_Old.2     UN_Old       20   3.6  5.7</span></span>
+<span><span class="co">#&gt; UN_Old.3     UN_Old       50   6.4  8.9</span></span>
+<span><span class="co">#&gt; UN_Old.4     UN_Old       75   8.7 11.9</span></span>
+<span><span class="co">#&gt; UN_New.1     UN_New       10   1.8  4.8</span></span>
+<span><span class="co">#&gt; UN_New.2     UN_New       20   2.2  5.2</span></span>
+<span><span class="co">#&gt; UN_New.3     UN_New       50   3.2  7.6</span></span>
+<span><span class="co">#&gt; UN_New.4     UN_New       75   4.0 10.0</span></span>
+<span><span class="co">#&gt; SAD_Old.1   SAD_Old       10  -1.8  4.1</span></span>
+<span><span class="co">#&gt; SAD_Old.2   SAD_Old       20  -3.2  4.8</span></span>
+<span><span class="co">#&gt; SAD_Old.3   SAD_Old       50  -7.4  8.0</span></span>
+<span><span class="co">#&gt; SAD_Old.4   SAD_Old       75 -10.9 11.2</span></span>
+<span><span class="co">#&gt; SAD_New.1   SAD_New       10   0.8  3.7</span></span>
+<span><span class="co">#&gt; SAD_New.2   SAD_New       20   0.5  3.8</span></span>
+<span><span class="co">#&gt; SAD_New.3   SAD_New       50  -0.2  4.5</span></span>
+<span><span class="co">#&gt; SAD_New.4   SAD_New       75  -0.9  5.1</span></span></code></pre></div>
+<p>The plot method draws the bias, the EAE or the differences:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"bias"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"expected_abs_error"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-17-2.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"difference"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-17-3.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p>The curves tell a different story for each SAD. The old SAD shifted
+estimates downwards, and the shift grew with severity, from about -2
+p.p. at 10% to about -7 p.p. at 50%. The new SAD did not change the bias
+significantly anywhere in the range; its benefit was precision, which
+shows in the EAE at 50% severity (about 4.5 p.p. with the new SAD,
+against 8 p.p. with the old one).</p>
 </div>
 <div class="section level3">
-<h3 id="raters-and-images">Raters and images<a class="anchor" aria-label="anchor" href="#raters-and-images"></a>
+<h3 id="a-functional-model-for-the-error-curves-sad_curvetype-smooth">8. A functional model for the error curves:
+<code>sad_curve(type = "smooth")</code><a class="anchor" aria-label="anchor" href="#a-functional-model-for-the-error-curves-sad_curvetype-smooth"></a>
 </h3>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p>The linear model assumes a straight bias line in each condition. With
+<code>type = "smooth"</code>, <code><a href="../reference/sad_curve.html">sad_curve()</a></code> fits a
+generalised additive mixed model (GAMM, <code><a href="https://rdrr.io/pkg/mgcv/man/bam.html" class="external-link">mgcv::bam()</a></code>) to the
+errors <span class="math inline">\(y_{ijc} - a_i\)</span>: a smooth
+function of actual severity for each condition, a random smooth curve
+for each rater by condition, and a random image effect. Differences
+between conditions get simultaneous bands in the same way.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_curve.html">sad_curve</a></span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"smooth"</span>, pairs <span class="op">=</span> <span class="va">pairs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sad_regions.html">sad_regions</a></span><span class="op">(</span><span class="va">cs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
+<span><span class="co">#&gt;   contrast           from    to direction</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> SAD_Old - UN_Old   18.0  84   a &lt; b    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> SAD_New - SAD_Old  31.6  77.2 a &gt; b</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cs</span>, <span class="st">"difference"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" width="768" style="display: block; margin: auto;"></p>
+<p>In the paper, the linear model found the new SAD less negatively
+biased than the old one from 7% severity upwards, and the GAMM only from
+31% upwards. When the two models disagree, report both and give more
+weight to effects found by both.</p>
+</div>
+<div class="section level3">
+<h3 id="raters-and-images-sad_raters-plot_sad_raters-sad_images">9. Raters and images: <code>sad_raters()</code>,
+<code>plot_sad_raters()</code>, <code>sad_images()</code><a class="anchor" aria-label="anchor" href="#raters-and-images-sad_raters-plot_sad_raters-sad_images"></a>
+</h3>
+<p><code><a href="../reference/sad_raters.html">sad_raters()</a></code> returns, for each rater and condition, the
+predicted bias at 10% severity and the calibration slope (best linear
+unbiased predictors). The plot links the same rater across conditions;
+it is Figure 3 of the paper.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_raters.html">sad_raters</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/sad_raters.html">plot_sad_raters</a></span><span class="op">(</span><span class="va">rt</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sad-validation_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p><img src="sad-validation_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p>With the new SAD, most raters moved close to no bias and to a slope
+of one; with the old SAD, many moved to underestimation with slopes
+below one.</p>
+<p><code><a href="../reference/sad_images.html">sad_images()</a></code> returns the difficulty of each image, the
+amount by which all raters tended to over- or underestimate it, sorted
+from the largest absolute value. Images at the top deserve a second
+look, for instance to check the actual severity measured by image
+analysis.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/sad_images.html">sad_images</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
 <span><span class="co">#&gt;   image actual difficulty    se</span></span>
@@ -321,29 +558,108 @@ two conditions differ, without assuming a linear bias.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 25      36.7       5.37 1.07 </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 14      23.6      -<span style="color: #BB0000;">5.27</span> 0.936</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 17      25.8       4.83 0.944</span></span></code></pre></div>
-<p>Images with large absolute difficulty were consistently over- or
-underestimated by all raters and deserve a second look.</p>
+</div>
+<div class="section level3">
+<h3 id="sensitivity-analyses">10. Sensitivity analyses<a class="anchor" aria-label="anchor" href="#sensitivity-analyses"></a>
+</h3>
+<p>The paper checked two assumptions of the model with arguments of
+<code><a href="../reference/sad_fit.html">sad_fit()</a></code>.</p>
+<p><strong>Residual variance.</strong> Severity is bounded at 0 and
+100%, so errors are necessarily smaller near the bounds. The default
+quadratic dispersion allows the residual variance to peak at
+intermediate severity. It can be compared with a log-linear dispersion,
+keeping the same random-effects structure, by AIC:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_lin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_fit.html">sad_fit</a></span><span class="op">(</span><span class="va">x</span>, structure <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">structure</span>, dispersion <span class="op">=</span> <span class="st">"lin"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/AIC.html" class="external-link">AIC</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">model</span>, <span class="va">fit_lin</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               df      AIC</span></span>
+<span><span class="co">#&gt; fit$model     27 28896.59</span></span>
+<span><span class="co">#&gt; fit_lin$model 23 29175.60</span></span></code></pre></div>
+<p>The quadratic dispersion fitted better in all five studies of the
+paper.</p>
+<p><strong>Bounded response.</strong> <code>family = "ordbeta"</code>
+refits the model as an ordered beta regression on the proportion scale,
+which accepts exact zeros and ones. The fixed effects are on the logit
+scale, so the check is whether the conclusions about the SAD effects
+stay the same, not whether the numbers match. The fit takes a few
+minutes, so it is not run here.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_ob</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sad_fit.html">sad_fit</a></span><span class="op">(</span><span class="va">x</span>, family <span class="op">=</span> <span class="st">"ordbeta"</span>, dispersion <span class="op">=</span> <span class="st">"lin"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_ob</span><span class="op">)</span></span></code></pre></div>
+<p>In the paper the ordered beta model supported the main conclusions:
+in soybean it shifted the mean downwards with the old SAD but not with
+the new one.</p>
+</div>
+<div class="section level3">
+<h3 id="planning-a-new-study-sad_simulate">11. Planning a new study: <code>sad_simulate()</code><a class="anchor" aria-label="anchor" href="#planning-a-new-study-sad_simulate"></a>
+</h3>
+<p>How many raters a validation study needs depends on its question. To
+estimate mean agreement precisely and test its gain with the SAD, use
+the precision and power criteria for <span class="math inline">\(\rho_c\)</span> of Romero-Benavides et
+al. (2026b), also available in their Shiny application.
+Severity-dependent effects need more information, and
+<code><a href="../reference/sad_simulate.html">sad_simulate()</a></code> checks whether a design is enough for
+them.</p>
+<p><code><a href="../reference/sad_simulate.html">sad_simulate()</a></code> generates paired studies (each rater
+assesses the same images without and then with the SAD) and returns, for
+each number of raters and images, the rejection rate at 5% of the paired
+<span class="math inline">\(t\)</span> test on <span class="math inline">\(\rho_c\)</span> and of the likelihood ratio test
+of the one-stage model. The SAD effect is set with <code>shift</code>
+(change in bias at 10% severity, in p.p.), <code>slope_change</code>
+(change in calibration slope) and <code>precision</code> (multiplier of
+the rater and residual SDs). The other parameters default to values
+typical of published studies. With <code>shift = 0</code>,
+<code>slope_change = 0</code> and <code>precision = 1</code>, the
+rejection rate is the type I error.</p>
+<p>Each scenario fits many models, so the calls below are not run. The
+first simulates a constant shift of -3 p.p.; the second a SAD that only
+changes calibration, two of the scenarios of the paper.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sad_simulate.html">sad_simulate</a></span><span class="op">(</span>n_rater <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, n_image <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, nsim <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>             shift <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>, cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/sad_simulate.html">sad_simulate</a></span><span class="op">(</span>n_rater <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, n_image <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, nsim <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>             shift <span class="op">=</span> <span class="fl">0</span>, slope_change <span class="op">=</span> <span class="op">-</span><span class="fl">0.10</span>, cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p>In the paper, the paired <span class="math inline">\(t\)</span> test
+detected a precision effect well but detected a constant shift in only
+16% of the studies and a calibration-only effect in 7%; the one-stage
+test reached 77% and 53% with 40 raters. With 10 raters its type I error
+was 0.13, so a parametric bootstrap of the likelihood ratio is advisable
+in small studies.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="planning-a-new-study">Planning a new study<a class="anchor" aria-label="anchor" href="#planning-a-new-study"></a>
+<h2 id="what-to-report">What to report<a class="anchor" aria-label="anchor" href="#what-to-report"></a>
 </h2>
-<p><code><a href="../reference/sad_simulate.html">sad_simulate()</a></code> estimates the power of the paired t test
-on <span class="math inline">\(\rho_c\)</span> and of the likelihood
-ratio test of the one-stage model for a given number of raters and
-images. Each scenario fits many models, so the call below is not
-run.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sad_simulate.html">sad_simulate</a></span><span class="op">(</span>n_rater <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>, n_image <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, nsim <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>             shift <span class="op">=</span> <span class="op">-</span><span class="fl">3</span>, precision <span class="op">=</span> <span class="fl">0.8</span>, cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p>From the conventional analysis, the table of
+<code><a href="../reference/sad_compare.html">sad_compare()</a></code> and the reliability coefficients, so that
+results can be compared with earlier studies. From the one-stage model,
+the random-effects structure retained, the bias curves with simultaneous
+bands and the regions where conditions differ, the EAE at a few
+severities of practical interest, and the rater plot. The code for all
+five studies of the paper is in its research compendium [GitHub
+repository to be added].</p>
 </div>
 <div class="section level2">
-<h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
+<p>Barnhart, H. X., Haber, M., and Song, J. (2002). Overall concordance
+correlation coefficient for evaluating agreement among multiple
+observers. Biometrics 58:1020-1027.</p>
+<p>Del Ponte, E. M., et al. (in preparation). Beyond Lin’s concordance:
+a one-stage hierarchical framework for validating standard area diagrams
+for plant disease severity.</p>
 <p>Franceschi, V. T., Alves, K. S., Mazaro, S. M., Godoy, C. V., Duarte,
 H. S. S., and Del Ponte, E. M. (2020). A new standard area diagram set
 for assessment of severity of soybean rust improves accuracy of
 estimates and optimizes resource use. Plant Pathology 69:495-505.</p>
+<p>Lin, L. I. (1989). A concordance correlation coefficient to evaluate
+reproducibility. Biometrics 45:255-268.</p>
+<p>McGraw, K. O., and Wong, S. P. (1996). Forming inferences about some
+intraclass correlation coefficients. Psychological Methods 1:30-46.</p>
+<p>Romero-Benavides, M. P., Bock, C. H., Tomáz, R. G., Nunes, W. C., and
+Del Ponte, E. M. (2026b). Integrating precision and power criteria in
+determining the number of raters needed for standard area diagram
+validation studies. European Journal of Plant Pathology, in press.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

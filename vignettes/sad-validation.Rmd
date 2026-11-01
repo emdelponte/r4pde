@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 )
 has_models <- requireNamespace("glmmTMB", quietly = TRUE) &&
   requireNamespace("MASS", quietly = TRUE)
+has_gam <- has_models && requireNamespace("mgcv", quietly = TRUE)
 has_compare <- requireNamespace("emmeans", quietly = TRUE) &&
   requireNamespace("lmerTest", quietly = TRUE) &&
   requireNamespace("multcompView", quietly = TRUE)
@@ -30,42 +31,51 @@ usually validated by asking a group of raters to assess the same images
 without and then with the SAD, and comparing the accuracy of the two sets of
 estimates.
 
-The `sad_*` functions of {r4pde} cover two ways of analysing such a study:
+This vignette walks through the workflow of the paper that proposed the
+one-stage framework (Del Ponte et al., in preparation), step by step and with
+the same functions, using one of the five studies reanalysed there. Each
+section explains what a function does, what its output means and how it was
+used in the paper. The workflow has two parts:
 
 ```text
-sad_data()                         organise and check the estimates
+sad_data()                            1. organise and check the estimates
    │
    ├── conventional, two stages
-   │     sad_ccc()                 Lin's statistics per rater and condition
-   │     sad_compare()             means and Tukey letters by condition
-   │     sad_reliability()         ICC and OCC among raters
-   │     sad_plots()               exploratory figures
+   │     sad_ccc()                    2. Lin's statistics per rater and condition
+   │     sad_compare()                3. means and Tukey letters by condition
+   │     sad_reliability()            4. ICC and OCC among raters
+   │     sad_plots()                  5. exploratory figures
    │
    └── one stage, hierarchical model
-         sad_fit()                 mixed model of all estimates
-         sad_curve()               bias, variance and expected error along severity;
-                                   functional comparison of conditions
-         sad_regions()             severity ranges where conditions differ
-         sad_raters(), sad_images()  rater calibration and image difficulty
-         sad_simulate()            power for planning a new study
+         sad_fit()                    6. mixed model of all estimates
+         sad_curve(), sad_regions()   7. bias, variation and expected error along severity
+         sad_curve(type = "smooth")   8. functional comparison (GAMM)
+         sad_raters(), sad_images()   9. rater calibration and image difficulty
+         sad_fit(dispersion, family) 10. sensitivity analyses
+         sad_simulate()              11. planning a new study
 ```
 
-The example uses `SADRustSoybean`, from the study of Franceschi et al. (2020).
-Forty raters estimated the severity of soybean rust on 50 leaves without a SAD
-and then with a SAD. Raters 1 to 20 used an old SAD and raters 21 to 40 a new
-one. The design therefore compares two SADs, each against its own unaided
-baseline.
+## The example: soybean rust
+
+`SADRustSoybean` comes from Franceschi et al. (2020). Forty raters estimated
+the severity of soybean rust on 50 leaves, first without and then with a SAD.
+Raters 1 to 20 used an old SAD and raters 21 to 40 a new one. The design
+therefore compares two SADs between groups of raters, each against its own
+unaided baseline. In the paper this is one of the two studies with two SADs.
 
 ```{r}
 library(r4pde)
 head(SADRustSoybean)
 ```
 
-## Preparing the data
+## 1. Preparing the data: `sad_data()`
 
-The estimates are in wide format, one column per method. `wide` names the
-estimate columns, and its names become the method labels. `group` says which
-SAD each rater used, so there are four conditions.
+`sad_data()` puts the estimates in long format, one row per rater, image and
+condition, and checks them (missing values, estimates outside 0-100%, raters
+who did not assess every image). The estimates here are in wide format, one
+column per method, so `wide` names those columns and its names become the
+method labels. `group` says which SAD each rater used, so there are four
+conditions: `UN_Old`, `UN_New`, `SAD_Old` and `SAD_New`.
 
 ```{r}
 x <- sad_data(SADRustSoybean, rater = "rater", image = "leaf", actual = "actual",
@@ -73,7 +83,15 @@ x <- sad_data(SADRustSoybean, rater = "rater", image = "leaf", actual = "actual"
 x
 ```
 
-For a study with a single SAD, leave out `group`:
+Data already in long format are passed with `estimate` and `method` instead of
+`wide`. This is how the five studies of the paper were read:
+
+```{r, eval = FALSE}
+sad_data(d, rater = "rater", image = "image", actual = "actual",
+         estimate = "estimate", method = "method", group = "group")
+```
+
+For a study with a single SAD, `group` is left out:
 
 ```{r}
 x_new <- sad_data(subset(SADRustSoybean, sad == "New"),
@@ -81,39 +99,67 @@ x_new <- sad_data(subset(SADRustSoybean, sad == "New"),
 levels(x_new$condition)
 ```
 
-## Conventional analysis
+## Part 1. The conventional two-stage analysis
 
-### Lin's concordance per rater
+The conventional analysis first summarises each rater under each condition by
+one number per statistic (stage 1), then compares the means of these numbers
+between conditions (stage 2). The paper keeps this analysis because it is how
+SADs have been validated so far, and the one-stage results are read against it.
 
-The first stage summarises each rater under each condition by Lin's
-concordance correlation coefficient ($\rho_c$) and its components: precision
-($r$), the bias correction factor ($C_b$), the scale shift ($v$) and the
-location shift ($u$, negative when the rater underestimates).
+### 2. Lin's concordance per rater: `sad_ccc()`
+
+For each rater and condition, `sad_ccc()` computes Lin's concordance
+correlation coefficient, $\rho_c = r \cdot C_b$, and its components:
+
+* $r$, Pearson's correlation, measures **precision**;
+* $C_b = 2 / (v + 1/v + u^2)$, the bias correction factor, measures
+  **accuracy** and combines two shifts;
+* $v = \sigma_Y / \sigma_T$, the **scale shift** (1 when the spread of the
+  estimates matches the spread of the actual values);
+* $u = (\mu_Y - \mu_T) / \sqrt{\sigma_Y \sigma_T}$, the **location shift**,
+  negative when the rater underestimates.
 
 ```{r}
 cc <- sad_ccc(x)
 head(cc)
 ```
 
-### Comparing conditions
+### 3. Comparing conditions: `sad_compare()`
 
-The second stage compares the means of these statistics between conditions.
-Because the same raters assessed the images without and with the SAD, a mixed
-model with rater as random effect is used, followed by Tukey's test. The table
-matches Table 2 of Franceschi et al. (2020).
+The second stage compares the means of each statistic between conditions.
+Because the same raters assessed the images without and with the SAD, the
+means are compared with a mixed model with rater as random intercept
+(`lmerTest::lmer()`), followed by Tukey's test (`emmeans`). Means followed by
+the same letter do not differ, and "a" marks the highest mean. These are the
+soybean rows of Table 1 of the paper, and they match Table 2 of Franceschi et
+al. (2020).
 
 ```{r, eval = has_compare}
 cmp <- sad_compare(x, cc)
 cmp
 ```
 
-### Inter-rater reliability
+Only the new SAD improved $\rho_c$ significantly (0.96, against 0.83 with the
+old SAD and 0.80 without aid). The old SAD did change $u$, which became
+negative, a sign of underestimation. The conventional analysis stops here: it
+cannot say whether that underestimation is constant or grows with severity.
+
+### 4. Inter-rater reliability: `sad_reliability()`
+
+`sad_reliability()` gives, for each condition, the two-way random-effects,
+absolute-agreement, single-rater intraclass correlation coefficient
+(ICC(A,1), McGraw and Wong 1996) and the overall concordance correlation
+coefficient (OCC, Barnhart et al. 2002).
 
 ```{r}
 sad_reliability(x)
 ```
 
-### Exploratory plots
+### 5. Exploratory plots: `sad_plots()`
+
+`sad_plots()` returns a list of ggplot objects: estimates against actual
+severity, boxplots of each Lin statistic, and the gain in $\rho_c$ of each
+rater against the rater's unaided $\rho_c$.
 
 ```{r, fig.height = 3}
 p <- sad_plots(x, cc, baseline = "UN")
@@ -131,87 +177,262 @@ p$gain_vs_baseline
 The new SAD improved agreement for every rater, while the old SAD helped some
 raters and made others worse.
 
-## One-stage hierarchical model
+## Part 2. The one-stage hierarchical model
 
-The two-stage analysis reduces 50 estimates per rater to a single number, and
-cannot say at which severity a SAD helps. `sad_fit()` models all estimates at
-once: each condition has its own bias and calibration slope, raters have their
-own intercepts and slopes in each method, images have an intrinsic difficulty
-and the residual variance changes with severity and condition.
+The two-stage analysis reduces 50 estimates per rater to one number per
+statistic. It cannot say at which severity a SAD helps or hurts, it mixes
+bias, calibration and precision in $\rho_c$, and it ignores that some images
+are hard for every rater. Looking at the components $r$, $v$ and $u$ does not
+solve this, because they are also one number per rater, averaged over the
+severity range. The one-stage model uses every estimate.
+
+### 6. Fitting the model: `sad_fit()`
+
+Let $y_{ijc}$ be the estimate of rater $j$ for image $i$ under condition $c$,
+and $z_i = (a_i - 10)/10$ the actual severity $a_i$, centred at 10% and in
+units of 10 percentage points (p.p.). The model is
+
+$$y_{ijc} = (\beta_{0c} + b_{0jm}) + (\beta_{1c} + b_{1jm})\, z_i + v_i + w_{ic} + \varepsilon_{ijc}$$
+
+* $\beta_{0c}$ and $\beta_{1c}$ are the mean estimate at 10% severity and the
+  **calibration slope** of condition $c$ (a slope of 1 is perfect calibration);
+* $b_{0jm}$ and $b_{1jm}$ are the intercept and slope of rater $j$ under method
+  $m$, so each rater can respond differently to the SAD;
+* $v_i$ is the **difficulty** of image $i$, shared by all raters;
+* $w_{ic}$ is an image by condition effect;
+* $\varepsilon_{ijc}$ is the residual error, whose variance changes with
+  severity and condition (`dispersion = "quad"`: log SD quadratic in $z$).
+
+The rater effects matter most. The simulation in the paper showed that a
+simpler model, with the same rater effects with and without the SAD,
+attributes individual changes to the SAD and has a type I error near 35%.
+
+Rich random-effects structures do not always converge, so
+`structure = "auto"` (the default) tries four nested structures in order and
+keeps the first with a positive definite Hessian and finite standard errors:
+`"full"` (as above), `"noim"` (without $w_{ic}$), `"sep"` (rater intercepts and
+slopes uncorrelated) and `"base"` (rater effects common to all methods). Under
+`"base"` the model cannot say whether the SAD changed the variation among
+raters, so report which structure was retained.
 
 ```{r, eval = has_models}
 fit <- sad_fit(x)
 fit
 ```
 
-`structure = "auto"` tries richer random-effects structures first and keeps the
-first that converges.
-
-### Bias and expected error along the severity range
-
-`sad_curve()` turns the model into curves. With `reference = "UN"`, each SAD is
-compared with the unaided estimates of the same raters, using simultaneous
-confidence bands over the whole severity range.
+For soybean rust the `"sep"` structure was retained, as in the paper.
+`summary(fit)` shows the full `glmmTMB` output: fixed effects, variance
+components and dispersion coefficients.
 
 ```{r, eval = has_models}
-cv <- sad_curve(fit, reference = "UN")
+summary(fit)
+```
+
+### 7. Curves along the severity range: `sad_curve()` and `sad_regions()`
+
+`sad_curve()` turns the fitted model into curves over a grid of severities
+within the observed range of each condition:
+
+* **`bias`**, $\beta_{0c} + \beta_{1c} z - a$, with pointwise 95% confidence
+  intervals;
+* **`sd_rater`**, the standard deviation among raters, from the covariance of
+  rater intercepts and slopes of the method;
+* **`sd_image`** and **`sd_resid`**, the image and residual standard deviations;
+* **`expected_abs_error`** (EAE), the expected absolute error of one estimate
+  made by a new rater on a new image. It combines bias and all variance
+  components (the mean of a folded normal distribution) and is in percentage
+  points, so it can be compared directly with the accuracy a user needs.
+
+Differences between pairs of conditions are computed over the common severity
+range with 95% **simultaneous** confidence bands (from the maximum absolute
+$t$ statistic over the grid), so a difference can be read anywhere along the
+curve without inflating the error rate.
+
+`reference = "UN"` compares each SAD with the unaided estimates of the same
+raters. In the paper, `pairs` was used instead, to add the comparison of the
+two SADs (New minus Old):
+
+```{r, eval = has_models}
+pairs <- data.frame(a = c("SAD_Old", "SAD_New", "SAD_New"),
+                    b = c("UN_Old",  "UN_New",  "SAD_Old"))
+cv <- sad_curve(fit, pairs = pairs)
+```
+
+`sad_regions()` lists the severity ranges where each difference is
+significant, and its direction:
+
+```{r, eval = has_models}
 sad_regions(cv)
 ```
 
+The curves are stored in `cv$curves`. Table 2 of the paper reports them at
+selected severities, which takes a few lines:
+
+```{r, eval = has_models}
+at <- c(10, 20, 50, 75)
+tab <- do.call(rbind, lapply(split(cv$curves, cv$curves$condition), function(z)
+  data.frame(condition = z$condition[1], severity = at,
+             bias = round(approx(z$actual, z$bias, at)$y, 1),
+             EAE = round(approx(z$actual, z$expected_abs_error, at)$y, 1))))
+tab[!is.na(tab$bias), ]
+```
+
+The plot method draws the bias, the EAE or the differences:
+
 ```{r, eval = has_models}
 plot(cv, "bias")
+plot(cv, "expected_abs_error")
 plot(cv, "difference")
 ```
 
-The old SAD shifted estimates downwards, and the shift grows with severity.
-The new SAD did not change the bias significantly anywhere in the range. Its
-benefit is precision, which shows in the expected absolute error, which
-combines bias and the variation among raters, among images and within raters:
+The curves tell a different story for each SAD. The old SAD shifted estimates
+downwards, and the shift grew with severity, from about -2 p.p. at 10% to about
+-7 p.p. at 50%. The new SAD did not change the bias significantly anywhere in
+the range; its benefit was precision, which shows in the EAE at 50% severity
+(about 4.5 p.p. with the new SAD, against 8 p.p. with the old one).
 
-```{r, eval = has_models}
-plot(cv, "expected_abs_error")
-```
+### 8. A functional model for the error curves: `sad_curve(type = "smooth")`
 
-### A functional model for the error curves
+The linear model assumes a straight bias line in each condition. With
+`type = "smooth"`, `sad_curve()` fits a generalised additive mixed model
+(GAMM, `mgcv::bam()`) to the errors $y_{ijc} - a_i$: a smooth function of
+actual severity for each condition, a random smooth curve for each rater by
+condition, and a random image effect. Differences between conditions get
+simultaneous bands in the same way.
 
-`type = "smooth"` replaces the straight lines by smooth error curves, with a
-random smooth curve per rater, fitted by `mgcv::bam()`. It shows where along
-the severity range the two conditions differ, without assuming a linear bias.
-
-```{r, eval = has_models}
-cs <- sad_curve(fit, type = "smooth", reference = "UN")
+```{r, eval = has_gam}
+cs <- sad_curve(fit, type = "smooth", pairs = pairs)
 sad_regions(cs)
 plot(cs, "difference")
 ```
 
-### Raters and images
+In the paper, the linear model found the new SAD less negatively biased than
+the old one from 7% severity upwards, and the GAMM only from 31% upwards.
+When the two models disagree, report both and give more weight to effects
+found by both.
+
+### 9. Raters and images: `sad_raters()`, `plot_sad_raters()`, `sad_images()`
+
+`sad_raters()` returns, for each rater and condition, the predicted bias at 10%
+severity and the calibration slope (best linear unbiased predictors). The plot
+links the same rater across conditions; it is Figure 3 of the paper.
 
 ```{r, eval = has_models, fig.width = 6, fig.height = 4}
 rt <- sad_raters(fit)
 plot_sad_raters(rt)
 ```
 
+With the new SAD, most raters moved close to no bias and to a slope of one;
+with the old SAD, many moved to underestimation with slopes below one.
+
+`sad_images()` returns the difficulty of each image, the amount by which all
+raters tended to over- or underestimate it, sorted from the largest absolute
+value. Images at the top deserve a second look, for instance to check the
+actual severity measured by image analysis.
+
 ```{r, eval = has_models}
 head(sad_images(fit))
 ```
 
-Images with large absolute difficulty were consistently over- or
-underestimated by all raters and deserve a second look.
+### 10. Sensitivity analyses
 
-## Planning a new study
+The paper checked two assumptions of the model with arguments of `sad_fit()`.
 
-`sad_simulate()` estimates the power of the paired t test on $\rho_c$ and of
-the likelihood ratio test of the one-stage model for a given number of raters
-and images. Each scenario fits many models, so the call below is not run.
+**Residual variance.** Severity is bounded at 0 and 100%, so errors are
+necessarily smaller near the bounds. The default quadratic dispersion allows
+the residual variance to peak at intermediate severity. It can be compared
+with a log-linear dispersion, keeping the same random-effects structure, by
+AIC:
 
-```{r, eval = FALSE}
-sad_simulate(n_rater = c(10, 20), n_image = c(20, 40), nsim = 200,
-             shift = -3, precision = 0.8, cores = 4)
+```{r, eval = has_models}
+fit_lin <- sad_fit(x, structure = fit$structure, dispersion = "lin")
+AIC(fit$model, fit_lin$model)
 ```
 
-## Reference
+The quadratic dispersion fitted better in all five studies of the paper.
+
+**Bounded response.** `family = "ordbeta"` refits the model as an ordered beta
+regression on the proportion scale, which accepts exact zeros and ones. The
+fixed effects are on the logit scale, so the check is whether the conclusions
+about the SAD effects stay the same, not whether the numbers match. The fit
+takes a few minutes, so it is not run here.
+
+```{r, eval = FALSE}
+fit_ob <- sad_fit(x, family = "ordbeta", dispersion = "lin")
+summary(fit_ob)
+```
+
+In the paper the ordered beta model supported the main conclusions: in
+soybean it shifted the mean downwards with the old SAD but not with the new
+one.
+
+### 11. Planning a new study: `sad_simulate()`
+
+How many raters a validation study needs depends on its question. To estimate
+mean agreement precisely and test its gain with the SAD, use the precision and
+power criteria for $\rho_c$ of Romero-Benavides et al. (2026b), also available
+in their Shiny application. Severity-dependent effects need more information,
+and `sad_simulate()` checks whether a design is enough for them.
+
+`sad_simulate()` generates paired studies (each rater assesses the same images
+without and then with the SAD) and returns, for each number of raters and
+images, the rejection rate at 5% of the paired $t$ test on $\rho_c$ and of the
+likelihood ratio test of the one-stage model. The SAD effect is set with
+`shift` (change in bias at 10% severity, in p.p.), `slope_change` (change in
+calibration slope) and `precision` (multiplier of the rater and residual SDs).
+The other parameters default to values typical of published studies. With
+`shift = 0`, `slope_change = 0` and `precision = 1`, the rejection rate is the
+type I error.
+
+Each scenario fits many models, so the calls below are not run. The first
+simulates a constant shift of -3 p.p.; the second a SAD that only changes
+calibration, two of the scenarios of the paper.
+
+```{r, eval = FALSE}
+sad_simulate(n_rater = c(10, 20, 40), n_image = c(20, 40), nsim = 200,
+             shift = -3, cores = 4)
+sad_simulate(n_rater = c(10, 20, 40), n_image = c(20, 40), nsim = 200,
+             shift = 0, slope_change = -0.10, cores = 4)
+```
+
+In the paper, the paired $t$ test detected a precision effect well but
+detected a constant shift in only 16% of the studies and a calibration-only
+effect in 7%; the one-stage test reached 77% and 53% with 40 raters. With 10
+raters its type I error was 0.13, so a parametric bootstrap of the likelihood
+ratio is advisable in small studies.
+
+## What to report
+
+From the conventional analysis, the table of `sad_compare()` and the
+reliability coefficients, so that results can be compared with earlier
+studies. From the one-stage model, the random-effects structure retained, the
+bias curves with simultaneous bands and the regions where conditions differ,
+the EAE at a few severities of practical interest, and the rater plot. The
+code for all five studies of the paper is in its research compendium
+[GitHub repository to be added].
+
+## References
+
+Barnhart, H. X., Haber, M., and Song, J. (2002). Overall concordance
+correlation coefficient for evaluating agreement among multiple observers.
+Biometrics 58:1020-1027.
+
+Del Ponte, E. M., et al. (in preparation). Beyond Lin's concordance: a
+one-stage hierarchical framework for validating standard area diagrams for
+plant disease severity.
 
 Franceschi, V. T., Alves, K. S., Mazaro, S. M., Godoy, C. V., Duarte, H. S. S.,
 and Del Ponte, E. M. (2020). A new standard area diagram set for assessment of
 severity of soybean rust improves accuracy of estimates and optimizes resource
 use. Plant Pathology 69:495-505.
+
+Lin, L. I. (1989). A concordance correlation coefficient to evaluate
+reproducibility. Biometrics 45:255-268.
+
+McGraw, K. O., and Wong, S. P. (1996). Forming inferences about some
+intraclass correlation coefficients. Psychological Methods 1:30-46.
+
+Romero-Benavides, M. P., Bock, C. H., Tomáz, R. G., Nunes, W. C., and
+Del Ponte, E. M. (2026b). Integrating precision and power criteria in
+determining the number of raters needed for standard area diagram validation
+studies. European Journal of Plant Pathology, in press.
