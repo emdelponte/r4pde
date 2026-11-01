@@ -51,6 +51,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/functional-analysis.html">Functional analysis of plant disease progress curves</a></li>
+    <li><a class="dropdown-item" href="articles/sad-validation.html">Validation of standard area diagrams</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -81,7 +82,7 @@
 </h1>
 </div>
 <p><a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://www.r-pkg.org/badges/version/r4pde" alt="CRAN"></a> <a href="https://CRAN.R-project.org/package=r4pde" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/r4pde" alt="Downloads"></a></p>
-<p><strong>r4pde</strong> provides tools for quantitative plant disease epidemiology. It started as the companion package to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a> and now also implements methods from recent research on the functional analysis of disease progress curves. It is aimed at researchers, students and practitioners who analyse field and greenhouse disease data.</p>
+<p><strong>r4pde</strong> provides tools for quantitative plant disease epidemiology. It started as the companion package to the book <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a> and now also implements methods from recent research on the functional analysis of disease progress curves and on the validation of standard area diagrams. It is aimed at researchers, students and practitioners who analyse field and greenhouse disease data.</p>
 <div class="section level2">
 <h2 id="what-the-package-does">What the package does<a class="anchor" aria-label="anchor" href="#what-the-package-does"></a>
 </h2>
@@ -126,6 +127,13 @@
 </td>
 </tr>
 <tr>
+<td><strong>Validation of standard area diagrams (SADs)</strong></td>
+<td>Conventional analysis with Lin’s concordance per rater, comparison of conditions and inter-rater reliability; one-stage hierarchical model of all estimates, with bias, variation among raters and expected error along the severity range, functional comparison of SADs, rater and image effects, and power simulation for planning studies</td>
+<td>
+<code><a href="reference/sad_data.html">sad_data()</a></code>, <code><a href="reference/sad_ccc.html">sad_ccc()</a></code>, <code><a href="reference/sad_compare.html">sad_compare()</a></code>, <code><a href="reference/sad_reliability.html">sad_reliability()</a></code>, <code><a href="reference/sad_plots.html">sad_plots()</a></code>, <code><a href="reference/sad_fit.html">sad_fit()</a></code>, <code><a href="reference/sad_curve.html">sad_curve()</a></code>, <code><a href="reference/sad_regions.html">sad_regions()</a></code>, <code><a href="reference/sad_raters.html">sad_raters()</a></code>, <code><a href="reference/sad_images.html">sad_images()</a></code>, <code><a href="reference/sad_simulate.html">sad_simulate()</a></code>
+</td>
+</tr>
+<tr>
 <td><strong>Weather and environment</strong></td>
 <td>Download daily weather (NASA POWER, ERA5, BR-DWGD) and build window-pane variables for weather–disease models</td>
 <td>
@@ -136,7 +144,7 @@
 <td><strong>Datasets</strong></td>
 <td>Real epidemiological datasets used in the book and in the examples</td>
 <td>
-<code>BudBlightSoybean</code>, <code>RustSoybean</code>, <code>FHBWheat</code>, <code>WhiteMoldSoybean</code>, <code>SpatialAggregated</code>, …</td>
+<code>BudBlightSoybean</code>, <code>RustSoybean</code>, <code>FHBWheat</code>, <code>WhiteMoldSoybean</code>, <code>SpatialAggregated</code>, <code>SADRustSoybean</code>, …</td>
 </tr>
 </tbody>
 </table>
@@ -164,7 +172,14 @@
 <li>
 <strong>Book:</strong> <a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology</a> explains the epidemiological concepts and uses this package throughout.</li>
 <li>
-<strong>Vignette:</strong> <a href="https://emdelponte.github.io/r4pde/articles/functional-analysis.html">Functional analysis of disease progress curves</a> walks through the full workflow, from fitting curves to resistance and stability across environments.</li>
+<strong>Vignettes:</strong>
+<ul>
+<li>
+<a href="https://emdelponte.github.io/r4pde/articles/functional-analysis.html">Functional analysis of disease progress curves</a> walks through the full workflow, from fitting curves to resistance and stability across environments.</li>
+<li>
+<a href="https://emdelponte.github.io/r4pde/articles/sad-validation.html">Validation of standard area diagrams</a> walks through the conventional and the one-stage analysis of a SAD validation study, step by step.</li>
+</ul>
+</li>
 <li>
 <strong>Website:</strong> <a href="https://emdelponte.github.io/r4pde/">emdelponte.github.io/r4pde</a> has the function reference and the changelog.</li>
 <li>
@@ -187,7 +202,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://CRAN.R-project.org/package=r4pde" class="external-link">View on CRAN</a></li>
+<li><a href="https://cloud.r-project.org/package=r4pde" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/emdelponte/r4pde/issues" class="external-link">Report a bug</a></li>
 <li><a href="https://r4pde.netlify.app/" class="external-link">R for Plant Disease Epidemiology (book)</a></li>
