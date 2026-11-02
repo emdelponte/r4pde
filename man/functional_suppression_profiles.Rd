@@ -13,6 +13,9 @@ functional_suppression_profiles(
   environment = NULL,
   by_environment = FALSE,
   env_ref = NULL,
+  env_smooth = FALSE,
+  ge_term = c("none", "intercept", "smooth"),
+  k_ge = 4,
   threshold = 5,
   metrics = c("protected_area", "max_suppression", "persistence", "centroid"),
   dist_method = "euclidean",
@@ -39,7 +42,25 @@ functional_suppression_profiles(
 
 \item{env_ref}{Character string specifying the reference environment for joint analysis (optional).}
 
-\item{threshold}{Numeric threshold for the persistence metric. Default is \code{5}.}
+\item{env_smooth}{Logical; passed to \code{\link{functional_curves}}. If \code{TRUE} and
+\code{environment} is given, the environment random intercept is replaced by a random
+environment factor-smooth over time. Default is \code{FALSE}.}
+
+\item{ge_term}{Treatment-by-environment term passed to \code{\link{functional_curves}}:
+\code{"none"} (default), \code{"intercept"} (a random intercept per treatment x environment
+suppression curve) or \code{"smooth"} (a random factor-smooth over time per treatment x
+environment curve). Requires \code{environment} and \code{by_environment = FALSE}. The
+treatment mean suppression curves average the treatment x environment deviations over the
+environments in which each treatment was observed, as in \code{\link{functional_instability}}.}
+
+\item{k_ge}{Basis dimension (over time) for the treatment x environment factor-smooth used
+when \code{ge_term = "smooth"}. Default is \code{4}.}
+
+\item{threshold}{Numeric threshold for the persistence metric, in the units of
+\code{response}. Default is \code{5}. When \code{environment} is given, the metrics are
+computed from the fitted suppression curves, which are returned to the scale of
+\code{response} first, so the threshold and the metrics keep the same units with and
+without \code{environment}.}
 
 \item{metrics}{Character vector of metrics to include in the ranking. Default is \code{c("protected_area", "max_suppression", "persistence", "centroid")}.}
 

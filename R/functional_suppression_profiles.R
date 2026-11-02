@@ -32,7 +32,22 @@
 #' @param environment Character string specifying the environment column (optional).
 #' @param by_environment Logical; if \code{TRUE}, the analysis is run separately for each environment. Default is \code{FALSE}.
 #' @param env_ref Character string specifying the reference environment for joint analysis (optional).
-#' @param threshold Numeric threshold for the persistence metric. Default is \code{5}.
+#' @param env_smooth Logical; passed to \code{\link{functional_curves}}. If \code{TRUE} and
+#'   \code{environment} is given, the environment random intercept is replaced by a random
+#'   environment factor-smooth over time. Default is \code{FALSE}.
+#' @param ge_term Treatment-by-environment term passed to \code{\link{functional_curves}}:
+#'   \code{"none"} (default), \code{"intercept"} (a random intercept per treatment x environment
+#'   suppression curve) or \code{"smooth"} (a random factor-smooth over time per treatment x
+#'   environment curve). Requires \code{environment} and \code{by_environment = FALSE}. The
+#'   treatment mean suppression curves average the treatment x environment deviations over the
+#'   environments in which each treatment was observed, as in \code{\link{functional_instability}}.
+#' @param k_ge Basis dimension (over time) for the treatment x environment factor-smooth used
+#'   when \code{ge_term = "smooth"}. Default is \code{4}.
+#' @param threshold Numeric threshold for the persistence metric, in the units of
+#'   \code{response}. Default is \code{5}. When \code{environment} is given, the metrics are
+#'   computed from the fitted suppression curves, which are returned to the scale of
+#'   \code{response} first, so the threshold and the metrics keep the same units with and
+#'   without \code{environment}.
 #' @param metrics Character vector of metrics to include in the ranking. Default is \code{c("protected_area", "max_suppression", "persistence", "centroid")}.
 #' @param dist_method Character string specifying the distance method. Default is \code{"euclidean"}.
 #' @param hclust_method Character string specifying the hierarchical clustering method. Default is \code{"average"}.
@@ -98,6 +113,9 @@ functional_suppression_profiles <- function(
     environment = NULL,
     by_environment = FALSE,
     env_ref = NULL,
+    env_smooth = FALSE,
+    ge_term = c("none", "intercept", "smooth"),
+    k_ge = 4,
     threshold = 5,
     metrics = c("protected_area", "max_suppression", "persistence", "centroid"),
     dist_method = "euclidean",
@@ -117,6 +135,17 @@ functional_suppression_profiles <- function(
   
   if (!requireNamespace("stats", quietly = TRUE)) {
     stop("Package 'stats' is required.")
+  }
+
+  ge_term <- match.arg(ge_term)
+  if (!is.character(treatment) || length(treatment) != 1L || !treatment %in% names(data)) {
+    stop(sprintf("Treatment column '%s' not found in data.", treatment))
+  }
+  if (isTRUE(by_environment) && (isTRUE(env_smooth) || ge_term != "none")) {
+    warning("`env_smooth` and `ge_term` are ignored when `by_environment = TRUE` ",
+            "(each environment is analysed separately).", call. = FALSE)
+    env_smooth <- FALSE
+    ge_term <- "none"
   }
 
   if (isTRUE(by_environment)) {
@@ -178,6 +207,9 @@ functional_suppression_profiles <- function(
     treatment = treatment,
     environment = environment,
     env_ref = env_ref,
+    env_smooth = env_smooth,
+    ge_term = ge_term,
+    k_ge = k_ge,
     ...
   )
   
@@ -280,12 +312,20 @@ functional_suppression_profiles <- function(
   }
   
   # Ensure treatment is character in cluster table
-  cluster_table$treatment <- as.character(cluster_table$treatment)
+  cluster_table[[treatment]] <- as.character(cluster_table[[treatment]])
   
   # Step 6: Functional summary
   if (!is.null(environment)) {
+    # functional_curves() models the response as a proportion; return the fitted
+    # curves to the scale of `response` so that `threshold` and the metrics have
+    # the same units as in the analysis without environment.
+    resp_scale <- dsp_curves$settings$response_scale
+    dsp_obs <- suppressWarnings(max(contrast[["DSP"]], na.rm = TRUE))
+    scale_back <- if (identical(resp_scale, "percent") || (is.finite(dsp_obs) && dsp_obs > 1)) 100 else 1
+    curves_resp <- dsp_curves$curves
+    curves_resp[["mu"]] <- curves_resp[["mu"]] * scale_back
     summary_df <- functional_summary(
-      object = dsp_curves$curves,
+      object = curves_resp,
       time = time,
       response = "mu",
       treatment = treatment,
@@ -336,7 +376,7 @@ functional_suppression_profiles <- function(
   # Step 8: Cluster-level summary
   cluster_summary <- summary_df |>
     dplyr::inner_join(ranking, by = treatment) |>
-    dplyr::inner_join(cluster_table, by = "treatment")
+    dplyr::inner_join(cluster_table, by = treatment)
   
   # Create lightweight profiles table
   profiles_df <- tibble::tibble(
@@ -379,6 +419,9 @@ functional_suppression_profiles <- function(
         environment = environment,
         by_environment = by_environment,
         env_ref = env_ref,
+        env_smooth = env_smooth,
+        ge_term = ge_term,
+        k_ge = k_ge,
         threshold = threshold,
         metrics = metrics,
         dist_method = dist_method,

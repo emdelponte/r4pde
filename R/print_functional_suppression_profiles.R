@@ -5,7 +5,7 @@
 #'
 #' @export
 print.functional_suppression_profiles <- function(x, ...) {
-  n_treatments <- length(unique(x$clusters$treatment))
+  n_treatments <- length(unique(x$clusters[[x$parameters$treatment]]))
   n_profiles <- length(unique(x$clusters$cluster))
   
   cat("Functional Suppression Profiles\n")

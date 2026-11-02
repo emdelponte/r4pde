@@ -208,3 +208,48 @@ test_that("functional_suppression_profiles supports multiple environments", {
     )
   })
 })
+
+test_that("functional_suppression_profiles handles environments, ge_term and custom treatment names", {
+  set.seed(42)
+  envs <- paste0("E", 1:4)
+  trts <- c("Control", "A", "B", "C", "D")
+  times <- seq(0, 60, by = 10)
+  shift <- c(Control = 0, A = 0.55, B = 0.45, C = 0.25, D = 0.20)
+  dat <- expand.grid(env = envs, trt = trts, day = times, stringsAsFactors = FALSE)
+  env_eff <- setNames(c(0.8, 1, 1.1, 1.2), envs)
+  ctrl <- 40 / (1 + exp(-(dat$day - 30) / 8)) * env_eff[dat$env]
+  dat$sev <- pmax(0, ctrl * (1 - shift[dat$trt]) + stats::rnorm(nrow(dat), 0, 0.5))
+  dat <- tibble::as_tibble(dat)
+
+  fit_none <- suppressWarnings(functional_suppression_profiles(
+    data = dat, reference = "Control", time = "day", response = "sev",
+    treatment = "trt", environment = "env", threshold = 5, k = 2,
+    show_progress = FALSE
+  ))
+  expect_s3_class(fit_none, "functional_suppression_profiles")
+  expect_true("trt" %in% names(fit_none$cluster_summary))
+  expect_setequal(fit_none$classification$trt, c("A", "B", "C", "D"))
+  expect_identical(fit_none$parameters$ge_term, "none")
+  # metrics are on the response (percent) scale, so persistence with
+  # threshold = 5 percentage points is positive
+  expect_true(all(fit_none$summary$persistence > 0))
+  expect_true(max(fit_none$summary$max_suppression) > 1)
+
+  fit_ge <- suppressWarnings(functional_suppression_profiles(
+    data = dat, reference = "Control", time = "day", response = "sev",
+    treatment = "trt", environment = "env", ge_term = "intercept",
+    threshold = 5, k = 2, show_progress = FALSE
+  ))
+  expect_identical(fit_ge$dsp_curves$settings$ge_term, "intercept")
+  expect_identical(fit_ge$parameters$ge_term, "intercept")
+  expect_setequal(fit_ge$classification$trt, c("A", "B", "C", "D"))
+
+  expect_warning(
+    functional_suppression_profiles(
+      data = dat, reference = "Control", time = "day", response = "sev",
+      treatment = "trt", environment = "env", by_environment = TRUE,
+      ge_term = "smooth", k = 2, show_progress = FALSE
+    ),
+    "ignored when `by_environment = TRUE`"
+  )
+})
