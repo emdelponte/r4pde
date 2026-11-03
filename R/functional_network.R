@@ -49,7 +49,9 @@
 #' @param grid_n Number of time points in the prediction grid.
 #' @param n_sim Number of posterior draws for the bands.
 #' @param seed Seed for the posterior draws; the user's random stream is restored.
-#' @param discrete,gamma Passed to \code{mgcv::bam()}.
+#' @param discrete,gamma,nthreads Passed to \code{mgcv::bam()}.
+#' @param control Named list of \code{mgcv::gam.control()} settings, e.g.
+#'   \code{list(maxit = 500)} when the fit does not converge.
 #' @param keep_draws Logical; keep the posterior draws of the suppression curves.
 #'
 #' @return An object of class \code{"functional_network"}: a list with \code{gam},
@@ -81,6 +83,8 @@ functional_network <- function(
     seed = 1,
     discrete = TRUE,
     gamma = 1,
+    nthreads = 1,
+    control = list(),
     keep_draws = TRUE
 ) {
   response_scale <- match.arg(response_scale)
@@ -140,7 +144,8 @@ functional_network <- function(
   fam <- if (family == "betar") mgcv::betar(link = "logit") else stats::quasibinomial(link = "logit")
   t0 <- Sys.time()
   m <- mgcv::bam(form, family = fam, data = df, method = "fREML",
-                 discrete = discrete, gamma = gamma)
+                 discrete = discrete, gamma = gamma, nthreads = nthreads,
+                 control = do.call(mgcv::gam.control, control))
   fit_time <- difftime(Sys.time(), t0, units = "mins")
 
   # ---- Mean linear-predictor matrix per arm (typical environment) ----
@@ -246,6 +251,7 @@ functional_network <- function(
                       unit_re = unit_re && !unit_is_ge, family = family,
                       contrast = contrast, n_sim = n_sim, seed = seed,
                       formula = paste(deparse(form, width.cutoff = 500L), collapse = " ")),
+      convergence = m$outer.info,
       fit_time = fit_time
     ),
     class = "functional_network"
