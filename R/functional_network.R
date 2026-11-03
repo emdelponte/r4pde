@@ -50,6 +50,7 @@
 #' @param n_sim Number of posterior draws for the bands.
 #' @param seed Seed for the posterior draws; the user's random stream is restored.
 #' @param discrete,gamma,nthreads Passed to \code{mgcv::bam()}.
+#' @param verbose Logical; print timing messages.
 #' @param control Named list of \code{mgcv::gam.control()} settings, e.g.
 #'   \code{list(maxit = 500)} when the fit does not converge.
 #' @param keep_draws Logical; keep the posterior draws of the suppression curves.
@@ -85,7 +86,8 @@ functional_network <- function(
     gamma = 1,
     nthreads = 1,
     control = list(),
-    keep_draws = TRUE
+    keep_draws = TRUE,
+    verbose = FALSE
 ) {
   response_scale <- match.arg(response_scale)
   ge_term <- match.arg(ge_term)
@@ -147,6 +149,7 @@ functional_network <- function(
                  discrete = discrete, gamma = gamma, nthreads = nthreads,
                  control = do.call(mgcv::gam.control, control))
   fit_time <- difftime(Sys.time(), t0, units = "mins")
+  if (verbose) message(sprintf("bam fit: %.1f min", as.numeric(fit_time)))
 
   # ---- Mean linear-predictor matrix per arm (typical environment) ----
   t_grid <- seq(min(df$.time), max(df$.time), length.out = grid_n)
@@ -166,28 +169,34 @@ functional_network <- function(
   }
   obs_ge <- unique(data.frame(trt = as.character(df$.trt), env = as.character(df$.env),
                               ge = as.character(df$.ge), stringsAsFactors = FALSE))
+  # One stacked lpmatrix call per arm (rows = grid x environment), then
+  # block-averaged; far faster than one predict call per environment.
+  ge_cols <- unlist(lapply(ge_lab, cols_of))
+  unit_cols <- unlist(lapply(unit_lab, cols_of))
+  block_mean <- function(X, n_blocks) {
+    grp <- rep(seq_len(grid_n), times = n_blocks)
+    rowsum(X, grp, reorder = TRUE) / n_blocks
+  }
+  stacked_lp <- function(nd, env, ge = NULL) {
+    nd <- nd[rep(seq_len(grid_n), times = length(env)), , drop = FALSE]
+    nd$.env <- factor(rep(env, each = grid_n), levels = env_lev)
+    if (!is.null(ge)) nd$.ge <- factor(rep(ge, each = grid_n), levels = levels(df$.ge))
+    mgcv::predict.bam(m, newdata = nd, type = "lpmatrix", block.size = 50000)
+  }
   arm_X <- lapply(trt_levels, function(trt_i) {
     nd <- base_nd(trt_i)
-    X <- 0
-    for (e in env_lev) {
-      nd$.env <- factor(e, levels = env_lev)
-      X <- X + mgcv::predict.bam(m, newdata = nd, type = "lpmatrix")
-    }
-    X <- X / length(env_lev)
-    ge_cols <- unlist(lapply(ge_lab, cols_of))
+    X <- block_mean(stacked_lp(nd, env_lev), length(env_lev))
     if (length(ge_cols)) {
       o <- obs_ge[obs_ge$trt == trt_i, , drop = FALSE]
-      acc <- 0
-      for (k in seq_len(nrow(o))) {
-        nd$.env <- factor(o$env[k], levels = env_lev)
-        nd$.ge <- factor(o$ge[k], levels = levels(df$.ge))
-        acc <- acc + mgcv::predict.bam(m, newdata = nd, type = "lpmatrix")[, ge_cols, drop = FALSE]
+      if (nrow(o)) {
+        Xg <- stacked_lp(nd, o$env, o$ge)[, ge_cols, drop = FALSE]
+        X[, ge_cols] <- block_mean(Xg, nrow(o))
+      } else {
+        X[, ge_cols] <- 0
       }
-      X[, ge_cols] <- acc / max(1, nrow(o))
     }
-    unit_cols <- unlist(lapply(unit_lab, cols_of))
     if (length(unit_cols)) X[, unit_cols] <- 0
-    X
+    unname(X)
   })
   names(arm_X) <- trt_levels
 
