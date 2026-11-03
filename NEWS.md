@@ -1,6 +1,7 @@
 # r4pde (development version)
 
 ## New features
+- New `functional_network()` (experimental): arm-based functional network model of disease suppression for unbalanced multi-trial data. Every treatment, including the reference (e.g. untreated check), is an arm of a plot-level GAMM, `logit(y) ~ trt + s(time, by = trt) + s(time, env, bs = "fs") + s(time, env:trt, bs = "fs") + s(unit, bs = "re")`, so treatments never tested together are connected through shared arms. It returns arm curves for a typical environment and suppression curves (`reference - treatment`, or relative) with pointwise and simultaneous 95% bands from posterior simulation, plus the posterior draws for derived contrasts.
 - `functional_suppression_profiles()` gains `env_smooth`, `ge_term` and `k_ge`, passed to `functional_curves()` in the joint analysis across environments. `ge_term = "intercept"` or `"smooth"` adds a treatment-by-environment random intercept or factor-smooth per suppression curve, as already available for `functional_instability()`. The treatment mean suppression curves average those deviations over the environments where each treatment was observed. Defaults keep the previous model. With `by_environment = TRUE` the terms are ignored, with a warning.
 
 ## Bug fixes
