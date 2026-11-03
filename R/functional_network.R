@@ -44,7 +44,13 @@
 #' @param k_trt,k_env,k_ge Basis dimensions of the treatment smooths, the
 #'   environment factor-smooth and the treatment-by-environment factor-smooth.
 #' @param unit_re Logical; include a unit (plot) random intercept. Default \code{TRUE}.
-#' @param family \code{"quasibinomial"} (default) or \code{"betar"}.
+#' @param family \code{"quasibinomial"} (default), \code{"betar"}, or
+#'   \code{"gaussian_logit"}: a Gaussian additive mixed model on the empirical
+#'   logit of the response (proportions clipped to \code{[logit_eps, 1 - logit_eps]}).
+#'   It needs no PQL iterations, so use it when the quasibinomial fit does not
+#'   converge (e.g. many all-zero units). Back-transformed curves are then
+#'   medians on the response scale.
+#' @param logit_eps Clipping constant for \code{family = "gaussian_logit"}.
 #' @param contrast \code{"difference"} (default) or \code{"relative"}.
 #' @param grid_n Number of time points in the prediction grid.
 #' @param n_sim Number of posterior draws for the bands.
@@ -77,7 +83,8 @@ functional_network <- function(
     k_env = 4,
     k_ge = 3,
     unit_re = TRUE,
-    family = c("quasibinomial", "betar"),
+    family = c("quasibinomial", "betar", "gaussian_logit"),
+    logit_eps = 1e-4,
     contrast = c("difference", "relative"),
     grid_n = 100,
     n_sim = 1000,
@@ -113,6 +120,8 @@ functional_network <- function(
   if (family == "betar") {
     n <- length(y)
     y <- (y * (n - 1) + 0.5) / n
+  } else if (family == "gaussian_logit") {
+    y <- stats::qlogis(pmin(pmax(y, logit_eps), 1 - logit_eps))
   }
   df$.y <- y
   df$.ge <- interaction(df$.env, df$.trt, drop = TRUE, sep = "|")
@@ -143,7 +152,10 @@ functional_network <- function(
   if (unit_re && !unit_is_ge) terms <- c(terms, "s(.unit, bs = 're')")
   form <- stats::as.formula(paste(".y ~", paste(terms, collapse = " + ")))
 
-  fam <- if (family == "betar") mgcv::betar(link = "logit") else stats::quasibinomial(link = "logit")
+  fam <- switch(family,
+                betar = mgcv::betar(link = "logit"),
+                gaussian_logit = stats::gaussian(),
+                stats::quasibinomial(link = "logit"))
   t0 <- Sys.time()
   m <- mgcv::bam(form, family = fam, data = df, method = "fREML",
                  discrete = discrete, gamma = gamma, nthreads = nthreads,
@@ -208,7 +220,7 @@ functional_network <- function(
   set.seed(seed)
   beta <- stats::coef(m)
   B <- mgcv::rmvn(n_sim, beta, m$Vp)
-  linkinv <- m$family$linkinv
+  linkinv <- if (family == "gaussian_logit") stats::plogis else m$family$linkinv
   scale_out <- if (response_scale == "percent") 100 else 1
   arm_mu <- lapply(arm_X, function(X) linkinv(X %*% t(B)) * scale_out)
   arm_hat <- lapply(arm_X, function(X) linkinv(as.numeric(X %*% beta)) * scale_out)
