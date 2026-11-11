@@ -51,7 +51,7 @@ and \code{get_era5} by returning a daily-aggregated data frame with columns name
 to \code{nasapower} conventions.
 }
 \details{
-The function requires the \code{terra} package to read NetCDF files and the \code{tidyr} package
+The function requires the \code{terra} package (suggested, not imported) to read NetCDF files and the \code{tidyr} package
 for data reshaping. It expects NetCDF files to be named starting with the variable name
 (e.g., \code{pr_*.nc}) and to contain the variable with the same name.
 }
