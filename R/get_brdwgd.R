@@ -28,7 +28,7 @@
 #' `RH2M` (from `RH`), `longitude`, `latitude`, and `study`.
 #'
 #' @details
-#' The function requires the `terra` package to read NetCDF files and the `tidyr` package
+#' The function requires the `terra` package (suggested, not imported) to read NetCDF files and the `tidyr` package
 #' for data reshaping. It expects NetCDF files to be named starting with the variable name
 #' (e.g., `pr_*.nc`) and to contain the variable with the same name.
 #'
@@ -37,7 +37,6 @@
 #' @importFrom purrr map_dfr
 #' @importFrom progress progress_bar
 #' @importFrom tidyr pivot_wider
-#' @importFrom terra rast time extract cellFromXY nlyr
 #' @importFrom rlang .data
 #' @export
 #' @family Disease modeling
@@ -85,6 +84,10 @@ get_brdwgd <- function(data, days_around, date_col, study_col = "study",
 
     # Message for transparency
     message(paste("Processing", v, "..."))
+
+    if (!requireNamespace("terra", quietly = TRUE)) {
+      stop("Package 'terra' is required to read the BR-DWGD NetCDF files. Install it with install.packages('terra').", call. = FALSE)
+    }
 
     # Load once
     r <- terra::rast(files)

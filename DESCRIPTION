@@ -35,10 +35,11 @@ Imports:
     tidyr,
     tibble,
     httr,
-    jsonlite,
-    terra
+    jsonlite
 Suggests:
     interval,
+    terra,
+    epiR,
     testthat,
     knitr,
     rmarkdown,

@@ -345,8 +345,15 @@ with a log-linear dispersion, keeping the same random-effects structure, by
 AIC:
 
 ```{r, eval = has_models}
-fit_lin <- sad_fit(x, structure = fit$structure, dispersion = "lin")
-AIC(fit$model, fit_lin$model)
+fit_lin <- tryCatch(
+  sad_fit(x, structure = fit$structure, dispersion = "lin"),
+  error = function(e) NULL
+)
+if (!is.null(fit_lin)) {
+  AIC(fit$model, fit_lin$model)
+} else {
+  message("The log-linear dispersion model did not converge on this system.")
+}
 ```
 
 The quadratic dispersion fitted better in all five studies of the paper.
