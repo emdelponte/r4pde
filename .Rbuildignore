@@ -12,3 +12,4 @@
 ^scratch$
 
 ^CRAN-SUBMISSION$
+^cran-comments\.md$

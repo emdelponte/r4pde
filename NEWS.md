@@ -1,12 +1,3 @@
-# r4pde (development version)
-
-## New features
-- `functional_suppression_profiles()` gains `env_smooth`, `ge_term` and `k_ge`, passed to `functional_curves()` in the joint analysis across environments. `ge_term = "intercept"` or `"smooth"` adds a treatment-by-environment random intercept or factor-smooth per suppression curve, as already available for `functional_instability()`. The treatment mean suppression curves average those deviations over the environments where each treatment was observed. Defaults keep the previous model. With `by_environment = TRUE` the terms are ignored, with a warning.
-
-## Bug fixes
-- `functional_suppression_profiles()` works when the treatment column is not named `"treatment"`; the column name was hard-coded in the cluster table and in a join (also in `print()`).
-- `functional_suppression_profiles()` with `environment`: the metrics are computed from the fitted suppression curves returned to the scale of `response` (they were on the 0-1 proportion scale used internally by `functional_curves()`). `threshold` and the metrics now have the same units with and without `environment`; previously the default `threshold = 5` gave `persistence = 0` for every treatment with percent data. `protected_area` and `max_suppression` from joint fits on percent data are now 100 times larger than before.
-
 # r4pde 0.2.3
 
 ## New features
