@@ -9,6 +9,7 @@
 - glmmTMB, emmeans, lmerTest, multcompView, MASS and ggridges are suggested packages, needed only by the `sad_*` functions.
 - `functional_curves()` gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE` replaces the environment random intercept with a random environment factor-smooth, `s(time, env, bs = "fs")`, which adjusts for environments that differ in epidemic timing or shape and for treatments that are unbalanced across environments. `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment random intercept or factor-smooth per treatment x environment curve. Defaults keep the previous model. `k_env` now sets the basis dimension of the environment factor-smooth. Both factor-smooths use a first-order penalty (`m = 1`), so an environment or G x E deviation flattens out where a curve has no assessments instead of bending back up at the start of the time domain.
 - Treatment mean curves average environment factor-smooth and G x E deviations over environments instead of dropping them, because factor-smooths are not centred. The same construction is shared by `functional_rate()` and `diagnose_curves()`, so fitted rates match the curves.
+- `functional_suppression_profiles()` gains `env_smooth`, `ge_term` and `k_ge`, passed to `functional_curves()` in the joint analysis across environments. `ge_term = "intercept"` or `"smooth"` adds a treatment-by-environment random intercept or factor-smooth per suppression curve, as already available for `functional_instability()`. The treatment mean suppression curves average those deviations over the environments where each treatment was observed. Defaults keep the previous model. With `by_environment = TRUE` the terms are ignored, with a warning.
 
 ## Bug fixes
 - `functional_instability()` now predicts genotype-by-environment curves with the G x E term, averages out plot-level unit effects, and no longer fails when `functional_curves()` was fitted with `block` or `unit`. It warns when the model has no G x E term, because nFI then mainly reflects each genotype's disease level.
@@ -25,6 +26,8 @@
 - `theme_r4pde()` works without cowplot (in Suggests), falling back to a `theme_classic()`-based equivalent.
 - Documentation: `FHBWheat$i` and `$n` are the diseased and assessed plant counts used by `BPL()`; `BlastWheat$index_mean` is the wheat blast index.
 - Tests: the `CompMuCens()` test checked a non-existent element.
+- `functional_suppression_profiles()` works when the treatment column is not named `"treatment"`; the column name was hard-coded in the cluster table and in a join (also in `print()`).
+- `functional_suppression_profiles()` with `environment`: the metrics are computed from the fitted suppression curves returned to the scale of `response` (they were on the 0-1 proportion scale used internally by `functional_curves()`). `threshold` and the metrics now have the same units with and without `environment`; previously the default `threshold = 5` gave `persistence = 0` for every treatment with percent data. `protected_area` and `max_suppression` from joint fits on percent data are now 100 times larger than before.
 
 # r4pde 0.2.2
 
