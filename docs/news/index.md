@@ -1,9 +1,58 @@
 # Changelog
 
+## r4pde (development version)
+
+### New features
+
+- New
+  [`plot_model_results()`](https://emdelponte.github.io/r4pde/reference/plot_model_results.md),
+  the helper used in the book chapters on temporal compartmental models.
+  It plots the healthy, latent, infectious, removed and diseased
+  compartments of HLIR and HLIRP models (and total host tissue with host
+  growth), and disease progress and inoculum across seasons of a
+  multi-seasonal epidemic (`type = "MULTI"`). Plots are printed by
+  default and returned invisibly.
+
 ## r4pde 0.2.3
 
 ### New features
 
+- New `sad_*` family for the validation of standard area diagrams
+  (SADs), for studies with a single SAD (without and with the SAD) and
+  for comparisons of two or more SADs or conditions:
+  - [`sad_data()`](https://emdelponte.github.io/r4pde/reference/sad_data.md)
+    organises estimates in long or wide format and checks them.
+  - Conventional two-stage workflow:
+    [`sad_ccc()`](https://emdelponte.github.io/r4pde/reference/sad_ccc.md)
+    (Lin’s concordance and its components per rater),
+    [`sad_compare()`](https://emdelponte.github.io/r4pde/reference/sad_compare.md)
+    (means by condition with Tukey letters, mixed model with rater
+    random when raters are paired),
+    [`sad_reliability()`](https://emdelponte.github.io/r4pde/reference/sad_reliability.md)
+    (ICC(A,1) with confidence interval and OCC) and
+    [`sad_plots()`](https://emdelponte.github.io/r4pde/reference/sad_plots.md)
+    (exploratory figures).
+  - One-stage hierarchical model:
+    [`sad_fit()`](https://emdelponte.github.io/r4pde/reference/sad_fit.md)
+    (glmmTMB mixed model with rater intercepts and slopes per method,
+    image difficulty and severity-dependent dispersion; gaussian or
+    ordered beta),
+    [`sad_curve()`](https://emdelponte.github.io/r4pde/reference/sad_curve.md)
+    (bias, variance components and expected absolute error along the
+    severity range, and differences between conditions with simultaneous
+    bands; `type = "smooth"` fits a functional GAMM of the error
+    curves),
+    [`sad_regions()`](https://emdelponte.github.io/r4pde/reference/sad_regions.md),
+    [`sad_raters()`](https://emdelponte.github.io/r4pde/reference/sad_raters.md),
+    [`plot_sad_raters()`](https://emdelponte.github.io/r4pde/reference/sad_raters.md),
+    [`sad_images()`](https://emdelponte.github.io/r4pde/reference/sad_images.md)
+    and
+    [`sad_simulate()`](https://emdelponte.github.io/r4pde/reference/sad_simulate.md)
+    (power for planning a study).
+- New dataset `SADRustSoybean` (Franceschi et al. 2020) and vignette
+  “Validation of standard area diagrams”.
+- glmmTMB, emmeans, lmerTest, multcompView, MASS and ggridges are
+  suggested packages, needed only by the `sad_*` functions.
 - [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
   gains `env_smooth` and `ge_term` (with `k_ge`). `env_smooth = TRUE`
   replaces the environment random intercept with a random environment
@@ -13,7 +62,10 @@
   `ge_term = "intercept"` or `"smooth"` adds a genotype-by-environment
   random intercept or factor-smooth per treatment x environment curve.
   Defaults keep the previous model. `k_env` now sets the basis dimension
-  of the environment factor-smooth.
+  of the environment factor-smooth. Both factor-smooths use a
+  first-order penalty (`m = 1`), so an environment or G x E deviation
+  flattens out where a curve has no assessments instead of bending back
+  up at the start of the time domain.
 - Treatment mean curves average environment factor-smooth and G x E
   deviations over environments instead of dropping them, because
   factor-smooths are not centred. The same construction is shared by
@@ -21,6 +73,17 @@
   and
   [`diagnose_curves()`](https://emdelponte.github.io/r4pde/reference/diagnose_curves.md),
   so fitted rates match the curves.
+- [`functional_suppression_profiles()`](https://emdelponte.github.io/r4pde/reference/functional_suppression_profiles.md)
+  gains `env_smooth`, `ge_term` and `k_ge`, passed to
+  [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)
+  in the joint analysis across environments. `ge_term = "intercept"` or
+  `"smooth"` adds a treatment-by-environment random intercept or
+  factor-smooth per suppression curve, as already available for
+  [`functional_instability()`](https://emdelponte.github.io/r4pde/reference/functional_instability.md).
+  The treatment mean suppression curves average those deviations over
+  the environments where each treatment was observed. Defaults keep the
+  previous model. With `by_environment = TRUE` the terms are ignored,
+  with a warning.
 
 ### Bug fixes
 
@@ -88,6 +151,20 @@
 - Tests: the
   [`CompMuCens()`](https://emdelponte.github.io/r4pde/reference/CompMuCens.md)
   test checked a non-existent element.
+- [`functional_suppression_profiles()`](https://emdelponte.github.io/r4pde/reference/functional_suppression_profiles.md)
+  works when the treatment column is not named `"treatment"`; the column
+  name was hard-coded in the cluster table and in a join (also in
+  [`print()`](https://rdrr.io/r/base/print.html)).
+- [`functional_suppression_profiles()`](https://emdelponte.github.io/r4pde/reference/functional_suppression_profiles.md)
+  with `environment`: the metrics are computed from the fitted
+  suppression curves returned to the scale of `response` (they were on
+  the 0-1 proportion scale used internally by
+  [`functional_curves()`](https://emdelponte.github.io/r4pde/reference/functional_curves.md)).
+  `threshold` and the metrics now have the same units with and without
+  `environment`; previously the default `threshold = 5` gave
+  `persistence = 0` for every treatment with percent data.
+  `protected_area` and `max_suppression` from joint fits on percent data
+  are now 100 times larger than before.
 
 ## r4pde 0.2.2
 

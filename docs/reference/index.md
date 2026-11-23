@@ -12,6 +12,40 @@ censored metrics.
 - [`DSI2()`](https://emdelponte.github.io/r4pde/reference/DSI2.md) :
   Calculate the Disease severity Index (DSI) (frequency of each class)
 
+## Validation of standard area diagrams (SADs)
+
+Conventional two-stage validation (Lin’s concordance per rater,
+comparison between conditions, inter-rater reliability) and the
+one-stage hierarchical model with functional comparison of error curves
+along the severity range.
+
+- [`sad_data()`](https://emdelponte.github.io/r4pde/reference/sad_data.md)
+  : Prepare severity estimates for SAD validation
+- [`sad_ccc()`](https://emdelponte.github.io/r4pde/reference/sad_ccc.md)
+  : Lin's concordance statistics per rater and condition
+- [`sad_compare()`](https://emdelponte.github.io/r4pde/reference/sad_compare.md)
+  : Compare concordance statistics between conditions
+- [`sad_reliability()`](https://emdelponte.github.io/r4pde/reference/sad_reliability.md)
+  : Inter-rater reliability by condition
+- [`sad_plots()`](https://emdelponte.github.io/r4pde/reference/sad_plots.md)
+  : Exploratory plots for SAD validation
+- [`sad_fit()`](https://emdelponte.github.io/r4pde/reference/sad_fit.md)
+  : Fit the one-stage hierarchical model for SAD validation
+- [`sad_curve()`](https://emdelponte.github.io/r4pde/reference/sad_curve.md)
+  : Bias, variance components and expected error along the severity
+  range
+- [`sad_regions()`](https://emdelponte.github.io/r4pde/reference/sad_regions.md)
+  : Severity ranges where conditions differ
+- [`plot(`*`<sad_curve>`*`)`](https://emdelponte.github.io/r4pde/reference/plot.sad_curve.md)
+  : Plot curves from sad_curve()
+- [`sad_raters()`](https://emdelponte.github.io/r4pde/reference/sad_raters.md)
+  [`plot_sad_raters()`](https://emdelponte.github.io/r4pde/reference/sad_raters.md)
+  : Bias and calibration of each rater
+- [`sad_images()`](https://emdelponte.github.io/r4pde/reference/sad_images.md)
+  : Intrinsic difficulty of each image
+- [`sad_simulate()`](https://emdelponte.github.io/r4pde/reference/sad_simulate.md)
+  : Simulate power for planning a SAD validation study
+
 ## Epidemic dynamics and functional analysis
 
 Functions for fitting, differentiating, comparing, and classifying
@@ -43,6 +77,8 @@ functional disease progress curves.
   : Plot functional dendrogram of epidemic curves
 - [`plot_functional_instability()`](https://emdelponte.github.io/r4pde/reference/plot_functional_instability.md)
   : Plot method for functional instability results
+- [`plot_model_results()`](https://emdelponte.github.io/r4pde/reference/plot_model_results.md)
+  : Plot the output of temporal compartmental epidemic models
 - [`diagnose_curves()`](https://emdelponte.github.io/r4pde/reference/diagnose_curves.md)
   : Diagnostic tools for functional epidemic curve models
 - [`plot_diagnostics()`](https://emdelponte.github.io/r4pde/reference/plot_diagnostics.md)
@@ -180,6 +216,8 @@ Package plotting theme and epidemiological research datasets.
   : FusariumBanana dataset
 - [`RustSoybean`](https://emdelponte.github.io/r4pde/reference/RustSoybean.md)
   : RustSoybean dataset
+- [`SADRustSoybean`](https://emdelponte.github.io/r4pde/reference/SADRustSoybean.md)
+  : SADRustSoybean dataset
 - [`SpatialAggregated`](https://emdelponte.github.io/r4pde/reference/SpatialAggregated.md)
   : SpatialAggregated dataset
 - [`SpatialRandom`](https://emdelponte.github.io/r4pde/reference/SpatialRandom.md)

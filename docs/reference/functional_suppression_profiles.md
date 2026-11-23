@@ -17,6 +17,9 @@ functional_suppression_profiles(
   environment = NULL,
   by_environment = FALSE,
   env_ref = NULL,
+  env_smooth = FALSE,
+  ge_term = c("none", "intercept", "smooth"),
+  k_ge = 4,
   threshold = 5,
   metrics = c("protected_area", "max_suppression", "persistence", "centroid"),
   dist_method = "euclidean",
@@ -65,9 +68,38 @@ functional_suppression_profiles(
   Character string specifying the reference environment for joint
   analysis (optional).
 
+- env_smooth:
+
+  Logical; passed to
+  [`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md).
+  If `TRUE` and `environment` is given, the environment random intercept
+  is replaced by a random environment factor-smooth over time. Default
+  is `FALSE`.
+
+- ge_term:
+
+  Treatment-by-environment term passed to
+  [`functional_curves`](https://emdelponte.github.io/r4pde/reference/functional_curves.md):
+  `"none"` (default), `"intercept"` (a random intercept per treatment x
+  environment suppression curve) or `"smooth"` (a random factor-smooth
+  over time per treatment x environment curve). Requires `environment`
+  and `by_environment = FALSE`. The treatment mean suppression curves
+  average the treatment x environment deviations over the environments
+  in which each treatment was observed, as in
+  [`functional_instability`](https://emdelponte.github.io/r4pde/reference/functional_instability.md).
+
+- k_ge:
+
+  Basis dimension (over time) for the treatment x environment
+  factor-smooth used when `ge_term = "smooth"`. Default is `4`.
+
 - threshold:
 
-  Numeric threshold for the persistence metric. Default is `5`.
+  Numeric threshold for the persistence metric, in the units of
+  `response`. Default is `5`. When `environment` is given, the metrics
+  are computed from the fitted suppression curves, which are returned to
+  the scale of `response` first, so the threshold and the metrics keep
+  the same units with and without `environment`.
 
 - metrics:
 

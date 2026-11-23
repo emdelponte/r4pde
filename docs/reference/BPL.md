@@ -122,7 +122,7 @@ print(result$hypothesis_test)
 #> 1    152 23.422                           
 #> 2    151 23.385  1  0.036968 0.2387 0.6259
 print(paste("ln(Ap):", result$ln_Ap))
-#> [1] "ln(Ap): 0.315806312326608"
+#> [1] "ln(Ap): 0.315806312326611"
 print(paste("Slope (b):", result$slope))
 #> [1] "Slope (b): 1.02052263172857"
 # }

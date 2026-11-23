@@ -71,14 +71,15 @@ match `nasapower` conventions where possible: `date`, `PRECTOTCORR`
 
 ## Details
 
-The function requires the `terra` package to read NetCDF files and the
-`tidyr` package for data reshaping. It expects NetCDF files to be named
-starting with the variable name (e.g., `pr_*.nc`) and to contain the
-variable with the same name.
+The function requires the `terra` package (suggested, not imported) to
+read NetCDF files and the `tidyr` package for data reshaping. It expects
+NetCDF files to be named starting with the variable name (e.g.,
+`pr_*.nc`) and to contain the variable with the same name.
 
 ## See also
 
 Other Disease modeling:
 [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md),
 [`get_nasapower()`](https://emdelponte.github.io/r4pde/reference/get_nasapower.md),
+[`plot_model_results()`](https://emdelponte.github.io/r4pde/reference/plot_model_results.md),
 [`windowpane()`](https://emdelponte.github.io/r4pde/reference/windowpane.md)

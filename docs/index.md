@@ -7,8 +7,9 @@
 started as the companion package to the book [R for Plant Disease
 Epidemiology](https://r4pde.netlify.app/) and now also implements
 methods from recent research on the functional analysis of disease
-progress curves. It is aimed at researchers, students and practitioners
-who analyse field and greenhouse disease data.
+progress curves and on the validation of standard area diagrams. It is
+aimed at researchers, students and practitioners who analyse field and
+greenhouse disease data.
 
 ## What the package does
 
@@ -18,8 +19,9 @@ who analyse field and greenhouse disease data.
 | **Disease management** | Build Disease Suppression Profiles (DSP) for fungicides or other control measures relative to an untreated check, summarise and rank them | [`functional_contrast()`](https://emdelponte.github.io/r4pde/reference/functional_contrast.md), [`functional_summary()`](https://emdelponte.github.io/r4pde/reference/functional_summary.md), [`functional_suppression_profiles()`](https://emdelponte.github.io/r4pde/reference/functional_suppression_profiles.md), [`rank_dsp()`](https://emdelponte.github.io/r4pde/reference/rank_dsp.md), [`plot_dsp()`](https://emdelponte.github.io/r4pde/reference/plot_dsp.md) |
 | **Spatial epidemiology** | Test for aggregation (ordinary runs, join counts, binary power law), analyse foci (AFSD), count subareas, fit dispersal gradients | [`oruns_test()`](https://emdelponte.github.io/r4pde/reference/oruns_test.md), [`join_count()`](https://emdelponte.github.io/r4pde/reference/join_count.md), [`BPL()`](https://emdelponte.github.io/r4pde/reference/BPL.md), [`AFSD()`](https://emdelponte.github.io/r4pde/reference/AFSD.md), [`count_subareas()`](https://emdelponte.github.io/r4pde/reference/count_subareas.md), [`fit_gradients()`](https://emdelponte.github.io/r4pde/reference/fit_gradients.md) |
 | **Disease quantification** | Compute disease severity indices from ordinal scales and compare treatments on censored ordinal data | [`DSI()`](https://emdelponte.github.io/r4pde/reference/DSI.md), [`DSI2()`](https://emdelponte.github.io/r4pde/reference/DSI2.md), [`CompMuCens()`](https://emdelponte.github.io/r4pde/reference/CompMuCens.md) |
+| **Validation of standard area diagrams (SADs)** | Conventional analysis with Lin’s concordance per rater, comparison of conditions and inter-rater reliability; one-stage hierarchical model of all estimates, with bias, variation among raters and expected error along the severity range, functional comparison of SADs, rater and image effects, and power simulation for planning studies | [`sad_data()`](https://emdelponte.github.io/r4pde/reference/sad_data.md), [`sad_ccc()`](https://emdelponte.github.io/r4pde/reference/sad_ccc.md), [`sad_compare()`](https://emdelponte.github.io/r4pde/reference/sad_compare.md), [`sad_reliability()`](https://emdelponte.github.io/r4pde/reference/sad_reliability.md), [`sad_plots()`](https://emdelponte.github.io/r4pde/reference/sad_plots.md), [`sad_fit()`](https://emdelponte.github.io/r4pde/reference/sad_fit.md), [`sad_curve()`](https://emdelponte.github.io/r4pde/reference/sad_curve.md), [`sad_regions()`](https://emdelponte.github.io/r4pde/reference/sad_regions.md), [`sad_raters()`](https://emdelponte.github.io/r4pde/reference/sad_raters.md), [`sad_images()`](https://emdelponte.github.io/r4pde/reference/sad_images.md), [`sad_simulate()`](https://emdelponte.github.io/r4pde/reference/sad_simulate.md) |
 | **Weather and environment** | Download daily weather (NASA POWER, ERA5, BR-DWGD) and build window-pane variables for weather–disease models | [`get_nasapower()`](https://emdelponte.github.io/r4pde/reference/get_nasapower.md), [`get_era5()`](https://emdelponte.github.io/r4pde/reference/get_era5.md), [`get_brdwgd()`](https://emdelponte.github.io/r4pde/reference/get_brdwgd.md), [`windowpane()`](https://emdelponte.github.io/r4pde/reference/windowpane.md), [`windowpane_tests()`](https://emdelponte.github.io/r4pde/reference/windowpane_tests.md) |
-| **Datasets** | Real epidemiological datasets used in the book and in the examples | `BudBlightSoybean`, `RustSoybean`, `FHBWheat`, `WhiteMoldSoybean`, `SpatialAggregated`, … |
+| **Datasets** | Real epidemiological datasets used in the book and in the examples | `BudBlightSoybean`, `RustSoybean`, `FHBWheat`, `WhiteMoldSoybean`, `SpatialAggregated`, `SADRustSoybean`, … |
 
 The [reference page](https://emdelponte.github.io/r4pde/reference/)
 lists every function by family.
@@ -56,10 +58,15 @@ remotes::install_github("emdelponte/r4pde")
 - **Book:** [R for Plant Disease
   Epidemiology](https://r4pde.netlify.app/) explains the epidemiological
   concepts and uses this package throughout.
-- **Vignette:** [Functional analysis of disease progress
-  curves](https://emdelponte.github.io/r4pde/articles/functional-analysis.html)
-  walks through the full workflow, from fitting curves to resistance and
-  stability across environments.
+- **Vignettes:**
+  - [Functional analysis of disease progress
+    curves](https://emdelponte.github.io/r4pde/articles/functional-analysis.html)
+    walks through the full workflow, from fitting curves to resistance
+    and stability across environments.
+  - [Validation of standard area
+    diagrams](https://emdelponte.github.io/r4pde/articles/sad-validation.html)
+    walks through the conventional and the one-stage analysis of a SAD
+    validation study, step by step.
 - **Website:**
   [emdelponte.github.io/r4pde](https://emdelponte.github.io/r4pde/) has
   the function reference and the changelog.
