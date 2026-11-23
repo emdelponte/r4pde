@@ -73,6 +73,7 @@ reference:
       - plot_curves
       - plot_dendrogram
       - plot_functional_instability
+      - plot_model_results
       - diagnose_curves
       - plot_diagnostics
       - augment

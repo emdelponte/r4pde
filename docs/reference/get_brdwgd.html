@@ -19,7 +19,7 @@ to nasapower conventions."><meta property="og:image" content="https://emdelponte
 
     <a class="navbar-brand me-2" href="../index.html">r4pde</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.3</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.2.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,7 @@ to nasapower conventions."><meta property="og:image" content="https://emdelponte
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/functional-analysis.html">Functional analysis of plant disease progress curves</a></li>
+    <li><a class="dropdown-item" href="../articles/sad-validation.html">Validation of standard area diagrams</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -124,7 +125,7 @@ Options are "both" (default), "back", or "forth".
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function requires the <code>terra</code> package to read NetCDF files and the <code>tidyr</code> package
+    <p>The function requires the <code>terra</code> package (suggested, not imported) to read NetCDF files and the <code>tidyr</code> package
 for data reshaping. It expects NetCDF files to be named starting with the variable name
 (e.g., <code>pr_*.nc</code>) and to contain the variable with the same name.</p>
     </div>
@@ -133,6 +134,7 @@ for data reshaping. It expects NetCDF files to be named starting with the variab
     <div class="dont-index"><p>Other Disease modeling:
 <code><a href="get_era5.html">get_era5()</a></code>,
 <code><a href="get_nasapower.html">get_nasapower()</a></code>,
+<code><a href="plot_model_results.html">plot_model_results()</a></code>,
 <code><a href="windowpane.html">windowpane()</a></code></p></div>
     </div>
 
