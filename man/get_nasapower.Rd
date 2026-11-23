@@ -52,6 +52,7 @@ process, and the results are combined into a single data frame.
 Other Disease modeling: 
 \code{\link{get_brdwgd}()},
 \code{\link{get_era5}()},
+\code{\link{plot_model_results}()},
 \code{\link{windowpane}()}
 }
 \concept{Disease modeling}

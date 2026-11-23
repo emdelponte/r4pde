@@ -59,6 +59,7 @@ for data reshaping. It expects NetCDF files to be named starting with the variab
 Other Disease modeling: 
 \code{\link{get_era5}()},
 \code{\link{get_nasapower}()},
+\code{\link{plot_model_results}()},
 \code{\link{windowpane}()}
 }
 \concept{Disease modeling}

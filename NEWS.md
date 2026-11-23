@@ -1,3 +1,8 @@
+# r4pde (development version)
+
+## New features
+- New `plot_model_results()`, the helper used in the book chapters on temporal compartmental models. It plots the healthy, latent, infectious, removed and diseased compartments of HLIR and HLIRP models (and total host tissue with host growth), and disease progress and inoculum across seasons of a multi-seasonal epidemic (`type = "MULTI"`). Plots are printed by default and returned invisibly.
+
 # r4pde 0.2.3
 
 ## New features
