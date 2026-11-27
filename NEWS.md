@@ -3,6 +3,12 @@
 ## New features
 - New `plot_model_results()`, the helper used in the book chapters on temporal compartmental models. It plots the healthy, latent, infectious, removed and diseased compartments of HLIR and HLIRP models (and total host tissue with host growth), and disease progress and inoculum across seasons of a multi-seasonal epidemic (`type = "MULTI"`). Plots are printed by default and returned invisibly.
 
+## Breaking changes
+- `get_era5()`: the default of `models` changed from Open-Meteo's `"best_match"` to `"era5_land"` (ERA5-Land, 0.1 degree). Code that did not set `models` now gets ERA5-Land data, so values differ slightly from earlier runs; use `models = "best_match"` to reproduce previous results. `models` must now be one of `"era5_land"`, `"era5"`, `"era5_seamless"` or `"best_match"`.
+
+## Minor improvements
+- `get_era5()` returns two new columns, `elevation` (elevation used by Open-Meteo for the temperature correction) and `model`, warns when all values for a location are missing (ERA5-Land has no data over water; try `models = "era5"` for coastal points), returns `NA` instead of `-Inf`/`NaN` for days without data, and validates `direction`.
+
 # r4pde 0.2.3
 
 ## New features

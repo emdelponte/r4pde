@@ -10,7 +10,7 @@ get_era5(
   date_col,
   study_col = "study",
   pars = c("temperature_2m", "relative_humidity_2m", "precipitation", "dewpoint_2m"),
-  models = NULL,
+  models = c("era5_land", "era5", "era5_seamless", "best_match"),
   direction = "both"
 )
 }
@@ -30,8 +30,12 @@ in the input data frame (default: "study").}
 These are mapped to \code{nasapower} equivalents:
 "temperature_2m" (T2M), "relative_humidity_2m" (RH2M), "precipitation" (PRECTOTCORR), etc.}
 
-\item{models}{A character string specifying the reanalysis model(s) to use. If \code{NULL} (default),
-Open-Meteo uses its "best_match" logic (ERA5, ERA5-Land, etc.).}
+\item{models}{Character string with the reanalysis to use. One of
+\code{"era5_land"} (default; 0.1 degree, ~9 km, land only), \code{"era5"} (0.25 degree,
+~25 km), \code{"era5_seamless"} (ERA5-Land combined with ERA5) or \code{"best_match"}
+(Open-Meteo chooses; the source may change over time, which is not
+recommended for long series or bias correction). Use a single fixed model
+when series will be compared across years or calibrated against a reference.}
 
 \item{direction}{Character string specifying the direction of the date range relative to the reference date.
 Options are "both" (default), "back", or "forth".
@@ -42,7 +46,9 @@ Options are "both" (default), "back", or "forth".
 \value{
 A data frame (tibble) with daily weather data. Columns are named to match
 \code{nasapower} conventions: \code{date}, \code{T2M}, \code{T2M_MAX}, \code{T2M_MIN}, \code{RH2M}, \code{PRECTOTCORR},
-\code{T2MDEW}, \code{longitude}, \code{latitude}, and \code{study}.
+\code{T2MDEW}, \code{longitude}, \code{latitude}, \code{elevation}, \code{model}, and \code{study}.
+\code{elevation} is the elevation (m) Open-Meteo used for the statistical
+elevation correction of temperature (90 m DEM by default).
 }
 \description{
 This function downloads ERA5 historical weather data from the Open-Meteo API

@@ -69,3 +69,12 @@ test_that("get_nasapower validates coordinate columns without network call", {
     "Latitude column not found"
   )
 })
+
+test_that("get_era5 validates models and direction without network call", {
+  df <- data.frame(longitude = -45, latitude = -20, date = as.Date("2021-01-01"), study = 1)
+  expect_error(get_era5(df, days_around = 1, date_col = "date", models = "merra2"),
+               "should be one of")
+  expect_error(get_era5(df, days_around = 1, date_col = "date", direction = "up"),
+               "should be one of")
+  expect_identical(eval(formals(get_era5)$models)[1], "era5_land")
+})

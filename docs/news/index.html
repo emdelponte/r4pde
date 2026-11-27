@@ -54,6 +54,16 @@
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
 <ul><li>New <code><a href="../reference/plot_model_results.html">plot_model_results()</a></code>, the helper used in the book chapters on temporal compartmental models. It plots the healthy, latent, infectious, removed and diseased compartments of HLIR and HLIRP models (and total host tissue with host growth), and disease progress and inoculum across seasons of a multi-seasonal epidemic (<code>type = "MULTI"</code>). Plots are printed by default and returned invisibly.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/get_era5.html">get_era5()</a></code>: the default of <code>models</code> changed from Open-Meteo’s <code>"best_match"</code> to <code>"era5_land"</code> (ERA5-Land, 0.1 degree). Code that did not set <code>models</code> now gets ERA5-Land data, so values differ slightly from earlier runs; use <code>models = "best_match"</code> to reproduce previous results. <code>models</code> must now be one of <code>"era5_land"</code>, <code>"era5"</code>, <code>"era5_seamless"</code> or <code>"best_match"</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/get_era5.html">get_era5()</a></code> returns two new columns, <code>elevation</code> (elevation used by Open-Meteo for the temperature correction) and <code>model</code>, warns when all values for a location are missing (ERA5-Land has no data over water; try <code>models = "era5"</code> for coastal points), returns <code>NA</code> instead of <code>-Inf</code>/<code>NaN</code> for days without data, and validates <code>direction</code>.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.3" id="r4pde-023">r4pde 0.2.3<a class="anchor" aria-label="anchor" href="#r4pde-023"></a></h2>
@@ -98,7 +108,7 @@
 <li>
 <code><a href="../reference/fit_gradients.html">fit_gradients()</a></code>: <code>results_table</code> is a data frame with numeric columns; parameters are no longer rounded before back-transformation or before drawing the fitted curves. The documentation no longer claims the models are ranked.</li>
 <li>
-<code><a href="../reference/theme_r4pde.html">theme_r4pde()</a></code> works without cowplot (in Suggests), falling back to a <code><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic()</a></code>-based equivalent.</li>
+<code><a href="../reference/theme_r4pde.html">theme_r4pde()</a></code> works without cowplot (in Suggests), falling back to a <code>theme_classic()</code>-based equivalent.</li>
 <li>Documentation: <code>FHBWheat$i</code> and <code>$n</code> are the diseased and assessed plant counts used by <code><a href="../reference/BPL.html">BPL()</a></code>; <code>BlastWheat$index_mean</code> is the wheat blast index.</li>
 <li>Tests: the <code><a href="../reference/CompMuCens.html">CompMuCens()</a></code> test checked a non-existent element.</li>
 <li>

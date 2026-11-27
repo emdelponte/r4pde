@@ -73,7 +73,7 @@ to ensure all variables (including relative humidity and dew point) are availabl
 <span>  <span class="va">date_col</span>,</span>
 <span>  study_col <span class="op">=</span> <span class="st">"study"</span>,</span>
 <span>  pars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"temperature_2m"</span>, <span class="st">"relative_humidity_2m"</span>, <span class="st">"precipitation"</span>, <span class="st">"dewpoint_2m"</span><span class="op">)</span>,</span>
-<span>  models <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"era5_land"</span>, <span class="st">"era5"</span>, <span class="st">"era5_seamless"</span>, <span class="st">"best_match"</span><span class="op">)</span>,</span>
 <span>  direction <span class="op">=</span> <span class="st">"both"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -108,8 +108,12 @@ These are mapped to <code>nasapower</code> equivalents:
 
 
 <dt id="arg-models">models<a class="anchor" aria-label="anchor" href="#arg-models"></a></dt>
-<dd><p>A character string specifying the reanalysis model(s) to use. If <code>NULL</code> (default),
-Open-Meteo uses its "best_match" logic (ERA5, ERA5-Land, etc.).</p></dd>
+<dd><p>Character string with the reanalysis to use. One of
+<code>"era5_land"</code> (default; 0.1 degree, ~9 km, land only), <code>"era5"</code> (0.25 degree,
+~25 km), <code>"era5_seamless"</code> (ERA5-Land combined with ERA5) or <code>"best_match"</code>
+(Open-Meteo chooses; the source may change over time, which is not
+recommended for long series or bias correction). Use a single fixed model
+when series will be compared across years or calibrated against a reference.</p></dd>
 
 
 <dt id="arg-direction">direction<a class="anchor" aria-label="anchor" href="#arg-direction"></a></dt>
@@ -124,7 +128,9 @@ Options are "both" (default), "back", or "forth".
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame (tibble) with daily weather data. Columns are named to match
 <code>nasapower</code> conventions: <code>date</code>, <code>T2M</code>, <code>T2M_MAX</code>, <code>T2M_MIN</code>, <code>RH2M</code>, <code>PRECTOTCORR</code>,
-<code>T2MDEW</code>, <code>longitude</code>, <code>latitude</code>, and <code>study</code>.</p>
+<code>T2MDEW</code>, <code>longitude</code>, <code>latitude</code>, <code>elevation</code>, <code>model</code>, and <code>study</code>.
+<code>elevation</code> is the elevation (m) Open-Meteo used for the statistical
+elevation correction of temperature (90 m DEM by default).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

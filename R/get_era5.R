@@ -16,8 +16,12 @@
 #' @param pars A character vector specifying the weather variables to fetch from Open-Meteo.
 #' These are mapped to `nasapower` equivalents:
 #' "temperature_2m" (T2M), "relative_humidity_2m" (RH2M), "precipitation" (PRECTOTCORR), etc.
-#' @param models A character string specifying the reanalysis model(s) to use. If `NULL` (default),
-#' Open-Meteo uses its "best_match" logic (ERA5, ERA5-Land, etc.).
+#' @param models Character string with the reanalysis to use. One of
+#' `"era5_land"` (default; 0.1 degree, ~9 km, land only), `"era5"` (0.25 degree,
+#' ~25 km), `"era5_seamless"` (ERA5-Land combined with ERA5) or `"best_match"`
+#' (Open-Meteo chooses; the source may change over time, which is not
+#' recommended for long series or bias correction). Use a single fixed model
+#' when series will be compared across years or calibrated against a reference.
 #' @param direction Character string specifying the direction of the date range relative to the reference date.
 #' Options are "both" (default), "back", or "forth".
 #' "back" retrieves data from `date - days_around` to `date`.
@@ -26,7 +30,9 @@
 #'
 #' @return A data frame (tibble) with daily weather data. Columns are named to match
 #' `nasapower` conventions: `date`, `T2M`, `T2M_MAX`, `T2M_MIN`, `RH2M`, `PRECTOTCORR`,
-#' `T2MDEW`, `longitude`, `latitude`, and `study`.
+#' `T2MDEW`, `longitude`, `latitude`, `elevation`, `model`, and `study`.
+#' `elevation` is the elevation (m) Open-Meteo used for the statistical
+#' elevation correction of temperature (90 m DEM by default).
 #'
 #' @details
 #' Since the Open-Meteo Archive API `daily` endpoint does not provide all variables
@@ -52,7 +58,11 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
                        "temperature_2m", "relative_humidity_2m",
                        "precipitation", "dewpoint_2m"
                      ),
-                     models = NULL, direction = "both") {
+                     models = c("era5_land", "era5", "era5_seamless", "best_match"),
+                     direction = "both") {
+  models <- match.arg(models)
+  direction <- match.arg(direction, c("both", "back", "forth"))
+
   # Helper function to fetch and aggregate data for a single location
   get_single_era5 <- function(data_row, days_around, date_col, study_col, pars, models, direction) {
     # Dynamically extract the date column
@@ -88,7 +98,7 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
       timezone = "auto"
     )
 
-    if (!is.null(models)) query$models <- models
+    if (models != "best_match") query$models <- models
 
     # Fetch data
     res <- tryCatch(
@@ -128,6 +138,16 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
     hourly_df <- as.data.frame(json_data$hourly)
     hourly_df$date <- as.Date(hourly_df$time)
 
+    # ERA5-Land is land only: coastal/water cells may return all NA
+    if (all(vapply(json_data$hourly[pars], function(x) all(is.na(x)), logical(1)))) {
+      warning(paste0("All values are NA for location ", data_row[[lat_col]], ", ",
+                     data_row[[lon_col]], " with model '", models,
+                     "'. For coastal points try models = \"era5\"."))
+    }
+
+    # Helper to avoid -Inf/NaN when a whole day is missing
+    safe <- function(f, x) if (all(is.na(x))) NA_real_ else f(x, na.rm = TRUE)
+
     # Aggregate to daily
     # We check available columns first to avoid issues with names(.)
     avail_cols <- names(hourly_df)
@@ -135,18 +155,20 @@ get_era5 <- function(data, days_around, date_col, study_col = "study",
     daily_df <- hourly_df %>%
       dplyr::group_by(.data$date) %>%
       dplyr::summarize(
-        T2M = if ("temperature_2m" %in% avail_cols) mean(.data$temperature_2m, na.rm = TRUE) else NA_real_,
-        T2M_MAX = if ("temperature_2m" %in% avail_cols) max(.data$temperature_2m, na.rm = TRUE) else NA_real_,
-        T2M_MIN = if ("temperature_2m" %in% avail_cols) min(.data$temperature_2m, na.rm = TRUE) else NA_real_,
-        RH2M = if ("relative_humidity_2m" %in% avail_cols) mean(.data$relative_humidity_2m, na.rm = TRUE) else NA_real_,
-        PRECTOTCORR = if ("precipitation" %in% avail_cols) sum(.data$precipitation, na.rm = TRUE) else NA_real_,
-        T2MDEW = if ("dewpoint_2m" %in% avail_cols) mean(.data$dewpoint_2m, na.rm = TRUE) else NA_real_,
+        T2M = if ("temperature_2m" %in% avail_cols) safe(mean, .data$temperature_2m) else NA_real_,
+        T2M_MAX = if ("temperature_2m" %in% avail_cols) safe(max, .data$temperature_2m) else NA_real_,
+        T2M_MIN = if ("temperature_2m" %in% avail_cols) safe(min, .data$temperature_2m) else NA_real_,
+        RH2M = if ("relative_humidity_2m" %in% avail_cols) safe(mean, .data$relative_humidity_2m) else NA_real_,
+        PRECTOTCORR = if ("precipitation" %in% avail_cols) safe(sum, .data$precipitation) else NA_real_,
+        T2MDEW = if ("dewpoint_2m" %in% avail_cols) safe(mean, .data$dewpoint_2m) else NA_real_,
         .groups = "drop"
       )
 
     # Add metadata
     daily_df$longitude <- json_data$longitude
     daily_df$latitude <- json_data$latitude
+    daily_df$elevation <- if (!is.null(json_data$elevation)) json_data$elevation else NA_real_
+    daily_df$model <- models
     daily_df$study <- data_row[[study_col]]
 
     return(daily_df)
